@@ -34,6 +34,12 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS: list[str]= ["143.47.104.74", "seoseung-soo.com", "www.seoseung-soo.com"]
 
+SESSION_COOKIE_SAMESITE = "Lax"  # cross-site 허용
+SESSION_COOKIE_SECURE = True      # HTTPS 전용 쿠키 (ngrok는 https)
+CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = [
+    "https://seoseung-soo.com",
+]
 
 # Application definition
 

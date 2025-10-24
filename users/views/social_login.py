@@ -6,13 +6,17 @@ from typing import Optional
 from django.contrib import messages
 from django.contrib.auth import login
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
 
-from users.services.social_login import GoogleLoginService, NaverLoginService
+from users.services.social_login import (
+    AppleLoginService,
+    GoogleLoginService,
+    NaverLoginService,
+)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -126,3 +130,53 @@ class NaverCallbackView(View):
         login(request, user)
         return redirect("home")
 
+class AppleLoginView(View):
+    def get(self, request: HttpRequest) -> HttpResponse:
+        # CSRF 유사 공격 방지용 state
+        state = uuid.uuid4().hex
+        request.session["apple_state"] = state
+
+        login_url = AppleLoginService.get_login_url(state)
+        return redirect(login_url)
+
+@method_decorator(csrf_exempt, name="dispatch")
+class AppleCallbackView(View):
+    def post(self, request: HttpRequest) -> HttpResponse:
+        code = request.POST.get("code")
+        state = request.POST.get("state")
+        session_state = request.session.get("apple_state")
+
+        # code 확인
+        if not code:
+            return JsonResponse({
+                "error": "code 누락",
+                "raw_data": request.POST.dict(),
+            }, status=400)
+
+        # state 검증
+        if state != session_state:
+            return JsonResponse({
+                "error": "state 불일치",
+                "expected_state": session_state,
+                "received_state": state,
+            }, status=400)
+
+        # Apple 토큰 교환
+        token_payload = AppleLoginService.exchange_token(code)
+        if not token_payload or "id_token" not in token_payload:
+            return JsonResponse({
+                "error": "Apple 토큰 교환 실패",
+                "raw_response": token_payload,
+            }, status=400)
+
+        # Apple 사용자 인증
+        id_token = token_payload["id_token"]
+        user, error = AppleLoginService.authenticate_user(id_token=id_token)
+        if error or not user:
+            return JsonResponse({
+                "error": error or "사용자 인증 실패",
+            }, status=400)
+
+        login(request, user)
+
+        return render(request,"home.html")

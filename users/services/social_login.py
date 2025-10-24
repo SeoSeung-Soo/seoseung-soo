@@ -1,9 +1,11 @@
 import json
 import logging
 import os
+import time
 import urllib.parse
 from typing import Any, Dict, Optional, Tuple, cast
 
+import jwt
 import requests
 from django.conf import settings
 from django.db import transaction
@@ -331,5 +333,181 @@ class NaverLoginService:
             if not created:
                 user.naver_id = naver_id
                 user.save(update_fields=["naver_id"])
+
+        return user, None
+
+
+class AppleLoginService:
+    AUTH_URL = "https://appleid.apple.com/auth/authorize"
+    TOKEN_URL = "https://appleid.apple.com/auth/token"
+
+    @staticmethod
+    def _build_client_secret() -> str:
+        """
+        Apple OAuth client_secret(JWT) 생성
+        """
+        team_id = os.getenv("APPLE_TEAM_ID")
+        client_id = os.getenv("APPLE_CLIENT_ID")
+        key_id = os.getenv("APPLE_KEY_ID")
+        private_key = os.getenv("APPLE_PRIVATE_KEY", "").replace("\\n", "\n")
+
+        if not all([team_id, client_id, key_id, private_key]):
+            raise ValueError("Apple OAuth 환경변수가 누락되었습니다.")
+
+        iat = int(time.time())
+        exp = iat + 60 * 10
+
+        headers = {"kid": key_id, "alg": "ES256"}
+        payload = {
+            "iss": team_id,
+            "iat": iat,
+            "exp": exp,
+            "aud": "https://appleid.apple.com",
+            "sub": client_id,
+        }
+
+        return cast(str, jwt.encode(payload, private_key, algorithm="ES256", headers=headers))
+
+    @staticmethod
+    def get_login_url(state: str) -> str:
+        """
+        Apple 로그인 페이지로 리디렉션할 URL 생성
+        """
+        params = {
+            "response_type": "code",
+            "response_mode": "form_post",
+            "client_id": os.getenv("APPLE_CLIENT_ID"),
+            "redirect_uri": os.getenv("APPLE_REDIRECT_URI"),
+            "scope": "name email",
+            "state": state,
+        }
+
+        if not all([params["client_id"], params["redirect_uri"]]):
+            raise ValueError("APPLE_CLIENT_ID / APPLE_REDIRECT_URI가 설정되지 않았습니다.")
+
+        return f"{AppleLoginService.AUTH_URL}?{urllib.parse.urlencode(params)}"
+
+    @staticmethod
+    def exchange_token(code: str) -> Optional[Dict[str, Any]]:
+        client_id = os.getenv("APPLE_CLIENT_ID")
+        redirect_uri = os.getenv("APPLE_REDIRECT_URI")
+        client_secret = AppleLoginService._build_client_secret()
+
+        data = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uri": redirect_uri,
+        }
+
+        try:
+            res = requests.post(AppleLoginService.TOKEN_URL, data=data, timeout=(5, 15))
+        except Exception:
+            return None
+
+        if res.status_code != 200:
+            return None
+
+        try:
+            token_payload = res.json()
+        except ValueError:
+            return None
+
+        if not isinstance(token_payload, dict) or "error" in token_payload:
+            return None
+
+        return token_payload
+
+    @staticmethod
+    def parse_id_token(id_token: str) -> Optional[Dict[str, Any]]:
+        """
+        id_token(JWT)에서 사용자 정보 추출
+        """
+        try:
+            decoded = jwt.decode(
+                id_token,
+                options={"verify_signature": False, "verify_aud": False, "verify_iss": False},
+                algorithms=["RS256", "ES256"],
+            )
+        except Exception:
+            return None
+
+        # 최소한의 무결성 체크(iss/aud)
+        if decoded.get("iss") != "https://appleid.apple.com":
+            return None
+        if decoded.get("aud") != os.getenv("APPLE_CLIENT_ID"):
+            return None
+
+        return cast(Dict[str, Any], decoded)
+
+    @staticmethod
+    def authenticate_user(code: Optional[str] = None, id_token: Optional[str] = None) -> Tuple[
+        Optional[User], Optional[str]]:
+        """
+        Apple 로그인 인증 처리:
+        - id_token이 직접 주어지면 그대로 파싱
+        - 아니면 code를 이용해 Apple 서버에서 id_token을 교환
+        """
+        # id_token이 직접 넘어온 경우
+        if id_token:
+            id_info = AppleLoginService.parse_id_token(id_token)
+            if not id_info:
+                return None, "id_token 검증에 실패했습니다."
+        else:
+            token_payload = AppleLoginService.exchange_token(code)
+            if not token_payload:
+                return None, "애플 토큰 교환에 실패했습니다."
+            id_token = token_payload.get("id_token")
+            id_info = AppleLoginService.parse_id_token(id_token)
+
+        if not id_info:
+            return None, "id_token 파싱 실패"
+
+        sub = id_info.get("sub")
+        email = id_info.get("email")
+        if not sub or not email:
+            return None, "애플 사용자 정보(sub/email) 확인에 실패했습니다."
+
+        user_info = {"apple_id": sub, "email": email}
+        user, error = AppleLoginService.create_or_get_user(user_info)
+        if error:
+            return None, error
+
+        return user, None
+
+    @staticmethod
+    def create_or_get_user(user_info: Dict[str, Any]) -> Tuple[Optional[User], Optional[str]]:
+        if not user_info:
+            return None, "애플 사용자 정보가 비어있습니다."
+
+        apple_id = user_info.get("apple_id")
+        email = user_info.get("email") or f"{apple_id}@apple.anonymous"
+        if not apple_id:
+            return None, "애플 사용자 ID(sub)가 없습니다."
+
+        username = GoogleLoginService._generate_unique_username(email)
+
+        with transaction.atomic():
+            user = User.objects.filter(apple_id=apple_id).first()
+            if user:
+                if email and user.email != email:
+                    user.email = email
+                    user.save(update_fields=["email"])
+                return user, None
+
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    "username": username,
+                    "apple_id": apple_id,
+                    "personal_info_consent": False,
+                    "terms_of_use": False,
+                },
+            )
+
+            if not created:
+                user.apple_id = apple_id
+                user.save(update_fields=["apple_id"])
 
         return user, None
