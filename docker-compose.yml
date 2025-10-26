@@ -54,8 +54,8 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.dev.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
-      - ./static:/app/staticfiles
-      - ./media:/app/media
+      - static_volume:/app/staticfiles
+      - media_volume:/media:/app/media
     networks:
       - ss_networks
     depends_on:
