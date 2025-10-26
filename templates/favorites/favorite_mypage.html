@@ -5,7 +5,7 @@
 {% block title %}찜목록{% endblock %}
 
 {% block style %}
-<link rel="stylesheet" href="{% static 'css/users/mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/orders/order_mypage.css' %}">
 <link rel="stylesheet" href="{% static 'css/products/detail.css' %}">
 <link rel="stylesheet" href="{% static 'css/favorites/favorite_detail.css' %}">
 {% endblock %}
@@ -27,7 +27,7 @@
             <div class="menu-category">
                 <h4>주문/배송조회</h4>
                 <ul>
-                    <li><a href="{% url 'order_mypage' %}">배송현황</a></li>
+                    <li><a href="{% url 'orders' %}">배송현황</a></li>
                     <li><a href="#">취소/교환/반품 내역</a></li>
                     <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
                 </ul>

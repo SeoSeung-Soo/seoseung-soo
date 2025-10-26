@@ -1,6 +1,7 @@
 from typing import cast
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render
@@ -12,7 +13,7 @@ from users.models import User
 
 # TODO : 데이터 연동 후 데이터 수정
 @method_decorator(login_required, name='dispatch')
-class MyPageView(View):
+class OrderView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         user = cast(User, request.user)
         
@@ -35,7 +36,7 @@ class MyPageView(View):
             'user': user,
             'order_stats': order_stats,
             'cart_stats': cart_stats,
-            'current_page': 'order_mypage',
+            'current_page': 'orders',
         }
         
         return render(request, "orders/order_mypage.html", context)
@@ -52,3 +53,11 @@ class ProfileEditView(View):
         }
         
         return render(request, "users/profile_edit.html", context)
+
+class MyPageView(LoginRequiredMixin, View):
+    def get(self, request: HttpRequest) -> HttpResponse:
+        user = cast(User, request.user)
+        context = {
+            'user': user,
+        }
+        return render(request, "users/mypage.html", context)

@@ -5,7 +5,7 @@
 {% block title %}장바구니{% endblock %}
 
 {% block style %}
-<link rel="stylesheet" href="{% static 'css/users/mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/orders/order_mypage.css' %}">
 <link rel="stylesheet" href="{% static 'css/products/detail.css' %}">
 <link rel="stylesheet" href="{% static 'css/carts/cart_detail.css' %}">
 {% endblock %}
@@ -18,32 +18,40 @@
         </div>
         <div class="sidebar-menu">
             <div class="menu-category">
-                <h4>나의 정보</h4>
-                <ul>
-                    <li><a href="{% url 'profile-edit' %}">개인정보 수정</a></li>
-                </ul>
+                <div class="info-category-container">
+                    <h4>나의 정보</h4>
+                    <ul>
+                        <li><a href="{% url 'profile-edit' %}">개인정보 수정</a></li>
+                    </ul>
+                </div>
             </div>
             <div class="menu-category">
-                <h4>주문/배송조회</h4>
-                <ul>
-                    <li><a href="{% url 'order_mypage' %}">배송현황</a></li>
-                    <li><a href="#">취소/교환/반품 내역</a></li>
-                    <li><a href="{% url 'cart-detail' %}" class="active">장바구니</a></li>
-                </ul>
+                <div class="order-category-container">
+                    <h4>주문/배송조회</h4>
+                    <ul>
+                        <li><a href="{% url 'orders' %}">배송현황</a></li>
+                        <li><a href="#">취소/교환/반품 내역</a></li>
+                        <li><a href="{% url 'cart-detail' %}" class="active">장바구니</a></li>
+                    </ul>
+                </div>
             </div>
             <div class="menu-category">
-                <h4>혜택 관리</h4>
-                <ul>
-                    <li><a href="#">쿠폰/적립금</a></li>
-                </ul>
+                <div class="benefit-category-container">
+                    <h4>혜택 관리</h4>
+                    <ul>
+                        <li><a href="#">쿠폰/적립금</a></li>
+                    </ul>
+                </div>
             </div>
             <div class="menu-category">
-                <h4>활동 내역</h4>
-                <ul>
-                    <li><a href={% url 'favorite-list' %}>찜한 상품</a></li>
-                    <li><a href="#">최근 본 상품</a></li>
-                    <li><a href="#">나의 후기</a></li>
-                </ul>
+                <div class="activity-category-container">
+                    <h4>활동 내역</h4>
+                    <ul>
+                        <li><a href={% url 'favorite-list' %}>찜한 상품</a></li>
+                        <li><a href="#">최근 본 상품</a></li>
+                        <li><a href="#">나의 후기</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

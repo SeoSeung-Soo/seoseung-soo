@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}마이페이지{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/users/mypage.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="mypage-container">
+    <div class="main-content">
+        <div class="user-profile-section">
+            <div class="profile-header">
+                <div class="profile-info">
+                    <div class="user-name-container">
+                        <p class="user-name">{{ user.first_name|default:user.username }}</p>
+                        <p class="user-welcome">님, 안녕하세요!</p>
+                    </div>
+                    <p class="profile-email">{{ user.email }}</p>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">포인트</span>
+                        <span class="stat-value">{{ user.points|default:0 }}P</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">쿠폰</span>
+                        <span class="stat-value">{{ user.coupons|default:0 }}개</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="desktop-mypage-container">
+            <div class="desktop-mypage-category">
+                <div class="desktop-mypage-info-container">
+                    <h4>나의 정보</h4>
+                    <ul>
+                        <li><a href="{% url 'profile-edit' %}">개인정보 수정</a></li>
+                    </ul>
+                </div>
+                <div class="desktop-mypage-order-container">
+                    <h4>주문/배송조회</h4>
+                        <ul>
+                        <li><a href="{% url 'orders' %}">배송현황</a></li>
+                        <li><a href="#">취소/교환/반품 내역</a></li>
+                        <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
+                    </ul>
+                </div>
+                <div class="desktop-mypage-benefit-container">
+                    <h4>혜택 관리</h4>
+                    <ul>
+                        <li><a href="#">쿠폰/적립금</a></li>
+                    </ul>
+                </div>
+                <div class="desktop-mypage-activity-container">
+                    <h4>활동 내역</h4>
+                    <ul>
+                        <li><a href={% url 'favorite-list' %}>찜한 상품</a></li>
+                        <li><a href="#">최근 본 상품</a></li>
+                        <li><a href="#">나의 후기</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mobile-mypage-container">
+        <div class="mobile-category">
+            <div class="mobile-info-container">
+                <h4>나의 정보</h4>
+                <ul>
+                    <li><a href="{% url 'profile-edit' %}">개인정보 수정</a></li>
+                </ul>
+            </div>
+            <div class="mobile-order-container">
+                <h4>주문/배송조회</h4>
+                <ul>
+                    <li><a href="{% url 'orders' %}">배송현황</a></li>
+                    <li><a href="#">취소/교환/반품 내역</a></li>
+                    <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
+                </ul>
+            </div>
+            <div class="mobile-benefit-container">
+                <h4>혜택 관리</h4>
+                <ul>
+                    <li><a href="#">쿠폰/적립금</a></li>
+                </ul>
+            </div>
+            <div class="mobile-activity-container">
+                <h4>활동 내역</h4>
+                <ul>
+                    <li><a href={% url 'favorite-list' %}>찜한 상품</a></li>
+                    <li><a href="#">최근 본 상품</a></li>
+                    <li><a href="#">나의 후기</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

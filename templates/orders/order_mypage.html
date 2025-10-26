@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}마이페이지{% endblock %}
+{% block title %}주문 현황{% endblock %}
 
 {% block style %}
-<link rel="stylesheet" href="{% static 'css/users/mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/orders/order_mypage.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -15,94 +15,101 @@
         </div>
         <div class="sidebar-menu">
             <div class="menu-category">
-                <h4>나의 정보</h4>
-                <ul>
-                    <li><a href="{% url 'profile-edit' %}">개인정보 수정</a></li>
-                </ul>
+                <div class="info-category-container">
+                    <h4>나의 정보</h4>
+                    <ul>
+                        <li><a href="{% url 'profile-edit' %}">개인정보 수정</a></li>
+                    </ul>
+                </div>
             </div>
             <div class="menu-category">
-                <h4>주문/배송조회</h4>
+                <div class="order-category-container">
+                    <h4>주문/배송조회</h4>
                 <ul>
-                    <li><a href="{% url 'order_mypage' %}" class="active">배송현황</a></li>
+                    <li><a href="{% url 'orders' %}" class="active">배송현황</a></li>
                     <li><a href="#">취소/교환/반품 내역</a></li>
                     <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
                 </ul>
+                </div>
             </div>
             <div class="menu-category">
-                <h4>혜택 관리</h4>
+                <div class="benefit-category-container">
+                    <h4>혜택 관리</h4>
                 <ul>
                     <li><a href="#">쿠폰/적립금</a></li>
                 </ul>
+                </div>
             </div>
             <div class="menu-category">
-                <h4>활동 내역</h4>
+                <div class="activity-category-container">
+                    <h4>활동 내역</h4>
                 <ul>
                     <li><a href={% url 'favorite-list' %}>찜한 상품</a></li>
                     <li><a href="#">최근 본 상품</a></li>
                     <li><a href="#">나의 후기</a></li>
                 </ul>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 우측 메인 콘텐츠 -->
     <div class="main-content">
         <div class="mypage-container">
-        <!-- 주문처리 현황 -->
-        <div class="order-status-section">
-            <div class="section-header">
-                <h3>나의 주문처리 현황</h3>
+            <div class="order-status-section">
+                <div class="section-header">
+                    <h3>나의 주문처리 현황</h3>
+                </div>
+                <div class="order-stats">
+                    <div class="stat-box">
+                        <div class="stat-number">{{ order_stats.pending }}</div>
+                        <div class="stat-label">입금전</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{{ order_stats.preparing }}</div>
+                        <div class="stat-label">배송준비중</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{{ order_stats.shipping }}</div>
+                        <div class="stat-label">배송중</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{{ order_stats.delivered }}</div>
+                        <div class="stat-label">배송완료</div>
+                    </div>
+                </div>
             </div>
-            <div class="order-stats">
-                <div class="stat-box">
-                    <div class="stat-number">{{ order_stats.pending }}</div>
-                    <div class="stat-label">입금전</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">{{ order_stats.preparing }}</div>
-                    <div class="stat-label">배송준비중</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">{{ order_stats.shipping }}</div>
-                    <div class="stat-label">배송중</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">{{ order_stats.delivered }}</div>
-                    <div class="stat-label">배송완료</div>
-                </div>
-            </div>
-        </div>
 
-        <div class="benefits-section">
-            <div class="benefits-stats">
-                <div class="benefit-item">
-                    <a href="#" class="benefit-label">취소</a>
-                    <a href="#" class="benefit-value">{{ cart_stats.items }}</a>
-                </div>
-                <div class="benefit-item">
-                    <a href="#" class="benefit-label">교환</a>
-                    <a href="#" class="benefit-value">{{ cart_stats.likes }}</a>
-                </div>
-                <div class="benefit-item">
-                    <a href="#" class="benefit-label">반품</a>
-                    <a href="#" class="benefit-value">{{ cart_stats.reviews }}</a>
+            <div class="benefits-section">
+                <div class="benefits-stats">
+                    <div class="benefit-item">
+                        <a href="#" class="benefit-label">취소</a>
+                        <a href="#" class="benefit-value">{{ cart_stats.items }}</a>
+                    </div>
+                    <div class="benefit-item">
+                        <a href="#" class="benefit-label">교환</a>
+                        <a href="#" class="benefit-value">{{ cart_stats.likes }}</a>
+                    </div>
+                    <div class="benefit-item">
+                        <a href="#" class="benefit-label">반품</a>
+                        <a href="#" class="benefit-value">{{ cart_stats.reviews }}</a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="recent-orders-section">
-            <div class="section-header">
-                <h3>최근 주문 내역</h3>
-                <a href="#" class="view-all">전체보기 ></a>
-            </div>
-            <div class="order-table">
-                <div class="table-header">
-                    <div class="col">주문번호</div>
-                    <div class="col">주문일시</div>
-                    <div class="col">주문자</div>
+            <div class="recent-orders-section">
+                <div class="section-header">
+                    <h3>최근 주문 내역</h3>
+                    <a href="#" class="view-all">전체보기 ></a>
                 </div>
-                <div class="no-orders">
-                    <p>주문 내역이 없습니다.</p>
+                <div class="order-table">
+                    <div class="table-header">
+                        <div class="col">주문번호</div>
+                        <div class="col">주문일시</div>
+                        <div class="col">주문자</div>
+                    </div>
+                    <div class="no-orders">
+                        <p>주문 내역이 없습니다.</p>
+                    </div>
                 </div>
             </div>
         </div>
