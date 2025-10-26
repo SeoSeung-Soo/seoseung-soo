@@ -5,7 +5,7 @@ from users.views.check_duplicate import CheckDuplicateView
 from users.views.consent import PersonalInfoConsent
 from users.views.kakao_callback import KakaoCallbackView
 from users.views.login import LogoutView
-from users.views.mypage import OrderView, ProfileEditView, MyPageView
+from users.views.mypage import MyPageView, OrderView, ProfileEditView
 from users.views.signup import SignupView
 from users.views.social_login import GoogleLoginView, NaverCallbackView, NaverLoginView
 

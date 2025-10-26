@@ -34,6 +34,7 @@ class ProductCreateView(AdminPermission, View):
             
             images = request.FILES.getlist('image')
             if images:
+                # TODO: i 변수를 사용하고 있지않음 확인 후 수정 필요
                 for i, image in enumerate(images):
                     product_image = ProductImage.objects.create(image=image)
                     product.image.add(product_image)

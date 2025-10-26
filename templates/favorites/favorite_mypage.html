@@ -71,7 +71,7 @@
                         
                         <div class="item-info">
                             <h4 class="item-name">
-                                <a href="{% url 'products-detail' favorite.product.id %}">{{ favorite.product.name }}</a>
+                                <a href="{% url 'products-detail' favorite.product.name %}">{{ favorite.product.name }}</a>
                             </h4>
                             <div class="item-description">{{ favorite.product.description|truncatechars:100 }}</div>
                             

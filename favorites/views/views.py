@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 
 from favorites.forms.favorite import FavoriteForm
+from favorites.models import Favorite
 from favorites.services.favorite_service import FavoriteService
 from users.models import User
 
@@ -25,7 +26,7 @@ class FavoriteCreateView(LoginRequiredMixin, View):
         if form.is_valid():
             product_id = form.cleaned_data['product_id']
             result = FavoriteService.toggle_favorite(user, product_id)
-            
+
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse(result)
             else:
@@ -50,24 +51,24 @@ class FavoriteCreateView(LoginRequiredMixin, View):
 class FavoriteDeleteView(LoginRequiredMixin, View):
     def post(self, request: HttpRequest) -> HttpResponse:
         user = cast(User, request.user)
-        
+
         favorite_id = request.POST.get('favorite_id')
         if favorite_id:
             try:
-                from favorites.models import Favorite
                 favorite = Favorite.objects.get(id=favorite_id, user=user)
-                favorite.delete()
-                
+                favorite.is_active = False
+                favorite.save()
+
                 result = {
                     'success': True,
                     'message': '찜목록에서 제거되었습니다.',
-                    'is_favorite': False
+                    'is_active': False
                 }
             except Favorite.DoesNotExist:
                 result = {
                     'success': False,
                     'message': '찜한 상품을 찾을 수 없습니다.',
-                    'is_favorite': False
+                    'is_active': False
                 }
         else:
             form = FavoriteForm(request.POST)
@@ -78,7 +79,7 @@ class FavoriteDeleteView(LoginRequiredMixin, View):
                 result = {
                     'success': False,
                     'message': '잘못된 요청입니다.',
-                    'is_favorite': False
+                    'is_active': False
                 }
         
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
