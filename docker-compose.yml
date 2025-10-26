@@ -1,5 +1,5 @@
 services:
-  web:
+  django:
     container_name: django
     build:
       context: .
@@ -9,7 +9,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - static_volume:/app/static
+      - static_volume:/app/staticfiles
       - media_volume:/app/media
     depends_on:
       db:
@@ -46,20 +46,20 @@ services:
     networks:
       - ss_networks
 
-  nginx:
-    image: nginx:latest
-    container_name: nginx
+  openresty:
+    image: openresty/openresty:alpine-apk
+    container_name: openresty
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
-      - ./static:/app/static
+      - ./nginx/nginx.dev.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./static:/app/staticfiles
       - ./media:/app/media
     networks:
       - ss_networks
     depends_on:
-      web:
+      django:
         condition: service_healthy
     restart: unless-stopped
 
