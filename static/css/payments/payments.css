@@ -1,0 +1,1106 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    color: #1b1b1b;
+}
+
+.payment-container {
+    max-width: 1200px;
+    padding: 0 20px;
+    display: grid;
+    gap: 40px;
+}
+
+/* 배송 정보 입력란 (회원가입 스타일) */
+.delivery-info-container {
+    margin-top: 40px;
+    background: #ffffff1a;
+    padding: 10px 120px;
+    border-radius: 8px;
+}
+
+.order-items-container{
+    background: #ffffff1a;
+    padding: 10px 120px;
+    border-radius: 8px;
+}
+
+.payment-info-container{
+    background: #ffffff1a;
+    padding: 10px 120px;
+    border-radius: 8px;
+}
+
+.payment-method-container{
+    background: #ffffff1a;
+    padding: 10px 120px;
+    border-radius: 8px;
+}
+.payment-button-container{
+    background: #ffffff1a;
+    padding: 10px 120px;
+    border-radius: 8px;
+}
+
+.delivery-header {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.delivery-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.delivery-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.delivery-form .form-row {
+    display: flex;
+    min-height: 60px;
+    align-items: center;
+    padding: 15px 0;
+}
+
+.delivery-form .form-label-cell {
+    width: 150px;
+    padding-right: 10px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.delivery-form .form-input-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+}
+
+.delivery-form .form-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+.delivery-form .required {
+    color: #ef4444;
+    margin-left: 1px;
+}
+
+.delivery-form .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e1e5e9;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+.delivery-form .form-input:focus {
+    outline: none;
+    border-color: #1b1b1b;
+}
+
+.delivery-form .phone-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.delivery-form .phone-input {
+    width: 80px;
+    padding: 10px 8px;
+    border: 1px solid #e1e5e9;
+    font-size: 14px;
+    text-align: center;
+    background: #fff;
+    height: 38px;
+    box-sizing: border-box;
+}
+
+.delivery-form .phone-input:focus {
+    outline: none;
+    border-color: #1b1b1b;
+}
+
+.delivery-form .phone-separator {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.delivery-form .email-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.delivery-form .email-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e1e5e9;
+    font-size: 14px;
+    background: #fff;
+}
+
+.delivery-form .email-at {
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+}
+
+.delivery-form .email-domain {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e1e5e9;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+}
+
+.delivery-form .checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 0;
+}
+
+.delivery-form .checkbox-input {
+    width: 16px;
+    height: 16px;
+    accent-color: #1b1b1b;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.delivery-form .checkbox-text {
+    color: #333;
+    font-size: 13px;
+}
+
+.delivery-form .address-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.delivery-form .postal-code-section {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.delivery-form .postal-code-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e1e5e9;
+    font-size: 14px;
+    background: #f8f9fa;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.delivery-form .address-search-btn {
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border: 1px solid #e1e5e9;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1b1b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.delivery-form .address-search-btn:hover {
+    background: #e9ecef;
+    border-color: #1b1b1b;
+}
+
+.delivery-form .address-input {
+    padding: 12px 16px;
+    border: 1px solid #e1e5e9;
+    font-size: 14px;
+    background: #f8f9fa;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.delivery-form .detail-address-input {
+    padding: 12px 16px;
+    border: 1px solid #e1e5e9;
+    font-size: 14px;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.delivery-form .detail-address-input:focus {
+    outline: none;
+    border-color: #1b1b1b;
+}
+
+.order-form {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.form-section {
+    padding: 0px 32px;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1b1b1b;
+    margin: 0 0 24px 0;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1b1b;
+    margin-bottom: 8px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    color: #333;
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #1b1b1b;
+}
+
+.phone-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.phone-select {
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    min-width: 80px;
+}
+
+.phone-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.email-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.email-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+}
+
+.email-at {
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+}
+
+.email-domain {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+}
+
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.form-checkbox {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+}
+
+.checkbox-text {
+    font-size: 14px;
+    color: #666;
+}
+
+.order-items {
+    margin-top: 16px;
+}
+
+.order-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px 0;
+    border-bottom: 1px solid #f0f0f0;
+    position: relative;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.item-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 14px;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1b1b1b;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.item-options {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.item-quantity {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.item-discount {
+    font-size: 14px;
+    color: #e74c3c;
+    margin-bottom: 8px;
+}
+
+.item-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.current-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1b1b1b;
+}
+
+.original-price {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.remove-item {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s ease;
+}
+
+.remove-item:hover {
+    color: #e74c3c;
+}
+
+.shipping-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 24px;
+}
+
+.shipping-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.shipping-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1b1b;
+}
+
+.discount-section {
+    margin-top: 24px;
+}
+
+.discount-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1b1b1b;
+    margin: 0 0 16px 0;
+}
+
+.discount-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.discount-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.discount-select {
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.coupon-section {
+    margin-top: 16px;
+}
+
+.coupon-label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.coupon-input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.coupon-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.coupon-btn {
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1b1b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.coupon-btn:hover {
+    background: #e9ecef;
+}
+
+.payment-methods {
+    margin-top: 16px;
+}
+
+.payment-method {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border: 2px solid #f0f0f0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.payment-method:hover {
+    border-color: #1b1b1b;
+}
+
+.payment-method.selected {
+    border-color: #1b1b1b;
+    background: #f8f9fa;
+}
+
+.payment-method input[type="radio"] {
+    display: none;
+}
+
+.payment-method-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1b1b1b;
+}
+
+.payment-method-desc {
+    font-size: 14px;
+    color: #666;
+    margin-left: 8px;
+}
+
+.card-dropdown-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    margin-bottom: 0;
+}
+
+.card-dropdown-container.show {
+    max-height: 200px;
+    margin-bottom: 12px;
+}
+
+.card-dropdown {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+    border-radius: 8px;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+    pointer-events: none;
+}
+
+.card-dropdown-container.show .card-dropdown {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.card-option {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+    transform: translateY(-4px);
+    opacity: 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.card-option:last-child {
+    border-bottom: none;
+}
+
+.card-dropdown-container.show .card-option {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.card-dropdown-container.show .card-option:nth-child(1) {
+    transition-delay: 0.1s;
+}
+
+.card-dropdown-container.show .card-option:nth-child(2) {
+    transition-delay: 0.15s;
+}
+
+.card-dropdown-container.show .card-option:nth-child(3) {
+    transition-delay: 0.2s;
+}
+
+.card-option:hover {
+    background-color: #f8f9fa;
+}
+
+.card-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 16px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+}
+
+.kakao-icon {
+    background: #FEE500;
+    color: #3C1E1E;
+}
+
+.toss-icon {
+    background: #0064FF;
+}
+
+.naver-icon {
+    background: #03C75A;
+}
+
+.card-option span {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1b1b1b;
+}
+
+.payment-section {
+    text-align: center;
+}
+
+.payment-button {
+    width: 70%;
+    background: #1b1b1b;
+    color: white;
+    border: none;
+    padding: 15px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-bottom: 16px;
+}
+
+.payment-button:hover {
+    background: #333;
+}
+
+.payment-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.terms-agreement {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.terms-agreement a {
+    color: #1b1b1b;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .payment-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin: 20px auto;
+        padding: 0 16px;
+    }
+    
+    .delivery-info-container {
+        background: #ffffff1a;
+        padding: 20px 18px;
+        margin-bottom: 20px;
+    }
+    
+    .delivery-title {
+        font-size: 18px;
+    }
+    
+    .delivery-form .form-row {
+        flex-direction: column;
+        min-height: auto;
+        padding: 8px 0;
+    }
+    
+    .delivery-form .form-label-cell {
+        width: 100%;
+        padding-right: 0;
+        margin-bottom: 6px;
+        font-size: 10px;
+    }
+    
+    .delivery-form .form-input-cell {
+        width: 100%;
+    }
+    
+    .delivery-form .form-input {
+        padding: 12px 14px;
+        font-size: 15px;
+    }
+    
+    .delivery-form .phone-input {
+        height: 38px;
+        padding: 10px 8px;
+        font-size: 15px;
+    }
+    
+    .delivery-form .form-label {
+        font-size: 13px;
+    }
+    
+    .delivery-form .checkbox-text {
+        font-size: 11px;
+    }
+    
+    .delivery-form .postal-code-section {
+        flex-direction: row;
+        gap: 6px;
+    }
+    
+    .delivery-form .postal-code-input {
+        flex: 2;
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    
+    .delivery-form .address-search-btn {
+        flex: 1;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .form-section {
+        padding: 24px 20px;
+    }
+    
+    .phone-input-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .phone-select {
+        width: 100%;
+    }
+    
+    .email-input-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .email-at {
+        display: none;
+    }
+    
+    .order-item {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    
+    .item-image {
+        width: 70px;
+        height: 70px;
+        margin-right: 16px;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+    
+    .remove-item {
+        position: static;
+        margin-top: 16px;
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .payment-container {
+        padding: 0 12px;
+        margin: 15px auto;
+    }
+    
+    .delivery-info-container,
+    .order-items-container,
+    .payment-info-container,
+    .payment-method-container,
+    .payment-button-container {
+        padding: 15px 12px;
+        margin-bottom: 15px;
+    }
+    
+    .delivery-title {
+        font-size: 16px;
+    }
+    
+    .delivery-form .form-row {
+        padding: 6px 0;
+    }
+    
+    .delivery-form .form-label-cell {
+        margin-bottom: 4px;
+    }
+    
+    .delivery-form .form-label {
+        font-size: 12px;
+    }
+    
+    .delivery-form .form-input {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    
+    .delivery-form .phone-input {
+        height: 34px;
+        padding: 8px 6px;
+        font-size: 14px;
+    }
+    
+    .delivery-form .phone-separator {
+        font-size: 12px;
+    }
+    
+    .delivery-form .email-at {
+        font-size: 14px;
+    }
+    
+    .delivery-form .checkbox-text {
+        font-size: 10px;
+    }
+    
+    .delivery-form .address-search-btn {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .form-section {
+        padding: 15px 12px;
+    }
+    
+    .section-title {
+        font-size: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .order-item {
+        padding: 16px 0;
+        align-items: flex-start;
+    }
+    
+    .item-image {
+        width: 80px;
+        height: 80px;
+        margin-right: 14px;
+        flex-shrink: 0;
+    }
+    
+    .item-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .item-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: #1b1b1b;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+    
+    .item-options {
+        font-size: 11px;
+        color: #666;
+        margin-bottom: 4px;
+    }
+    
+    .item-quantity {
+        font-size: 11px;
+        color: #666;
+        margin-bottom: 4px;
+    }
+    
+    .item-discount {
+        font-size: 11px;
+        color: #e74c3c;
+        margin-bottom: 8px;
+    }
+    
+    .item-price {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .current-price {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1b1b1b;
+    }
+    
+    .original-price {
+        font-size: 12px;
+        color: #999;
+        text-decoration: line-through;
+    }
+    
+    .remove-item {
+        position: absolute;
+        top: 16px;
+        right: 0;
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: #999;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: color 0.2s ease;
+    }
+    
+    .remove-item:hover {
+        color: #e74c3c;
+    }
+    
+    .shipping-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 24px;
+    }
+    
+    .shipping-label {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .shipping-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1b1b1b;
+    }
+    
+    .discount-title {
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+    
+    .discount-item {
+        margin-bottom: 12px;
+    }
+    
+    .discount-label {
+        font-size: 13px;
+    }
+    
+    .discount-select {
+        padding: 8px 10px;
+        font-size: 13px;
+        min-width: 100px;
+    }
+    
+    .coupon-label {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+    
+    .coupon-input {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .coupon-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .payment-method {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+    
+    .payment-method-label {
+        font-size: 14px;
+    }
+    
+    .payment-method-desc {
+        font-size: 12px;
+        margin-left: 6px;
+    }
+    
+    .card-option {
+        padding: 12px 16px;
+    }
+    
+    .card-icon {
+        width: 28px;
+        height: 28px;
+        margin-right: 12px;
+        font-size: 14px;
+    }
+    
+    .card-option span {
+        font-size: 14px;
+    }
+    
+    .payment-button {
+        width: 100%;
+        font-size: 15px;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+    }
+    
+    .terms-agreement {
+        font-size: 11px;
+        margin-top: 12px;
+    }
+}

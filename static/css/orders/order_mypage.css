@@ -1,0 +1,265 @@
+.mypage-layout {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 50px;
+    gap: 30px;
+    min-height: calc(100vh - 200px);
+}
+
+.sidebar {
+    width: 280px;
+    background: white;
+    padding: 40px;
+    height: fit-content;
+}
+
+.sidebar-header {
+    padding: 24px;
+}
+
+.sidebar-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.sidebar-menu {
+    padding: 20px 0;
+    border-top: 1px solid #f0f0f0;
+}
+
+.menu-category {
+    margin-bottom: 24px;
+}
+
+.menu-category h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    margin: 0 0 12px 24px;
+    text-transform: uppercase;
+}
+
+.menu-category ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-category li {
+    margin: 0;
+}
+
+.menu-category a {
+    display: block;
+    padding: 12px 24px;
+    color: #6a6a6a;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.menu-category a:hover {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.menu-category a.active {
+    background-color: #f8f9fa;
+    color: #1b1b1b;
+    border-left-color: #1b1b1b;
+    font-weight: 600;
+}
+
+/* 우측 메인 콘텐츠 */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+
+.order-status-section,
+.benefits-section,
+.recent-orders-section {
+    background: white;
+    padding: 24px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.section-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.view-all {
+    font-size: 14px;
+    color: #1b1b1b;
+    text-decoration: none;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+.order-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 20px;
+    transition: all 0.2s ease;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1b1b1b;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.benefits-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.benefit-item {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+a.benefit-label {
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+}
+
+.benefit-value {
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.order-table {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.table-header .col {
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    text-align: center;
+}
+
+.no-orders {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+}
+
+.no-orders p {
+    margin: 0;
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .user-header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .order-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .stat-box {
+        padding: 16px;
+    }
+
+    .stat-number {
+        font-size: 24px;
+    }
+
+    .benefits-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .table-header {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-menu {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .mypage-layout {
+        flex-direction: column;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 20px;
+        order: 2;
+    }
+
+    .main-content {
+        order: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        display: none;
+    }
+    .mypage-layout {
+        padding: 12px;
+    }
+    .order-stats {
+        grid-template-columns: 1fr;
+    }
+}

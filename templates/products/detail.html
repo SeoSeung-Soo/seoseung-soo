@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{% static 'css/products/detail.css' %}">
 <link rel="stylesheet" href="{% static 'css/products/product_description.css' %}">
 <link rel="stylesheet" href="{% static 'css/products/review.css' %}">
+<link rel="stylesheet" href="{% static 'css/products/review_3d.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -120,7 +121,9 @@
     <div class="product-description-or-review-container">
         <div class="product-description-or-review-toggle">
             <button class="tab-button active" data-tab="description">상품 상세내용</button>
+            {% if reviews.count > 0 %}
             <button class="tab-button" data-tab="review">리뷰</button>
+            {% endif %}
             <button class="tab-button" data-tab="ai-agent">AI 에이전트</button>
         </div>
         
@@ -169,6 +172,51 @@
                 <div class="review-content-detail">
                     <h3>상품 리뷰</h3>
                 </div>
+                
+                <!-- 3D 리뷰 구체 인터페이스 -->
+                {% if review_count > 0 %}
+                <div class="review-sphere-container">
+                    <div class="review-spheres">
+                        {% for review in reviews %}
+                        <div class="review-sphere" data-review-id="{{ review.id }}">
+                            <span class="avatar-text">{{ review.get_masked_username|slice:":1"|upper }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="sphere-controls">
+                        <button class="control-btn auto-rotate-btn">자동 회전</button>
+                        <button class="control-btn reset-btn">위치 초기화</button>
+                    </div>
+                    
+                    <div class="review-detail-panel">
+                        <div class="panel-header">
+                            <h3>리뷰 상세</h3>
+                            <button class="close-panel">×</button>
+                        </div>
+                        <div class="panel-content">
+                            {% for review in reviews %}
+                            <div class="review-content-item" data-review-index="{{ forloop.counter0 }}">
+                                <div class="review-header">
+                                    <div class="reviewer-name">{{ review.get_masked_username }}</div>
+                                    <div class="review-rating">{{ review.get_star_display }}</div>
+                                    <div class="review-date">{{ review.created_at|date:"Y.m.d" }}</div>
+                                </div>
+                                <div class="review-text">{{ review.content }}</div>
+                                {% if review.images.all %}
+                                <div class="review-images">
+                                    {% for image in review.images.all %}
+                                    <img src="{{ image.image.url }}" alt="리뷰 이미지">
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
                 <div class="review-content">
 
                     <div class="review-summary">
@@ -202,7 +250,7 @@
                             {% csrf_token %}
                             
                             <div class="form-group">
-                                <label for="id_rating">{{ review_form.rating.label }}</label>
+                                <span class="form-label">{{ review_form.rating.label }}</span>
                                 <div class="rating-select">
                                     <input type="radio" id="rating-5" name="rating" value="5" checked>
                                     <label for="rating-5">★</label>
@@ -221,7 +269,7 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="id_content">{{ review_form.content.label }}</label>
+                                <label for="{{ review_form.content.id_for_label }}">{{ review_form.content.label }}</label>
                                 {{ review_form.content }}
                                 {% if review_form.content.errors %}
                                     <div class="error-message">{{ review_form.content.errors }}</div>
@@ -229,7 +277,7 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="id_image">{{ review_image_form.image.label }} (선택사항)</label>
+                                <label for="{{ review_image_form.image.id_for_label }}">{{ review_image_form.image.label }} (선택사항)</label>
                                 {{ review_image_form.image }}
                                 <small class="form-hint">최대 5개의 이미지를 업로드할 수 있습니다.</small>
                                 {% if review_image_form.image.errors %}

@@ -1,0 +1,428 @@
+/* 마이페이지 레이아웃 */
+.mypage-layout {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 50px;
+    gap: 30px;
+    min-height: calc(100vh - 200px);
+}
+
+/* 좌측 사이드바 */
+.sidebar {
+    width: 280px;
+    background: white;
+    padding: 40px;
+    height: fit-content;
+}
+
+.sidebar-header {
+    padding: 24px;
+}
+
+.sidebar-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.sidebar-menu {
+    padding: 20px 0;
+    border-top: 1px solid #f0f0f0;
+}
+
+.menu-category {
+    margin-bottom: 24px;
+}
+
+.menu-category h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    margin: 0 0 12px 24px;
+    text-transform: uppercase;
+}
+
+.menu-category ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-category li {
+    margin: 0;
+}
+
+.menu-category a {
+    display: block;
+    padding: 12px 24px;
+    color: #6a6a6a;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.menu-category a:hover {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.menu-category a.active {
+    background-color: #f8f9fa;
+    color: #1b1b1b;
+    border-left-color: #1b1b1b;
+    font-weight: 600;
+}
+
+/* 우측 메인 콘텐츠 */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.honorific {
+    font-weight: 400;
+    color: #666;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-item .label {
+    font-size: 12px;
+    color: #666;
+}
+
+.stat-item .value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.stat-divider {
+    color: #ddd;
+    font-size: 14px;
+}
+
+/* 섹션 공통 스타일 */
+.order-status-section,
+.benefits-section,
+.recent-orders-section {
+    background: white;
+    padding: 24px;
+}
+
+/*.benefits-section {*/
+/*    border-bottom: 1px solid #f0f0f0;*/
+/*    background: white;*/
+/*    padding: 24px;*/
+/*}*/
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.section-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.period {
+    font-size: 12px;
+    color: #999;
+    background-color: #f8f9fa;
+    padding: 4px 8px;
+}
+
+.view-all {
+    font-size: 14px;
+    color: #1b1b1b;
+    text-decoration: none;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+/* 주문처리 현황 */
+.order-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 20px;
+    transition: all 0.2s ease;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1b1b1b;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* 쇼핑혜택 안내 */
+.benefits-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.benefit-item {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+a.benefit-label {
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+}
+
+.benefit-value {
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 최근 주문 내역 */
+.order-table {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.table-header .col {
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    text-align: center;
+}
+
+.no-orders {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+}
+
+.no-orders p {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+    .mypage-layout {
+        flex-direction: column;
+        padding: 16px;
+    }
+    
+    /* 모바일에서는 사이드바 숨김 (햄버거 메뉴에서 처리) */
+    .sidebar {
+        display: none;
+    }
+    
+    .main-content {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+    
+    .order-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .stat-box {
+        padding: 16px;
+    }
+    
+    .stat-number {
+        font-size: 24px;
+    }
+    
+    .benefits-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .table-header {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar-menu {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .mypage-layout {
+        padding: 12px;
+    }
+    
+    .order-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .order-status-section,
+    .benefits-section,
+    .recent-orders-section {
+        padding: 16px;
+    }
+    
+    .sidebar {
+        padding: 0;
+    }
+    
+    .sidebar-header {
+        padding: 16px;
+    }
+}
+
+/* 개인정보 수정 폼 스타일 */
+.profile-edit-section {
+    background: white;
+    padding: 24px;
+}
+
+.profile-form {
+    max-width: 600px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="tel"]:focus {
+    outline: none;
+    border-color: #1b1b1b;
+}
+
+.form-group input[readonly] {
+    background-color: #f8f9fa;
+    color: #666;
+}
+
+.form-help {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    display: block;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    margin: 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.btn-save,
+.btn-cancel {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-save {
+    background-color: #1b1b1b;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #333;
+}
+
+.btn-cancel {
+    background-color: #f8f9fa;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.btn-cancel:hover {
+    background-color: #e9ecef;
+}
