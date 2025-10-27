@@ -13,13 +13,9 @@ from users.models import User
 
 
 class ReviewCreateView(LoginRequiredMixin, View):
-    login_url = '/users/login/'
-
     def post(self, request: HttpRequest, product_id: int) -> HttpResponse:
         product = get_object_or_404(Product, id=product_id)
         
-
-        # 이미 리뷰를 작성했는지 확인
         existing_review = Review.objects.filter(
             user=cast(User, request.user),
             product=product
@@ -37,7 +33,6 @@ class ReviewCreateView(LoginRequiredMixin, View):
             review.product = product
             review.save()
             
-            # 이미지 처리
             images = request.FILES.getlist('image')
             if images:
                 for image in images:
@@ -46,5 +41,4 @@ class ReviewCreateView(LoginRequiredMixin, View):
 
             return redirect('products-detail', product_name=product.name)
 
-        # 폼 에러가 있으면 상품 상세 페이지로 리다이렉트
         return redirect('products-detail', product_name=product.name)

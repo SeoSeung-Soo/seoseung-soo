@@ -79,14 +79,19 @@
                                 <button type="submit" class="btn btn-secondary">장바구니 담기</button>
                             </form>
                         {% else %}
-                            <button class="btn btn-secondary" onclick="alert('로그인이 필요합니다.')">장바구니 담기</button>
+                            <a href="{% url 'login' %}" onclick="alert('로그인이 필요합니다.')" class="btn btn-secondary">장바구니 담기</a>
                         {% endif %}
-
-                        <form class="wishlist-form">
-                            {% csrf_token %}
-                            <input type="hidden" name="product_id" value="{{ products.id }}">
-                            <button type="submit" class="btn btn-secondary">찜하기</button>
-                        </form>
+                        
+                        {% if user.is_authenticated %}
+                            <form class="wishlist-form">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-secondary" onclick="addToWishlist({{ products.id }})" id="wishlist-btn-{{ products.id }}">
+                                    {% if is_favorited %}찜하기 취소{% else %}찜하기{% endif %}
+                                </button>
+                            </form>
+                        {% else %}
+                            <a href="{% url 'login' %}" onclick="alert('로그인이 필요합니다.')" class="btn btn-secondary">찜하기</a>
+                        {% endif %}
                     </div>
                 {% else %}
                     <button class="btn btn-disabled btn-large" disabled>
@@ -451,4 +456,5 @@
 <script src="{% static 'js/products/detail.js' %}"></script>
 <script src="{% static 'js/products/review_rating.js' %}"></script>
 <script src="{% static 'js/products/size_quantity.js' %}"></script>
+<script src="{% static 'js/favorites/favorite.js' %}"></script>
 {% endblock %}

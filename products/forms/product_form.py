@@ -95,7 +95,8 @@ class ProductImageForm(forms.Form):
         widget=MultipleFileInput(attrs={
             'class': 'form-file',
             'accept': 'image/*',
-            'multiple': True
+            'multiple': True,
+            'id': 'id_image'
         })
     )
 

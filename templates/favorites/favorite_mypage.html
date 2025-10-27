@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load product_filters %}
+{% load static %}
+
+{% block title %}찜목록{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/orders/order_mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/products/detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/favorites/favorite_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="mypage-layout">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>나의 쇼핑활동</h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-category">
+                <h4>나의 정보</h4>
+                <ul>
+                    <li><a href="{% url 'profile-edit' %}">개인정보 수정</a></li>
+                </ul>
+            </div>
+            <div class="menu-category">
+                <h4>주문/배송조회</h4>
+                <ul>
+                    <li><a href="{% url 'orders' %}">배송현황</a></li>
+                    <li><a href="#">취소/교환/반품 내역</a></li>
+                    <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
+                </ul>
+            </div>
+            <div class="menu-category">
+                <h4>혜택 관리</h4>
+                <ul>
+                    <li><a href="#">쿠폰/적립금</a></li>
+                </ul>
+            </div>
+            <div class="menu-category">
+                <h4>활동 내역</h4>
+                <ul>
+                    <li><a href="{% url 'favorite-list' %}" class="active">찜한 상품</a></li>
+                    <li><a href="#">최근 본 상품</a></li>
+                    <li><a href="#">나의 후기</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="mypage-container">
+            {% if favorites %}
+            <div class="favorite-header-section">
+                <div class="section-header">
+                    <h3>찜목록</h3>
+                    <div class="favorite-count">총 {{ favorites.count }}개의 상품</div>
+                </div>
+            </div>
+            <div class="favorite-items-section">
+                <div class="favorite-items">
+                    {% for favorite in favorites %}
+                    <div class="favorite-item">
+                        <div class="item-image">
+                            {% if favorite.product.image.first %}
+                                <img src="{{ favorite.product.image.first.image.url }}" alt="{{ favorite.product.name }}" onclick="window.location.href='{% url 'products-detail' favorite.product.name %}'" style="cursor: pointer;">
+                            {% else %}
+                                <div class="no-image">이미지 없음</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="item-info">
+                            <h4 class="item-name">
+                                <a href="{% url 'products-detail' favorite.product.name %}">{{ favorite.product.name }}</a>
+                            </h4>
+                            <div class="item-description">{{ favorite.product.description|truncatechars:100 }}</div>
+                            
+                            <div class="item-price">
+                                {% if favorite.product.sale_price %}
+                                    <span class="sale-price">{{ favorite.product.price|discount_amount:favorite.product.sale_price }}원</span>
+                                    <span class="original-price">{{ favorite.product.price|floatformat:0 }}원</span>
+                                {% else %}
+                                    <span class="price">{{ favorite.product.price|floatformat:0 }}원</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="item-actions">
+                            <button class="delete-btn" onclick="removeFavorite({{ favorite.id }})">
+                                찜 해제
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-favorite-section">
+                <div class="section-header">
+                    <h3>찜목록</h3>
+                </div>
+                <div class="empty-favorite">
+                    <h3>찜목록이 비어있습니다</h3>
+                    <p>원하는 상품을 찜목록에 담아보세요!</p>
+                    <a href="{% url 'home' %}" class="btn btn-primary">쇼핑하러 가기</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/favorites/favorite.js' %}"></script>
+{% endblock %}

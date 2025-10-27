@@ -40,6 +40,7 @@ urlpatterns = [
     path("reviews/", include("reviews.urls"), name='reviews'),
     path("inquire/", include("inquire.urls"), name='inquire'),
     path("carts/", include("carts.urls"), name='carts'),
+    path("favorites/", include("favorites.urls"), name='favorites'),
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

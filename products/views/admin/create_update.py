@@ -30,13 +30,12 @@ class ProductCreateView(AdminPermission, View):
             product.user = cast(User, request.user)
             product.save()
             
-            # ManyToMany 필드 저장 (categories 포함)
             form.save_m2m()
             
-            # 이미지 처리 (이미지가 있는 경우에만)
             images = request.FILES.getlist('image')
             if images:
-                for image in images:
+                # TODO: i 변수를 사용하고 있지않음 확인 후 수정 필요
+                for i, image in enumerate(images):
                     product_image = ProductImage.objects.create(image=image)
                     product.image.add(product_image)
             

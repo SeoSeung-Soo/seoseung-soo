@@ -4,12 +4,12 @@
 {% block title %}개인정보 수정{% endblock %}
 
 {% block style %}
-<link rel="stylesheet" href="{% static 'css/users/mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/orders/order_mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/users/profile_edit.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="mypage-layout">
-    <!-- 좌측 사이드바 -->
     <div class="sidebar">
         <div class="sidebar-header">
             <h2>나의 쇼핑활동</h2>
@@ -24,9 +24,9 @@
             <div class="menu-category">
                 <h4>주문/배송조회</h4>
                 <ul>
-                    <li><a href="{% url 'order_mypage' %}">배송현황</a></li>
+                    <li><a href="{% url 'orders' %}">배송현황</a></li>
                     <li><a href="#">취소/교환/반품 내역</a></li>
-                    <li><a href="#">장바구니</a></li>
+                    <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
 
                 </ul>
             </div>
@@ -39,7 +39,7 @@
             <div class="menu-category">
                 <h4>활동 내역</h4>
                 <ul>
-                    <li><a href="#">찜한 상품</a></li>
+                    <li><a href={% url 'favorite-list' %}>찜한 상품</a></li>
                     <li><a href="#">최근 본 상품</a></li>
                     <li><a href="#">나의 후기</a></li>
                 </ul>
@@ -47,42 +47,39 @@
         </div>
     </div>
 
-    <!-- 우측 메인 콘텐츠 -->
     <div class="main-content">
         <div class="mypage-container">
-            <!-- 개인정보 수정 폼 -->
-            <div class="profile-edit-section">
+            <div class="profile-edit-section-header">
                 <div class="section-header">
-                    <h3>개인정보 수정</h3>
-                </div>
-                <form method="post" class="profile-form">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="username">아이디(닉네임)</label>
-                        <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
-                        <small class="form-help">아이디는 변경할 수 없습니다.</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">이메일</label>
-                        <input type="email" id="email" name="email" value="{{ user.email }}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="first_name">이름</label>
-                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="phone_number">휴대폰 번호</label>
-                        <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number }}">
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-save">저장하기</button>
-                        <button type="button" class="btn-cancel" onclick="history.back()">취소</button>
-                    </div>
-                </form>
+                <h3>개인정보 수정</h3>
             </div>
+            <form method="post" class="profile-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">아이디(닉네임)</label>
+                    <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
+                    <small class="form-help">아이디는 변경할 수 없습니다.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="first_name">이름</label>
+                    <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone_number">휴대폰 번호</label>
+                    <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number }}">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">저장하기</button>
+                    <button type="button" class="btn-cancel" onclick="history.back()">취소</button>
+                </div>
+            </form> 
         </div>
     </div>
 </div>

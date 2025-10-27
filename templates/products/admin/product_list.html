@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load product_filters %}
 
 {% block style %}
 <link rel="stylesheet" href="{% static 'css/admin/product_list.css' %}">
@@ -54,7 +55,7 @@
                     <div class="product-details">
                         <div class="price-section">
                             {% if product.sale_price %}
-                                <span class="sale-price">{{ product.sale_price|floatformat:0 }}원</span>
+                                <span class="sale-price">{{ product.price|discount_amount:product.sale_price }}원</span>
                                 <span class="original-price">{{ product.price|floatformat:0 }}원</span>
                             {% else %}
                                 <span class="price">{{ product.price|floatformat:0 }}원</span>
