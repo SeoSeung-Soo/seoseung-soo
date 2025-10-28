@@ -75,7 +75,7 @@ class SocialUser(models.Model):
         return f"{self.provider}: {self.email or self.social_id}"
 
 class OAuthState(models.Model):
-    key = models.CharField(max_length=64, primary_key=True, default=uuid.uuid4().hex)
+    key = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def is_expired(self) -> bool:

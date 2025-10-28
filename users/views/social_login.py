@@ -153,9 +153,21 @@ class AppleCallbackView(View):
         if not code:
             return JsonResponse({"error": "code 누락"}, status=400)
 
-        # state 검증 (문자열 비교 기반)
-        if state != "valid_state":
-            return JsonResponse({"error": "state 불일치"}, status=400)
+        # state 검증
+        if not state:
+            return JsonResponse({"error": "state가 누락되었습니다."}, status=400)
+
+        try:
+            oauth_state = OAuthState.objects.get(key=state)
+
+        except OAuthState.DoesNotExist:
+            return JsonResponse({"error": "state가 일치하지 않습니다."}, status=400)
+
+        if oauth_state.is_expired():
+            oauth_state.delete()
+
+            return JsonResponse({"error": "state가 만료되었습니다."}, status=400)
+        oauth_state.delete()
 
         # Apple 토큰 교환
         token_payload: dict[str, Any] | None = AppleLoginService.exchange_token(code)
