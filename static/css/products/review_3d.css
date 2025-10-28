@@ -1,34 +1,40 @@
-/* 3D 리뷰 인터페이스 */
+
 .review-sphere-container {
     position: relative;
     width: 100%;
     height: 600px;
     perspective: 1000px;
-    overflow: hidden;
+    overflow: visible; 
     border-radius: 12px;
     margin: 40px 0;
+    padding: 20px; 
 }
 
 .review-spheres {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     transform-style: preserve-3d;
+    pointer-events: none; 
 }
 
 .review-sphere {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: none; 
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 16px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     user-select: none;
+    pointer-events: auto; 
+    z-index: 5; 
 }
 
 .review-sphere:hover {
@@ -42,11 +48,19 @@
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
 }
 
-.review-sphere img {
+.review-sphere .sphere-profile-image {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
+}
+
+.review-sphere[data-has-image="false"] {
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+}
+
+.review-sphere[data-has-image="true"] {
+    background: none;
 }
 
 .review-sphere .avatar-text {
@@ -55,70 +69,246 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* 리뷰 상세 패널 */
-.review-detail-panel {
+.review-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.review-modal.active {
+    display: flex;
+}
+
+.modal-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    z-index: 100;
-    padding: 40px;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
 }
 
-.review-detail-panel.active {
-    transform: translateX(0);
+.modal-container {
+    position: relative;
+    width: 1000px;
+    height: 545.45px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    animation: modalSlideUp 0.3s ease;
 }
 
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #eee;
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.panel-header h3 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1b1b1b;
-    margin: 0;
-}
-
-.close-panel {
-    background: #f0f0f0;
+.modal-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #262626;
+    color: white;
     border: none;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    cursor: pointer;
     font-size: 24px;
+    cursor: pointer;
+    z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
 }
 
-.close-panel:hover {
-    background: #e0e0e0;
-    transform: rotate(90deg);
+.modal-close:hover {
+    background: #262626;
+    transform: scale(1.1);
 }
 
-.review-content-item {
-    display: none;
+.modal-nav-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #262626;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
-.review-content-item.active {
-    display: block;
+.modal-nav-btn:hover {
+    background: #262626;
+    transform: translateY(-50%) scale(1.1);
 }
 
-/* 컨트롤 버튼 */
+.modal-prev {
+    left: calc((100vw - 1000px) / 2 - 75px);
+}
+
+.modal-next {
+    right: calc((100vw - 1000px) / 2 - 75px);
+}
+
+.modal-content {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-image-section {
+    flex: 1.2;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.modal-images {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.3s ease-out;
+}
+
+.modal-images img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.modal-images.slideshow img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 545.45px;
+    height: 545.45px;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.modal-images.slideshow img.active {
+    opacity: 1;
+    z-index: 1;
+}
+
+.modal-images.no-image {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: white;
+}
+
+.modal-detail-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #efefef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.modal-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-username {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1b1b1b;
+}
+
+.modal-rating {
+    font-size: 16px;
+    color: #ffc107;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.modal-review-content {
+    line-height: 1.6;
+}
+
+.modal-review-text {
+    font-size: 14px;
+    color: #262626;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid #efefef;
+}
+
+.modal-date {
+    font-size: 12px;
+    color: #8e8e8e;
+    text-transform: uppercase;
+}
+
 .sphere-controls {
     position: absolute;
     bottom: 20px;
@@ -148,23 +338,182 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 반응형 */
+
 @media (max-width: 768px) {
     .review-sphere-container {
-        height: 400px;
+        width: 330px;
+        height: 280px;
+        padding: 10px;
+        margin: 40px auto;
     }
     
     .review-sphere {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    .review-sphere .sphere-profile-image {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .modal-container {
+        width: 100vw;
+        height: 100vh;
+        max-height: none;
+        border-radius: 0;
+    }
+    
+    .modal-content {
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .modal-image-section {
+        width: 100%;
+        height: 40vh;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 0;
+        overflow: hidden;
+    }
+    
+    .modal-detail-section {
+        flex: none;
+        width: 100%;
+        height: 60vh;
+        overflow-y: auto;
+        backdrop-filter: blur(10px);
+    }
+    
+    .modal-images {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        transition: transform 0.3s ease-out;
+    }
+    
+    .modal-images img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    
+    .modal-header {
+        padding: 15px;
+        border-bottom: 1px solid #efefef;
+    }
+    
+    .modal-body {
+        padding: 15px;
+        border-bottom: 1px solid #efefef;
+
+    }
+    
+    .modal-footer {
+        padding: 15px;
+        border-top: 1px solid #efefef;
+    }
+    
+    .modal-user-info {
+        gap: 10px;
+    }
+    
+    .modal-avatar {
+        width: 35px;
+        height: 35px;
+        border: 2px solid white;
+    }
+    
+    .modal-username {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1b1b1b;
+    }
+    
+    .modal-rating {
+        font-size: 16px;
+        color: #ffc107;
+    }
+    
+    .modal-review-text {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .modal-date {
+        font-size: 12px;
+    }
+    
+    .modal-images.slideshow {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    
+    .modal-images.slideshow img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        z-index: 1;
+    }
+    
+    .modal-images.slideshow img.active {
+        opacity: 1;
+        z-index: 2;
+    }
+    
+    .modal-close {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+        color: white;
+        z-index: 20;
+    }
+    
+    .modal-nav-btn {
+        position: fixed;
+        display: flex;
         width: 60px;
         height: 60px;
-        font-size: 24px;
+        font-size: 28px;
+        bottom: 30px;
+        top: auto;
+        transform: none;
     }
     
-    .review-detail-panel {
-        padding: 20px;
+    .modal-nav-btn:hover {
+        transform: scale(1.1);
     }
     
-    .panel-header h3 {
-        font-size: 20px;
+    .modal-prev {
+        left: auto;
+        right: calc(50% + 15px);
+    }
+    
+    .modal-next {
+        left: calc(50% + 15px);
+        right: auto;
     }
 }
