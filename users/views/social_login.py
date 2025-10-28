@@ -36,16 +36,16 @@ class GoogleLoginView(View):
             
             # Google 로그인 서비스로 인증 처리
             user, error = GoogleLoginService.authenticate_user(credential)
-            
+
             if error:
                 return JsonResponse({
                     'success': False,
                     'message': error
                 }, status=400)
-            
+
             if user:
                 # 사용자 로그인
-                login(request, user)
+                login(request, user, backend="django.contrib.auth.backends.ModelBackend")
                 
                 # 안전한 리다이렉트 URL 결정 (오픈 리디렉션 취약점 방지)
                 next_url = request.GET.get('next', '/')
@@ -135,6 +135,7 @@ class AppleLoginView(View):
         # CSRF 유사 공격 방지용 state
         state = uuid.uuid4().hex
         request.session["apple_state"] = state
+        request.session.save()
 
         login_url = AppleLoginService.get_login_url(state)
         return redirect(login_url)

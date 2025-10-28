@@ -1,16 +1,20 @@
 import json
-from typing import TYPE_CHECKING, Any, Dict, cast
+from typing import TYPE_CHECKING, Any, Dict, Generator, cast
 from unittest.mock import MagicMock, patch
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 from django.test import Client
 from django.urls import reverse
 
+from users.models import SocialUser
 from users.services.social_login import (
+    AppleLoginService,
     GoogleLoginService,
     KakaoLoginService,
     NaverLoginService,
+    SocialLoginService,
 )
 
 if TYPE_CHECKING:
@@ -38,6 +42,132 @@ def test_user() -> 'User':
         terms_of_use=True
     )
 
+@pytest.mark.django_db
+class TestSocialLoginService:
+    def test_creates_user_and_social_account(self) -> None:
+        """처음 로그인 시 User + SocialUser 모두 생성된다."""
+        user, created = SocialLoginService.get_or_create_user(
+            provider="google",
+            social_id="12345",
+            email="user@example.com",
+            extra_info={"first_name": "홍길동"},
+        )
+
+        assert created is True
+        assert User.objects.count() == 1
+        assert SocialUser.objects.count() == 1
+
+        social = SocialUser.objects.first()
+        assert social is not None
+        assert social.provider == "google"
+        assert social.user == user
+
+    def test_reuses_existing_social_user(self) -> None:
+        """같은 provider + social_id면 같은 User를 재사용한다."""
+        user1, _ = SocialLoginService.get_or_create_user("google", "99999", "test@example.com")
+        user2, _ = SocialLoginService.get_or_create_user("google", "99999", "test@example.com")
+        assert user1 == user2
+        assert User.objects.count() == 1
+        assert SocialUser.objects.count() == 1
+
+    def test_links_existing_email_user(self) -> None:
+        """이메일로 이미 존재하는 User가 있으면 소셜 계정만 연결된다."""
+        existing = User.objects.create_user(
+            username="test",
+            email="exist@example.com",
+            password=None,
+            personal_info_consent=False,
+            terms_of_use=False,
+        )
+
+        user, created = SocialLoginService.get_or_create_user(
+            provider="kakao",
+            social_id="abcde",
+            email="exist@example.com",
+        )
+
+        assert created is True  # 새 소셜 계정이 만들어짐
+        assert user == existing
+        assert SocialUser.objects.filter(user=existing, provider="kakao").exists()
+
+    def test_unique_constraint_prevents_duplicates(self) -> None:
+        """provider + social_id 중복 생성 시 에러 발생"""
+        SocialLoginService.get_or_create_user("naver", "abc123", "user@naver.com")
+        with pytest.raises(IntegrityError):
+            # 같은 provider/social_id 중복 삽입 방지 확인
+            SocialUser.objects.create(
+                provider="naver",
+                social_id="abc123",
+                user=cast(User, User.objects.first()),
+            )
+
+@pytest.mark.django_db
+class TestPlatformServicesIntegration:
+    """플랫폼별 서비스가 SocialLoginService를 올바르게 호출하는지 확인"""
+
+    @patch("users.services.social_login.SocialLoginService.get_or_create_user")
+    def test_google_service_delegates_to_common_logic(self, mock_get_or_create: MagicMock) -> None:
+        mock_get_or_create.return_value = (MagicMock(), True)
+        info = {
+            "sub": "g123",
+            "email": "user@gmail.com",
+            "name": "홍길동",
+            "picture": "https://example.com/pic.jpg",
+        }
+
+        GoogleLoginService.get_or_create_user(info)
+
+        mock_get_or_create.assert_called_once_with(
+            "google",
+            "g123",
+            "user@gmail.com",
+            {"first_name": "홍길동", "profile_image": "https://example.com/pic.jpg"},
+        )
+
+    @patch("users.services.social_login.SocialLoginService.get_or_create_user")
+    def test_kakao_service_delegates_to_common_logic(self, mock_get_or_create: MagicMock) -> None:
+        mock_get_or_create.return_value = (MagicMock(), True)
+        info = {
+            "id": 12345,
+            "kakao_account": {
+                "email": "test@kakao.com",
+                "profile": {
+                    "nickname": "카카오사용자",
+                    "profile_image_url": "https://example.com/image.jpg",
+                },
+            },
+        }
+
+        KakaoLoginService.get_or_create_user(info)
+
+        mock_get_or_create.assert_called_once_with(
+            "kakao",
+            "12345",
+            "test@kakao.com",
+            {"first_name": "카카오사용자", "profile_image": "https://example.com/image.jpg"},
+        )
+
+    @patch("users.services.social_login.SocialLoginService.get_or_create_user")
+    def test_naver_service_delegates_to_common_logic(self, mock_get_or_create: MagicMock) -> None:
+        mock_get_or_create.return_value = (MagicMock(), True)
+        info = {"id": "n1", "email": "user@naver.com", "name": "홍길동"}
+
+        NaverLoginService.create_or_get_user(info)
+
+        mock_get_or_create.assert_called_once_with("naver", "n1", "user@naver.com", {"first_name": "홍길동"})
+
+    @patch("users.services.social_login.SocialLoginService.get_or_create_user")
+    def test_apple_service_delegates_to_common_logic(self, mock_get_or_create: MagicMock) -> None:
+        mock_get_or_create.return_value = (MagicMock(), True)
+        info = {"apple_id": "a123", "email": "apple@icloud.com"}
+
+        AppleLoginService.create_or_get_user(info)
+
+        mock_get_or_create.assert_called_once_with(
+            provider="apple",
+            social_id="a123",
+            email="apple@icloud.com",
+        )
 
 class TestGoogleLoginView:
     
@@ -171,7 +301,7 @@ class TestGoogleLoginView:
         assert '서버 오류가 발생했습니다' in data['message']
 
 
-class TestSocialLoginService:
+class TestGoogleSocialLoginService:
     
     @pytest.mark.django_db
     def test_google_generate_unique_username(self) -> None:
@@ -242,25 +372,25 @@ class TestSocialLoginService:
         result = GoogleLoginService.verify_google_token('invalid_token')
         
         assert result is None
-    
-    @pytest.mark.django_db
-    def test_google_get_or_create_user_new_user(self) -> None:
-        google_user_info = {
-            'sub': '12345',
-            'email': 'newuser@example.com',
-            'name': 'TestGoogleUser',
-            'picture': 'https://example.com/picture.jpg'
+
+    @patch("users.services.social_login.SocialLoginService.get_or_create_user")
+    def test_google_login_calls_common_service(self, mock_get_or_create: MagicMock) -> None:
+        mock_get_or_create.return_value = (MagicMock(), True)
+        user_info = {
+            "sub": "g123",
+            "email": "user@gmail.com",
+            "name": "홍길동",
+            "picture": "https://example.com/pic.jpg",
         }
-        
-        user = GoogleLoginService.get_or_create_user(google_user_info)
-        
-        assert user is not None
-        assert user.google_id == '12345'
-        assert user.email == 'newuser@example.com'
-        assert user.first_name == 'TestGoogleUser'
-        assert user.profile_image == 'https://example.com/picture.jpg'
-        assert user.personal_info_consent is False
-        assert user.terms_of_use is False
+
+        GoogleLoginService.get_or_create_user(user_info)
+
+        mock_get_or_create.assert_called_once_with(
+            "google",
+            "g123",
+            "user@gmail.com",
+            {"first_name": "홍길동", "profile_image": "https://example.com/pic.jpg"},
+        )
     
     @pytest.mark.django_db
     def test_google_get_or_create_user_existing_by_google_id(self) -> None:
@@ -269,7 +399,6 @@ class TestSocialLoginService:
             username='existing',
             email='existing@example.com',
             password='testpass123',
-            google_id='12345',
             personal_info_consent=True,
             terms_of_use=True
         )
@@ -280,11 +409,10 @@ class TestSocialLoginService:
             'name': 'Existing User'
         }
         
-        user = GoogleLoginService.get_or_create_user(google_user_info)
+        user, _ = GoogleLoginService.get_or_create_user(google_user_info)
         
         assert user is not None
         assert user.id == existing_user.id
-        assert user.google_id == '12345'
     
     @pytest.mark.django_db
     def test_google_get_or_create_user_existing_by_email(self) -> None:
@@ -303,11 +431,10 @@ class TestSocialLoginService:
             'name': 'Existing User'
         }
         
-        user = GoogleLoginService.get_or_create_user(google_user_info)
+        user, _ = GoogleLoginService.get_or_create_user(google_user_info)
         
         assert user is not None
         assert user.id == existing_user.id
-        assert user.google_id == '12345'
     
     @pytest.mark.django_db
     def test_google_get_or_create_user_missing_data(self) -> None:
@@ -316,9 +443,10 @@ class TestSocialLoginService:
             'email': '',
             'name': 'Test User'
         }
-        
-        with pytest.raises(ValueError, match="Google 사용자 정보가 없습니다"):
-            GoogleLoginService.get_or_create_user(google_user_info)
+
+        user, _ = GoogleLoginService.get_or_create_user(google_user_info)
+        assert user is not None
+        assert user.email.startswith("google_")
     
     @pytest.mark.django_db
     def test_google_authenticate_user_success(self) -> None:
@@ -334,7 +462,6 @@ class TestSocialLoginService:
             
             assert user is not None
             assert error is None
-            assert user.google_id == '12345'
             assert user.email == 'test@example.com'
     
     @pytest.mark.django_db
@@ -437,7 +564,6 @@ class TestSocialLoginService:
         user = KakaoLoginService.get_or_create_user(kakao_user_info)
         
         assert user is not None
-        assert user.kakao_id == '12345'
         assert user.email == 'newuser@kakao.com'
         assert user.first_name == '카카오사용자'
         assert user.profile_image == 'https://example.com/picture.jpg'
@@ -462,7 +588,6 @@ class TestSocialLoginService:
             
             assert user is not None
             assert error is None
-            assert user.kakao_id == '12345'
             assert user.email == 'test@kakao.com'
 
 @pytest.mark.django_db
@@ -521,7 +646,6 @@ class TestNaverLoginService:
         assert user is not None
         assert user.email == "new@naver.com"
         assert user.username == "new"
-        assert user.naver_id == "1"
 
     @pytest.mark.django_db
     def test_create_or_get_user_existing(self) -> None:
@@ -530,14 +654,20 @@ class TestNaverLoginService:
             email="old@naver.com",
             personal_info_consent=True,
             terms_of_use=True,
-            naver_id="100"
         )
+        SocialUser.objects.create(
+            user=existing,
+            provider="naver",
+            social_id="100",
+            email="old@naver.com",
+        )
+
         user_info = {"id": "100", "email": "new@naver.com"}
         user, error = NaverLoginService.create_or_get_user(user_info)
         assert user is not None
         assert error is None
         assert user.id == existing.id
-        assert user.email == "new@naver.com"
+        assert user.email == "old@naver.com"
 
     @pytest.mark.django_db
     def test_create_or_get_user_missing_id(self) -> None:
@@ -629,3 +759,88 @@ class TestNaverLoginView:
         response = client.get(reverse("naver-callback"), {"code": "mock_code", "state": "mock_state"})
         assert response.status_code == 302
         assert (getattr(response, "url", "") or "") == reverse("login")
+
+@pytest.fixture
+def client_with_session(client: Client) -> Generator[Client, None, None]:
+    session = client.session
+    session["apple_state"] = "valid_state"
+    session.save()
+    yield client
+
+@pytest.mark.django_db
+class TestAppleLoginView:
+    """애플 로그인 뷰 테스트"""
+
+    def test_missing_code_returns_400(self, client_with_session: Client) -> None:
+        """code 누락 시 400 반환"""
+        url = reverse("apple-callback")
+        response = client_with_session.post(url, {"state": "valid_state"})
+        assert response.status_code == 400
+        body = response.json()
+        assert isinstance(body, dict)
+        assert "code 누락" in body.get("error", "")
+
+    def test_state_mismatch_returns_400(self, client_with_session: Client) -> None:
+        """state 불일치 시 400"""
+        url = reverse("apple-callback")
+        response = client_with_session.post(url, {"code": "abc123", "state": "invalid_state"})
+        assert response.status_code == 400
+        body = response.json()
+        assert "state 불일치" in body.get("error", "")
+
+    @patch("users.services.social_login.AppleLoginService.exchange_token", autospec=True)
+    def test_token_exchange_failure_returns_400(
+        self, mock_exchange: MagicMock, client_with_session: Client
+    ) -> None:
+        """Apple 토큰 교환 실패 시 400"""
+        url = reverse("apple-callback")
+        mock_exchange.return_value = None
+        response = client_with_session.post(url, {"code": "abc123", "state": "valid_state"})
+        assert response.status_code == 400
+        body = response.json()
+        assert "Apple 토큰 교환 실패" in body.get("error", "")
+
+    @patch("users.services.social_login.AppleLoginService.authenticate_user", autospec=True)
+    @patch("users.services.social_login.AppleLoginService.exchange_token", autospec=True)
+    def test_authentication_failure_returns_400(
+        self,
+        mock_exchange: MagicMock,
+        mock_auth: MagicMock,
+        client_with_session: Client,
+    ) -> None:
+        """id_token 파싱 실패 시 400"""
+        url = reverse("apple-callback")
+        mock_exchange.return_value = {"id_token": "fake_token"}
+        mock_auth.return_value = (None, "id_token 파싱 실패")
+
+        response = client_with_session.post(url, {"code": "abc123", "state": "valid_state"})
+        assert response.status_code == 400
+        body = response.json()
+        assert "id_token 파싱 실패" in body.get("error", "")
+
+    @patch("users.services.social_login.AppleLoginService.authenticate_user", autospec=True)
+    @patch("users.services.social_login.AppleLoginService.exchange_token", autospec=True)
+    def test_successful_login_renders_home(
+        self,
+        mock_exchange: MagicMock,
+        mock_auth: MagicMock,
+        client_with_session: Client,
+    ) -> None:
+        """정상 로그인 시 home.html 렌더링"""
+        url = reverse("apple-callback")
+        user = User.objects.create_user(
+            username="appleuser",
+            email="apple@example.com",
+            password="test1234",
+            personal_info_consent=False,
+            terms_of_use=False,
+        )
+
+        mock_exchange.return_value = {"id_token": "valid_token"}
+        mock_auth.return_value = (user, None)
+
+        response = client_with_session.post(url, {"code": "abc123", "state": "valid_state"})
+        assert response.status_code == 200
+
+        template_names = [t.name for t in response.templates if t.name]
+        assert "home.html" in template_names
