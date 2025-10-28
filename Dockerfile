@@ -25,7 +25,7 @@ FROM python:3.13-slim
 
 RUN useradd -m app
 
-RUN mkdir -p /app && chown -R app:app /app
+RUN mkdir -p /app && mkdir -p /app/staticfiles && chown -R app:app /app
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
