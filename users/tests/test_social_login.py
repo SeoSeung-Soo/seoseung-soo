@@ -53,7 +53,7 @@ class TestSocialLoginService:
             extra_info={"first_name": "홍길동"},
         )
 
-        assert created is True
+        assert created
         assert User.objects.count() == 1
         assert SocialUser.objects.count() == 1
 
@@ -86,7 +86,7 @@ class TestSocialLoginService:
             email="exist@example.com",
         )
 
-        assert created is True  # 새 소셜 계정이 만들어짐
+        assert created  # 새 소셜 계정이 만들어짐
         assert user == existing
         assert SocialUser.objects.filter(user=existing, provider="kakao").exists()
 
@@ -475,15 +475,20 @@ class TestGoogleSocialLoginService:
     @pytest.mark.django_db
     def test_google_authenticate_user_creation_failed(self) -> None:
         google_user_info = {
-            'sub': '12345',
-            'email': 'test@example.com',
-            'name': 'Test User'
+            "sub": "12345",
+            "email": "test@example.com",
+            "name": "Test User",
         }
-        
-        with patch.object(GoogleLoginService, 'verify_google_token', return_value=google_user_info), \
-             patch.object(GoogleLoginService, 'get_or_create_user', return_value=None):
-            user, error = GoogleLoginService.authenticate_user('valid_token')
-            
+
+        with patch(
+                "users.services.social_login.GoogleLoginService.verify_google_token",
+                return_value=google_user_info,
+        ), patch(
+            "users.services.social_login.GoogleLoginService.get_or_create_user",
+            return_value=(None, "DB 오류"),
+        ):
+            user, error = GoogleLoginService.authenticate_user("valid_token")
+
             assert user is None
             assert error == "사용자 생성/조회에 실패했습니다."
     
@@ -493,7 +498,7 @@ class TestGoogleSocialLoginService:
             user, error = GoogleLoginService.authenticate_user('valid_token')
             
             assert user is None
-            assert error == "Database error"
+            assert error == "Google 토큰 검증 중 오류가 발생했습니다."
     
     @pytest.mark.django_db
     def test_kakao_generate_unique_username(self) -> None:
@@ -560,9 +565,10 @@ class TestGoogleSocialLoginService:
                 }
             }
         }
-        
-        user = KakaoLoginService.get_or_create_user(kakao_user_info)
-        
+
+        user, error = KakaoLoginService.get_or_create_user(kakao_user_info)
+
+        assert error is None
         assert user is not None
         assert user.email == 'newuser@kakao.com'
         assert user.first_name == '카카오사용자'

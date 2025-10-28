@@ -3,12 +3,12 @@ import logging
 import os
 import time
 import urllib.parse
-from typing import Any, Dict, Optional, Tuple, cast
+from typing import Any, Dict, Optional, Tuple, Union, cast
 
 import jwt
 import requests
 from django.conf import settings
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 
@@ -23,9 +23,10 @@ class SocialLoginService:
         social_id: str,
         email: Optional[str],
         extra_info: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[Optional[User], bool | str]:
+    ) -> Tuple[Optional[User], Optional[Union[bool, str]]]:
         if not social_id:
             return None, "소셜 ID 누락"
+
         if not email:
             email = f"{provider}_{social_id}@{provider}.anonymous"
 
@@ -33,13 +34,13 @@ class SocialLoginService:
 
         try:
             with transaction.atomic():
-                social_user: Optional[SocialUser] = (
+                existing = (
                     SocialUser.objects.select_related("user")
                     .filter(provider=provider, social_id=social_id)
                     .first()
                 )
-                if social_user:
-                    return social_user.user, False
+                if existing:
+                    return existing.user, False
 
                 user, _ = User.objects.get_or_create(
                     email=email,
@@ -55,16 +56,20 @@ class SocialLoginService:
                     },
                 )
 
-                SocialUser.objects.update_or_create(
+                SocialUser.objects.create(
                     user=user,
                     provider=provider,
-                    defaults={"social_id": social_id, "email": email},
+                    social_id=social_id,
+                    email=email,
                 )
 
             return user, True
 
+        except IntegrityError:
+            return None, "이미 연결된 소셜 계정입니다."
         except Exception as e:
             return None, f"DB 오류: {e}"
+
 
 
 class GoogleLoginService:
@@ -113,26 +118,28 @@ class GoogleLoginService:
         picture = google_user_info.get("picture", "")
         extra = {"first_name": name, "profile_image": picture}
 
-        try:
-            user, _ = SocialLoginService.get_or_create_user("google", google_id, email, extra)
-            return user, None
-        except Exception as e:
-            return None, f"소셜 로그인 중 오류: {e}"
+        user, created_or_error = SocialLoginService.get_or_create_user("google", google_id, email, extra)
+        if not user:
+            return None, str(created_or_error)
+        return user, None
 
     @classmethod
     def authenticate_user(cls, credential: str) -> Tuple[Optional[User], Optional[str]]:
         try:
             google_user_info = cls.verify_google_token(credential)
         except Exception as e:
-            return None, str(e)
+            logger.exception(f"[GoogleLogin] Token verification failed: {e}")
+            return None, "Google 토큰 검증 중 오류가 발생했습니다."
 
         if not google_user_info:
             return None, "Google 토큰 검증에 실패했습니다."
 
-        result = cls.get_or_create_user(google_user_info)
-        if result is None:
+        user, error = cls.get_or_create_user(google_user_info)
+        if error:
+            logger.warning(f"[GoogleLogin] User creation failed: {error}")
             return None, "사용자 생성/조회에 실패했습니다."
-        return result
+
+        return user, None
 
 
 class KakaoLoginService:
@@ -177,29 +184,31 @@ class KakaoLoginService:
             return None
 
     @staticmethod
-    def get_or_create_user(kakao_user_info: Dict[str, Any]) -> Optional[User]:
+    def get_or_create_user(kakao_user_info: Dict[str, Any]) -> Tuple[Optional[User], Optional[str]]:
         kakao_id = str(kakao_user_info.get("id"))
         email = kakao_user_info.get("kakao_account", {}).get("email")
         nickname = kakao_user_info.get("kakao_account", {}).get("profile", {}).get("nickname", "")
         profile_image = kakao_user_info.get("kakao_account", {}).get("profile", {}).get("profile_image_url", "")
         extra = {"first_name": nickname, "profile_image": profile_image}
-
-        user, _ = SocialLoginService.get_or_create_user("kakao", kakao_id, email, extra)
-        return user
+        user, created_or_error = SocialLoginService.get_or_create_user("kakao", kakao_id, email, extra)
+        if not user:
+            return None, str(created_or_error)
+        return user, None
 
     @classmethod
     def authenticate_user(cls, access_token: str) -> Tuple[Optional[User], Optional[str]]:
         try:
-            # 1. 카카오 사용자 정보 조회
             kakao_user_info = cls.get_kakao_user_info(access_token)
             if not kakao_user_info:
                 return None, "카카오 사용자 정보 조회에 실패했습니다."
-            
-            # 2. 사용자 생성 또는 조회
-            user = cls.get_or_create_user(kakao_user_info)
+
+            user, error = cls.get_or_create_user(kakao_user_info)
+            if error:
+                return None, error
+
             if not user:
                 return None, "사용자 생성/조회에 실패했습니다."
-            
+
             return user, None
         except Exception as e:
             return None, str(e)
@@ -286,7 +295,9 @@ class NaverLoginService:
 
         extra_info = {"first_name": name}
 
-        user, _ = SocialLoginService.get_or_create_user("naver", str(naver_id), email, extra_info)
+        user, created_or_error = SocialLoginService.get_or_create_user("naver", str(naver_id), email, extra_info)
+        if not user:
+            return None, str(created_or_error)
         return user, None
 
 
@@ -376,24 +387,25 @@ class AppleLoginService:
     @staticmethod
     def parse_id_token(id_token: str) -> Optional[Dict[str, Any]]:
         """
-        id_token(JWT)에서 사용자 정보 추출
+        id_token(JWT)에서 사용자 정보 추출 및 검증
         """
         try:
+            jwks_url = "https://appleid.apple.com/auth/keys"
+            jwks_client = jwt.PyJWKClient(jwks_url)
+            signing_key = jwks_client.get_signing_key_from_jwt(id_token)
+
             decoded = jwt.decode(
                 id_token,
-                options={"verify_signature": False, "verify_aud": False, "verify_iss": False},
-                algorithms=["RS256", "ES256"],
+                signing_key.key,
+                algorithms=["RS256"],
+                audience=os.getenv("APPLE_CLIENT_ID"),
+                issuer="https://appleid.apple.com",
             )
-        except Exception:
-            return None
 
-        # 최소한의 무결성 체크(iss/aud)
-        if decoded.get("iss") != "https://appleid.apple.com":
+            return cast(Dict[str, Any], decoded)
+        except Exception as e:
+            logger.exception(f"Failed to parse id_token: {e}")
             return None
-        if decoded.get("aud") != os.getenv("APPLE_CLIENT_ID"):
-            return None
-
-        return cast(Dict[str, Any], decoded)
 
     @staticmethod
     def authenticate_user(
@@ -452,11 +464,12 @@ class AppleLoginService:
         if not apple_id:
             return None, "애플 사용자 ID(sub)가 없습니다."
 
-        user, _ = SocialLoginService.get_or_create_user(
+        user, created_or_error = SocialLoginService.get_or_create_user(
             provider="apple",
             social_id=str(apple_id),
             email=email or "",
         )
-
+        if not user:
+            return None, str(created_or_error)
         return user, None
 

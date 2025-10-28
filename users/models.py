@@ -64,7 +64,8 @@ class SocialUser(models.Model):
         verbose_name = "소셜 유저"
         verbose_name_plural = "소셜 유저 목록"
         constraints = [
-            models.UniqueConstraint(fields=["provider", "social_id"], name="unique_provider_social_id")
+            models.UniqueConstraint(fields=["provider", "social_id"], name="unique_provider_social_id"),
+            models.UniqueConstraint(fields=["user", "provider"], name="unique_user_provider"),
         ]
 
     def __str__(self) -> str:
