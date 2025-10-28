@@ -1,5 +1,8 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 from config.basemodel import BaseModel
 
@@ -70,3 +73,11 @@ class SocialUser(models.Model):
 
     def __str__(self) -> str:
         return f"{self.provider}: {self.email or self.social_id}"
+
+class OAuthState(models.Model):
+    key = models.CharField(max_length=64, primary_key=True, default=uuid.uuid4().hex)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self) -> bool:
+        """생성 후 10분이 지나면 만료"""
+        return (timezone.now() - self.created_at).total_seconds() > 600
