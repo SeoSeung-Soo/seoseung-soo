@@ -9,6 +9,7 @@ from django.test import Client
 from django.urls import reverse
 
 from users.models import SocialUser
+from users.services.oauth_state import OAuthStateService
 from users.services.social_login import (
     AppleLoginService,
     GoogleLoginService,
@@ -778,75 +779,76 @@ class TestAppleLoginView:
     """애플 로그인 뷰 테스트"""
 
     def test_missing_code_returns_400(self, client_with_session: Client) -> None:
-        """code 누락 시 400 반환"""
+        state = OAuthStateService.create_state()
         url = reverse("apple-callback")
-        response = client_with_session.post(url, {"state": "valid_state"})
-        assert response.status_code == 400
-        body = response.json()
-        assert isinstance(body, dict)
-        assert "code 누락" in body.get("error", "")
+        res = client_with_session.post(url, {"state": state})
+        assert res.status_code == 400
+        assert "code 누락" in res.json()["error"]
 
     def test_state_mismatch_returns_400(self, client_with_session: Client) -> None:
-        """state 불일치 시 400"""
+        # 존재하지 않는 state 사용
         url = reverse("apple-callback")
-        response = client_with_session.post(url, {"code": "abc123", "state": "invalid_state"})
-        assert response.status_code == 400
-        body = response.json()
-        assert "state 불일치" in body.get("error", "")
+        res = client_with_session.post(url, {"code": "abc123", "state": "invalid"})
+        assert res.status_code == 400
+        assert "state 불일치" in res.json()["error"]
 
     @patch("users.services.social_login.AppleLoginService.exchange_token", autospec=True)
     def test_token_exchange_failure_returns_400(
-        self, mock_exchange: MagicMock, client_with_session: Client
+            self,
+            mock_exchange: MagicMock,
+            client_with_session: Client
     ) -> None:
         """Apple 토큰 교환 실패 시 400"""
-        url = reverse("apple-callback")
+        state = OAuthStateService.create_state()
         mock_exchange.return_value = None
-        response = client_with_session.post(url, {"code": "abc123", "state": "valid_state"})
-        assert response.status_code == 400
-        body = response.json()
-        assert "Apple 토큰 교환 실패" in body.get("error", "")
+
+        url = reverse("apple-callback")
+        res = client_with_session.post(url, {"code": "abc123", "state": state})
+
+        assert res.status_code == 400
+        assert "Apple 토큰 교환 실패" in res.json()["error"]
 
     @patch("users.services.social_login.AppleLoginService.authenticate_user", autospec=True)
     @patch("users.services.social_login.AppleLoginService.exchange_token", autospec=True)
     def test_authentication_failure_returns_400(
-        self,
-        mock_exchange: MagicMock,
-        mock_auth: MagicMock,
-        client_with_session: Client,
+            self,
+            mock_exchange: MagicMock,
+            mock_auth: MagicMock,
+            client_with_session: Client
     ) -> None:
         """id_token 파싱 실패 시 400"""
-        url = reverse("apple-callback")
+        state = OAuthStateService.create_state()
         mock_exchange.return_value = {"id_token": "fake_token"}
         mock_auth.return_value = (None, "id_token 파싱 실패")
 
-        response = client_with_session.post(url, {"code": "abc123", "state": "valid_state"})
-        assert response.status_code == 400
-        body = response.json()
-        assert "id_token 파싱 실패" in body.get("error", "")
+        url = reverse("apple-callback")
+        res = client_with_session.post(url, {"code": "abc123", "state": state})
+
+        assert res.status_code == 400
+        assert "id_token 파싱 실패" in res.json()["error"]
 
     @patch("users.services.social_login.AppleLoginService.authenticate_user", autospec=True)
     @patch("users.services.social_login.AppleLoginService.exchange_token", autospec=True)
     def test_successful_login_renders_home(
-        self,
-        mock_exchange: MagicMock,
-        mock_auth: MagicMock,
-        client_with_session: Client,
+            self,
+            mock_exchange: MagicMock,
+            mock_auth: MagicMock,
+            client_with_session: Client
     ) -> None:
         """정상 로그인 시 home.html 렌더링"""
-        url = reverse("apple-callback")
+        state = OAuthStateService.create_state()
+
         user = User.objects.create_user(
             username="appleuser",
             email="apple@example.com",
             password="test1234",
-            personal_info_consent=False,
-            terms_of_use=False,
+            personal_info_consent=True,
+            terms_of_use=True,
         )
-
         mock_exchange.return_value = {"id_token": "valid_token"}
         mock_auth.return_value = (user, None)
 
-        response = client_with_session.post(url, {"code": "abc123", "state": "valid_state"})
-        assert response.status_code == 200
-
-        template_names = [t.name for t in response.templates if t.name]
-        assert "home.html" in template_names
+        url = reverse("apple-callback")
+        res = client_with_session.post(url, {"code": "abc123", "state": state})
+        assert res.status_code == 200
+        assert "home.html" in [t.name for t in res.templates if t.name]
