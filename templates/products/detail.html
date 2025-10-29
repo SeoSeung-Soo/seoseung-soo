@@ -265,7 +265,7 @@
                     </div>
                 </div>
                 <div class="customer-review-content">
-                    {% if reviews.count > 0 %}
+                    {% if review_count > 0 %}
                         {% for review in reviews %}
                             <div class="customer-review-grid">
                                 <div class="customer-review-item">
@@ -274,13 +274,15 @@
                                         <span class="customer-review-item-rating-stars">{{ review.get_star_display }}</span>
                                         <span class="customer-review-item-date">{{ review.created_at|date:'Y.m.d' }}</span>
                                     </div>
-                                    {% if review.images.count > 0 %}
-                                        <div class="customer-review-item-images">
-                                            {% for image in review.images.all %}
-                                                <img src="{{ image.image.url }}" alt="리뷰 이미지">
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
+                                    {% with images=review.images.all %}
+                                        {% if images %}
+                                            <div class="customer-review-item-images">
+                                                {% for image in images %}
+                                                    <img src="{{ image.image.url }}" alt="리뷰 이미지">
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
                                     <div class="customer-review-item-body">
                                         <span class="customer-review-item-content">{{ review.content }}</span>
                                     </div>
