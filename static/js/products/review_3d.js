@@ -483,4 +483,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+    const expandBtn = document.getElementById('sphereExpandBtn');
+    if (expandBtn) {
+        expandBtn.addEventListener('click', function() {
+            sphereContainer.classList.add('expanded');
+            const spheresHeight = sphereContainer.querySelector('.review-spheres').scrollHeight;
+            sphereContainer.style.height = spheresHeight + 40 + 'px';
+        });
+    }
 });
