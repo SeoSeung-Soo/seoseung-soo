@@ -264,6 +264,31 @@
                         </div>
                     </div>
                 </div>
+                <div class="customer-review-content">
+                    {% if reviews.count > 0 %}
+                        {% for review in reviews %}
+                            <div class="customer-review-grid">
+                                <div class="customer-review-item">
+                                    <div class="customer-review-item-section">
+                                        <span class="customer-review-item-title">{{ review.get_masked_username }}</span>
+                                        <span class="customer-review-item-rating-stars">{{ review.get_star_display }}</span>
+                                        <span class="customer-review-item-date">{{ review.created_at|date:'Y.m.d' }}</span>
+                                    </div>
+                                    {% if review.images.count > 0 %}
+                                        <div class="customer-review-item-images">
+                                            {% for image in review.images.all %}
+                                                <img src="{{ image.image.url }}" alt="리뷰 이미지">
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="customer-review-item-body">
+                                        <span class="customer-review-item-content">{{ review.content }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
 
             <div class="tab-panel" id="ai-agent">
