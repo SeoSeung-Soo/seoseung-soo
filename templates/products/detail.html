@@ -38,13 +38,13 @@
             <div class="price-section">
                 {% if products.sale_price %}
                     <div class="price-row">
-                        <span class="sale-price">{{ products.price|discount_amount:products.sale_price }}원</span>
-                        <span class="original-price">{{ products.price|floatformat:0 }}원</span>
-                        <span class="discount-rate">{{ products.sale_price|floatformat:0 }}원 할인</span>
+                        <span class="sale-price">{{ products.price|discount_amount:products.sale_price|intcomma }}원</span>
+                        <span class="original-price">{{ products.price|intcomma }}원</span>
+                        <span class="discount-rate">{{ products.sale_price|intcomma }}원 할인</span>
                     </div>
                 {% else %}
                     <div class="price-row">
-                        <span class="price">{{ products.price|floatformat:0 }}원</span>
+                        <span class="price">{{ products.price|intcomma }}원</span>
                     </div>
                 {% endif %}
             </div>
@@ -142,12 +142,12 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">가격:</span>
-                            <span class="info-value">{{ products.price|floatformat:0 }}원</span>
+                            <span class="info-value">{{ products.price|intcomma }}원</span>
                         </div>
                         {% if products.sale_price %}
                         <div class="info-item">
                             <span class="info-label">할인가:</span>
-                            <span class="info-value">{{ products.sale_price|floatformat:0 }}원</span>
+                            <span class="info-value">{{ products.sale_price|intcomma }}원</span>
                         </div>
                         {% endif %}
                         <div class="info-item">
