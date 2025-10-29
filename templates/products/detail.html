@@ -183,6 +183,7 @@
                         {% endfor %}
                     </div>
                 </div>
+                
 
                 <div class="review-modal" id="reviewModal">
                     <div class="modal-overlay"></div>
@@ -219,11 +220,48 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="review-content">
-                    <h3>리뷰 작성하기</h3>
-                </div>
                 {% endif %}
+                <div class="review-summary">
+                    <div class="review-summary-grid">
+                        <div class="review-summary-section">
+                            <div class="review-summary-label">상품만족도</div>
+                            <div class="review-satisfaction">
+                                <span class="rating-score">{{ avg_rating|floatformat:1 }}</span>
+                                <span class="rating-total">/5</span>
+                            </div>
+                        </div>
+
+                        <div class="review-summary-section">
+                            <div class="review-summary-label">리뷰</div>
+                            <div class="review-count-display">
+                                <div class="review-count-items">
+                                    <span class="review-count-total">전체 {{ review_count }}</span>
+                                    <span class="review-count-label">포토 0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="review-summary-section">
+                            <div class="review-summary-label">평점 분포</div>
+                            <div class="review-stats-list">
+                                {% for rating, data in rating_distribution.items %}
+                                <div class="review-stat-item">
+                                    <span class="review-stat-star">{{ rating }}점</span>
+                                    <div class="review-stat-bar-container">
+                                        <div class="review-stat-bar" style="width: {{ data.percentage }}%;"></div>
+                                    </div>
+                                    <span class="review-stat-percentage">{{ data.percentage }}%</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="review-summary-section review-write-call">
+                            <span class="review-write-text">리뷰를 작성해서 립볼을 채워보세요!</span>
+                            <button class="review-write-btn">리뷰 작성하기</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="tab-panel" id="ai-agent">
