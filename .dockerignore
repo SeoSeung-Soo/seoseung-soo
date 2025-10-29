@@ -203,3 +203,6 @@ tests/
 test_*.py
 */tests/
 */test_*.py
+
+# media
+media

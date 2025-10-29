@@ -16,17 +16,29 @@ class ReviewCountService:
             review_count=Count('id')
         )
         
+        rating_counts = {
+            item['rating']: item['count'] 
+            for item in reviews.values('rating').annotate(count=Count('id'))
+        }
+        
+        total_reviews = stats['review_count']
         rating_distribution = {}
         for rating in range(5, 0, -1):
-            count = reviews.filter(rating=rating).count()
-            percentage = (count / stats['review_count'] * 100) if stats['review_count'] > 0 else 0.0
+            count = rating_counts.get(rating, 0)
+            percentage = (count / total_reviews * 100) if total_reviews > 0 else 0.0
             rating_distribution[rating] = {
                 'count': count,
                 'percentage': round(percentage, 1)
             }
         
+        photo_review_count = Review.objects.filter(
+            product=product,
+            images__isnull=False
+        ).distinct().count()
+        
         return {
             'avg_rating': float(stats['avg_rating']) if stats['avg_rating'] is not None else 0.0,
             'review_count': stats['review_count'],
+            'photo_review_count': photo_review_count,
             'rating_distribution': rating_distribution
         }

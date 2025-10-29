@@ -236,7 +236,7 @@
                             <div class="review-count-display">
                                 <div class="review-count-items">
                                     <span class="review-count-total">전체 {{ review_count }}</span>
-                                    <span class="review-count-label">포토 0</span>
+                                    <span class="review-count-label">포토 {{ photo_review_count|default:0 }}</span>
                                 </div>
                             </div>
                         </div>
@@ -353,7 +353,7 @@
               content: "{{ review.content|escapejs }}",
               date: "{{ review.created_at|date:'Y.m.d' }}",
               hasProfileImage: {% if review.user.profile_image %}true{% else %}false{% endif %},
-              profileImage: {% if review.user.profile_image %}"{{ review.user.profile_image }}"{% else %}null{% endif %},
+              profileImage: {% if review.user.profile_image.url %}"{{ review.user.profile_image }}"{% else %}null{% endif %},
               images: [
                   {% for image in review.images.all %}
                   "{{ image.image.url }}"{% if not forloop.last %},{% endif %}
