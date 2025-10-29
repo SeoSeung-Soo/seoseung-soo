@@ -194,10 +194,13 @@ if not DEBUG:
         "https://www.seoseung-soo.com",
         "https://accounts.google.com",
         "https://www.google.com",
+        "https://appleid.apple.com",
+        "https://www.apple.com",
     ]
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r"^https://.*\.google\.com$",
         r"^https://.*\.googleapis\.com$",
+        r"^https://.*\.apple\.com$",
     ]
 else:
     # 개발 환경에서는 모든 origin 허용
@@ -224,18 +227,27 @@ CSP_SCRIPT_SRC = (
     "'unsafe-inline'",
     "https://accounts.google.com",
     "https://developers.kakao.com",
-    "https://t1.kakaocdn.net"
+    "https://t1.kakaocdn.net",
+    "https://appleid.apple.com",
+    "https://www.apple.com"
 )
 CSP_FRAME_SRC = (
     "'self'",
     "https://accounts.google.com",
-    "https://kauth.kakao.com"
+    "https://kauth.kakao.com",
+    "https://appleid.apple.com"
 )
 CSP_CONNECT_SRC = (
     "'self'",
     "https://accounts.google.com",
     "https://kauth.kakao.com",
-    "https://kapi.kakao.com"
+    "https://kapi.kakao.com",
+    "https://appleid.apple.com",
+    "https://www.apple.com"
+)
+CSP_FONT_SRC = (
+    "'self'",
+    "https://www.apple.com"
 )
 
 # 보안 헤더 설정
