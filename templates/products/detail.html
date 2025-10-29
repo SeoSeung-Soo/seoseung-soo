@@ -170,7 +170,8 @@
             
             <div class="tab-panel" id="review">
                 {% if review_count > 0 %}
-                <div class="review-sphere-container">
+                <div class="review-sphere-container" id="reviewSphereContainer">
+                    <div class="review-sphere-gradient-mask"></div>
                     <div class="review-spheres">
                         {% for review in reviews %}
                         <div class="review-sphere" data-review-id="{{ review.id }}" data-has-image="{% if review.user.profile_image %}true{% else %}false{% endif %}">
@@ -182,6 +183,7 @@
                         </div>
                         {% endfor %}
                     </div>
+                    <button class="sphere-expand-btn" id="sphereExpandBtn">립볼 전체 보기</button>
                 </div>
                 
 
