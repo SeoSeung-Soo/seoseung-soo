@@ -362,6 +362,81 @@
         </div>
     </div>
 </div>
+
+<div class="mobile-purchase-drawer" id="mobilePurchaseDrawer">
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <div class="drawer-content">
+        <div class="drawer-header">
+            <h3>구매 옵션</h3>
+            <button class="drawer-close" id="drawerClose">×</button>
+        </div>
+        
+        <div class="drawer-body">
+            <div class="drawer-product-info">
+                <div class="drawer-product-details">
+                    <h4 class="drawer-product-name">{{ products.name }}</h4>
+                    <p class="drawer-product-price">
+                        {% if products.sale_price %}
+                            <span class="unit-price" data-price="{{ products.price|discount_amount:products.sale_price }}"><span class="total-price" id="drawerTotalPrice">{{ products.price|discount_amount:products.sale_price|intcomma }}원</span>
+                        {% else %}
+                            <span class="unit-price" data-price="{{ products.price }}"><span class="total-price" id="drawerTotalPrice">{{ products.price|intcomma }}원</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="drawer-options-row">
+                <div class="drawer-size-section">
+                    <h5>사이즈</h5>
+                    <div class="drawer-size-options">
+                        <button class="drawer-size-btn active" data-size="S">S</button>
+                        <button class="drawer-size-btn" data-size="M">M</button>
+                        <button class="drawer-size-btn" data-size="L">L</button>
+                    </div>
+                </div>
+                
+                <div class="drawer-quantity-section">
+                    <h5>수량</h5>
+                    <div class="drawer-quantity-controls">
+                        <button class="drawer-quantity-btn" onclick="decreaseDrawerQuantity()">-</button>
+                        <span class="drawer-quantity-display" id="drawerQuantityDisplay">1</span>
+                        <button class="drawer-quantity-btn" onclick="increaseDrawerQuantity()">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="drawer-footer">
+            <div class="drawer-actions">
+                <button class="drawer-btn drawer-btn-primary" id="drawerBuyBtn" onclick="handleDrawerBuy()">구매하기</button>
+                {% if products.is_live and not products.is_sold %}
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'cart-create' %}" class="drawer-cart-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ products.id }}">
+                            <input type="hidden" name="quantity" id="drawerCartQuantity" value="1">
+                            <button type="submit" class="drawer-btn drawer-btn-secondary">장바구니</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="drawer-btn drawer-btn-secondary">장바구니</a>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+                        <button type="button" class="drawer-btn drawer-btn-icon" onclick="addToWishlist({{ products.id }})" id="drawerWishlistBtn">
+                            {% if is_favorited %}★{% else %}☆{% endif %}
+                        </button>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="drawer-btn drawer-btn-icon">♡</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<button class="mobile-fab-btn" id="mobileFabBtn">
+    <span>구매하기</span>
+</button>
 {% endblock %}
 
 {% block scripts %}
