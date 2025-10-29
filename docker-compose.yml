@@ -63,10 +63,23 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ss_networks
+
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  redis_data:
 networks:
   ss_networks:
     driver: bridge

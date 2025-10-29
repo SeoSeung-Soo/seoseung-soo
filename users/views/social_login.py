@@ -1,7 +1,7 @@
 import json
 import logging
 import uuid
-from typing import Any, Optional
+from typing import Optional
 
 from django.contrib import messages
 from django.contrib.auth import login
@@ -12,7 +12,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
 
-from users.models import OAuthState
+from users.services.oauth_state import OAuthStateService
 from users.services.social_login import (
     AppleLoginService,
     GoogleLoginService,
@@ -133,14 +133,9 @@ class NaverCallbackView(View):
 
 class AppleLoginView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
-        # CSRF 유사 공격 방지용 state
-        state = uuid.uuid4().hex
-        OAuthState.objects.create(key=state)
-
-        # Apple 로그인 URL 생성
+        # Redis에 state 저장 (TTL 10분)
+        state = OAuthStateService.create_state()
         login_url = AppleLoginService.get_login_url(state)
-
-        # Apple로 리다이렉트
         return redirect(login_url)
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -149,37 +144,19 @@ class AppleCallbackView(View):
         code: str | None = request.POST.get("code")
         state: str | None = request.POST.get("state")
 
-        # code 누락 테스트 대응
         if not code:
             return JsonResponse({"error": "code 누락"}, status=400)
+        if not state or not OAuthStateService.validate_state(state):
+            return JsonResponse({"error": "state 불일치"}, status=400)
 
-        # state 검증
-        if not state:
-            return JsonResponse({"error": "state가 누락되었습니다."}, status=400)
-
-        try:
-            oauth_state = OAuthState.objects.get(key=state)
-
-        except OAuthState.DoesNotExist:
-            return JsonResponse({"error": "state가 일치하지 않습니다."}, status=400)
-
-        if oauth_state.is_expired():
-            oauth_state.delete()
-
-            return JsonResponse({"error": "state가 만료되었습니다."}, status=400)
-        oauth_state.delete()
-
-        # Apple 토큰 교환
-        token_payload: dict[str, Any] | None = AppleLoginService.exchange_token(code)
+        token_payload = AppleLoginService.exchange_token(code)
         if not token_payload or "id_token" not in token_payload:
             return JsonResponse({"error": "Apple 토큰 교환 실패"}, status=400)
 
-        # 사용자 인증
-        id_token: str = token_payload["id_token"]
+        id_token = token_payload["id_token"]
         user, error = AppleLoginService.authenticate_user(id_token=id_token)
         if error or not user:
             return JsonResponse({"error": error or "사용자 인증 실패"}, status=400)
 
-        # 로그인 성공 시 home.html 렌더링
         login(request, user)
         return render(request, "home.html")
