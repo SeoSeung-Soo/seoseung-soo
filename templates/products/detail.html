@@ -169,265 +169,101 @@
             </div>
             
             <div class="tab-panel" id="review">
-                <div class="review-content-detail">
-                    <h3>상품 리뷰</h3>
-                </div>
-                
-                <!-- 3D 리뷰 구체 인터페이스 -->
                 {% if review_count > 0 %}
                 <div class="review-sphere-container">
                     <div class="review-spheres">
                         {% for review in reviews %}
-                        <div class="review-sphere" data-review-id="{{ review.id }}">
-                            <span class="avatar-text">{{ review.get_masked_username|slice:":1"|upper }}</span>
+                        <div class="review-sphere" data-review-id="{{ review.id }}" data-has-image="{% if review.user.profile_image %}true{% else %}false{% endif %}">
+                            {% if review.user.profile_image %}
+                                <img src="{{ review.user.profile_image }}" alt="{{ review.get_masked_username }}" class="sphere-profile-image">
+                            {% else %}
+                                <span class="avatar-text">S</span>
+                            {% endif %}
                         </div>
                         {% endfor %}
                     </div>
-                    
-                    <div class="sphere-controls">
-                        <button class="control-btn auto-rotate-btn">자동 회전</button>
-                        <button class="control-btn reset-btn">위치 초기화</button>
-                    </div>
-                    
-                    <div class="review-detail-panel">
-                        <div class="panel-header">
-                            <h3>리뷰 상세</h3>
-                            <button class="close-panel">×</button>
-                        </div>
-                        <div class="panel-content">
-                            {% for review in reviews %}
-                            <div class="review-content-item" data-review-index="{{ forloop.counter0 }}">
-                                <div class="review-header">
-                                    <div class="reviewer-name">{{ review.get_masked_username }}</div>
-                                    <div class="review-rating">{{ review.get_star_display }}</div>
-                                    <div class="review-date">{{ review.created_at|date:"Y.m.d" }}</div>
+                </div>
+                
+
+                <div class="review-modal" id="reviewModal">
+                    <div class="modal-overlay"></div>
+                    <button class="modal-close">×</button>
+                    <button class="modal-nav-btn modal-prev" id="modalPrev">‹</button>
+                    <button class="modal-nav-btn modal-next" id="modalNext">›</button>
+
+                    <div class="modal-container">
+                        <div class="modal-content">
+                            <div class="modal-image-section">
+                                <div class="modal-images" id="modalImages">
                                 </div>
-                                <div class="review-text">{{ review.content }}</div>
-                                {% if review.images.all %}
-                                <div class="review-images">
-                                    {% for image in review.images.all %}
-                                    <img src="{{ image.image.url }}" alt="리뷰 이미지">
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
                             </div>
-                            {% endfor %}
+
+                            <div class="modal-detail-section">
+                                <div class="modal-header">
+                                    <div class="modal-user-info">
+                                        <div class="modal-avatar" id="modalAvatar"></div>
+                                        <div class="modal-username" id="modalUsername"></div>
+                                    </div>
+                                    <div class="modal-rating" id="modalRating"></div>
+                                </div>
+
+                                <div class="modal-body">
+                                    <div class="modal-review-content">
+                                        <div class="modal-review-text" id="modalReviewText"></div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <div class="modal-date" id="modalDate"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {% endif %}
-                
-                <div class="review-content">
+                <div class="review-summary">
+                    <div class="review-summary-grid">
+                        <div class="review-summary-section">
+                            <div class="review-summary-label">상품만족도</div>
+                            <div class="review-satisfaction">
+                                <span class="rating-score">{{ avg_rating|floatformat:1 }}</span>
+                                <span class="rating-total">/5</span>
+                            </div>
+                        </div>
 
-                    <div class="review-summary">
-                        <div class="rating-summary">
-                            <span class="rating-label">평점:</span>
-                            <div class="rating-value">
-                                {% if avg_rating > 0 %}
-                                    <div class="star-rating" data-rating="{{ avg_rating|floatformat:1 }}">
-                                        <span class="stars-background">★★★★★</span>
-                                        <span class="stars-fill">★★★★★</span>
-                                    </div>
-                                    <span class="rating-text">({{ avg_rating|floatformat:1 }}/5)</span>
-                                {% else %}
-                                    <div class="star-rating" data-rating="0">
-                                        <span class="stars-background">☆☆☆☆☆</span>
-                                        <span class="stars-fill">★★★★★</span>
-                                    </div>
-                                    <span class="rating-text">(평점 없음)</span>
-                                {% endif %}
+                        <div class="review-summary-section">
+                            <div class="review-summary-label">리뷰</div>
+                            <div class="review-count-display">
+                                <div class="review-count-items">
+                                    <span class="review-count-total">전체 {{ review_count }}</span>
+                                    <span class="review-count-label">포토 {{ photo_review_count|default:0 }}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="review-count">
-                            <span>총 {{ review_count }}개의 리뷰</span>
-                        </div>
-                    </div>
-                    
-                    {% if user.is_authenticated and not user_review %}
-                    <div class="review-write-section">
-                        <h3>리뷰 작성하기</h3>
-                        <form method="post" action="{% url 'review-create' products.id %}" enctype="multipart/form-data" class="review-form">
-                            {% csrf_token %}
-                            
-                            <div class="form-group">
-                                <span class="form-label">{{ review_form.rating.label }}</span>
-                                <div class="rating-select">
-                                    <input type="radio" id="rating-5" name="rating" value="5" checked>
-                                    <label for="rating-5">★</label>
-                                    <input type="radio" id="rating-4" name="rating" value="4">
-                                    <label for="rating-4">★</label>
-                                    <input type="radio" id="rating-3" name="rating" value="3">
-                                    <label for="rating-3">★</label>
-                                    <input type="radio" id="rating-2" name="rating" value="2">
-                                    <label for="rating-2">★</label>
-                                    <input type="radio" id="rating-1" name="rating" value="1">
-                                    <label for="rating-1">★</label>
+
+                        <div class="review-summary-section">
+                            <div class="review-summary-label">평점 분포</div>
+                            <div class="review-stats-list">
+                                {% for rating, data in rating_distribution.items %}
+                                <div class="review-stat-item">
+                                    <span class="review-stat-star">{{ rating }}점</span>
+                                    <div class="review-stat-bar-container">
+                                        <div class="review-stat-bar" style="width: {{ data.percentage }}%;"></div>
+                                    </div>
+                                    <span class="review-stat-percentage">{{ data.percentage }}%</span>
                                 </div>
-                                {% if review_form.rating.errors %}
-                                    <div class="error-message">{{ review_form.rating.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="{{ review_form.content.id_for_label }}">{{ review_form.content.label }}</label>
-                                {{ review_form.content }}
-                                {% if review_form.content.errors %}
-                                    <div class="error-message">{{ review_form.content.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="{{ review_image_form.image.id_for_label }}">{{ review_image_form.image.label }} (선택사항)</label>
-                                {{ review_image_form.image }}
-                                <small class="form-hint">최대 5개의 이미지를 업로드할 수 있습니다.</small>
-                                {% if review_image_form.image.errors %}
-                                    <div class="error-message">{{ review_image_form.image.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">리뷰 등록</button>
-                            </div>
-                        </form>
-                    </div>
-                    {% elif not user.is_authenticated %}
-                    {% endif %}
-                    
-                    <div class="review-list">
-                        {% for review in reviews %}
-                        <div class="review-item" id="review-{{ review.id }}">
-                            <div class="review-header">
-                                <div class="review-header-top">
-                                    <span class="reviewer-name">{{ review.get_masked_username }}</span>
-                                    <span class="review-rating" id="review-rating-{{ review.id }}">{{ review.get_star_display }}</span>
-                                    <span class="review-date">{{ review.created_at|date:"Y.m.d" }}</span>
-                                </div>
-                                {% if user == review.user %}
-                                <div class="review-actions">
-                                    <button class="btn-review-edit" onclick="editReview({{ review.id }})">수정</button>
-                                    <form method="post" action="{% url 'review-delete' review.id %}" style="display: inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn-review-delete" onclick="return confirm('리뷰를 삭제하시겠습니까?')">삭제</button>
-                                    </form>
-                                </div>
-                                {% endif %}
-                            </div>
-                            {% if review.images.all %}
-                            <div class="review-images">
-                                {% for image in review.images.all %}
-                                <img src="{{ image.image.url }}" alt="리뷰 이미지" class="review-image">
                                 {% endfor %}
                             </div>
-                            {% endif %}
-                            <div class="review-text" id="review-text-{{ review.id }}" data-content="{{ review.content }}" data-rating="{{ review.rating }}">
-                                {{ review.content }}
-                            </div>
-
-                            <div class="review-edit-form" id="review-edit-form-{{ review.id }}" style="display: none;">
-                                <div class="review-edit-rating">
-                                    <div class="rating-select-edit" id="rating-edit-{{ review.id }}">
-                                        <input type="radio" id="rating-edit-5-{{ review.id }}" name="rating-edit-{{ review.id }}" value="5" {% if review.rating == 5 %}checked{% endif %}>
-                                        <label for="rating-edit-5-{{ review.id }}">★</label>
-                                        <input type="radio" id="rating-edit-4-{{ review.id }}" name="rating-edit-{{ review.id }}" value="4" {% if review.rating == 4 %}checked{% endif %}>
-                                        <label for="rating-edit-4-{{ review.id }}">★</label>
-                                        <input type="radio" id="rating-edit-3-{{ review.id }}" name="rating-edit-{{ review.id }}" value="3" {% if review.rating == 3 %}checked{% endif %}>
-                                        <label for="rating-edit-3-{{ review.id }}">★</label>
-                                        <input type="radio" id="rating-edit-2-{{ review.id }}" name="rating-edit-{{ review.id }}" value="2" {% if review.rating == 2 %}checked{% endif %}>
-                                        <label for="rating-edit-2-{{ review.id }}">★</label>
-                                        <input type="radio" id="rating-edit-1-{{ review.id }}" name="rating-edit-{{ review.id }}" value="1" {% if review.rating == 1 %}checked{% endif %}>
-                                        <label for="rating-edit-1-{{ review.id }}">★</label>
-                                    </div>
-                                </div>
-                                <textarea class="review-edit-textarea" id="review-edit-textarea-{{ review.id }}" maxlength="1000" rows="5">{{ review.content }}</textarea>
-                                <div class="review-edit-options">
-                                    <div class="char-counter">
-                                        <span class="char-count" id="review-edit-char-count-{{ review.id }}">{{ review.content|length }}</span>/1000
-                                    </div>
-                                </div>
-                                <div class="review-edit-buttons">
-                                    <button class="btn-review-save" onclick="saveReview({{ review.id }})">저장</button>
-                                    <button class="btn-review-cancel" onclick="cancelEditReview({{ review.id }})">취소</button>
-                                </div>
-                            </div>
-                            
-                            
-                            {% if review.comments.all or user.role == 'admin' %}
-                            <div class="review-comments">
-                                {% for comment in review.comments.all %}
-                                <div class="comment-item" id="comment-{{ comment.id }}">
-                                    <div class="comment-header">
-                                        <div class="comment-header-top">
-                                            <span class="comment-author admin-badge">{{ comment.user.username }}</span>
-                                            <span class="comment-date">{{ comment.created_at|date:"Y.m.d H:i" }}</span>
-                                        </div>
-                                        {% if user.role == 'admin' %}
-                                        <div class="comment-actions">
-                                            <button class="btn-comment-edit" onclick="editComment({{ comment.id }})">수정</button>
-                                            <form method="post" action="{% url 'review-comment-delete' comment.id %}" style="display: inline;">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn-comment-delete" onclick="return confirm('답글을 삭제하시겠습니까?')">삭제</button>
-                                            </form>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="comment-content" data-comment-id="{{ comment.id }}" data-content="{{ comment.content }}" data-is-published="{{ comment.is_published|yesno:'true,false' }}">
-                                        {% if comment.is_published %}
-                                            {{ comment.content }}
-                                        {% elif user.role == 'admin' or user == review.user %}
-                                            {{ comment.content }}
-                                        {% else %}
-                                            <span class="private-comment">비공개 답글입니다</span>
-                                        {% endif %}
-                                    </div>
-                                    <div class="comment-edit-form" id="edit-form-{{ comment.id }}" style="display: none;">
-                                        <textarea class="comment-edit-textarea" id="edit-textarea-{{ comment.id }}" maxlength="500">{{ comment.content }}</textarea>
-                                        <div class="comment-edit-options">
-                                            <label class="edit-public-checkbox-label">
-                                                <input type="checkbox" id="edit-is-published-{{ comment.id }}" {% if comment.is_published %}checked{% endif %}>
-                                                <span class="checkbox-text">공개 답글</span>
-                                            </label>
-                                            <div class="char-counter">
-                                                <span class="char-count" id="edit-char-count-{{ comment.id }}">{{ comment.content|length }}</span>/500
-                                            </div>
-                                        </div>
-                                        <div class="comment-edit-buttons">
-                                            <button class="btn-comment-save" onclick="saveComment({{ comment.id }})">저장</button>
-                                            <button class="btn-comment-cancel" onclick="cancelEditComment({{ comment.id }})">취소</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                                
-                                {% if user.role == 'admin' %}
-                                <div class="admin-comment-form">
-                                    <h5>관리자 답글 작성</h5>
-                                    <form method="post" action="{% url 'review-comment-create' review.id %}" class="comment-form">
-                                        {% csrf_token %}
-                                        <div class="comment-input-wrapper">
-                                            {{ comment_form.content }}
-                                            <div class="comment-options">
-                                                <label class="public-checkbox-label">
-                                                    {{ comment_form.is_published }}
-                                                    <span class="checkbox-text">공개 답글</span>
-                                                </label>
-                                                <div class="char-counter">
-                                                    <span class="char-count">0</span>/500
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button type="submit" class="btn-admin-comment">답글 작성</button>
-                                    </form>
-                                </div>
-                                {% endif %}
-                            </div>
-                            {% endif %}
                         </div>
 
-                        {% endfor %}
+                        <div class="review-summary-section review-write-call">
+                            <span class="review-write-text">리뷰를 작성해서 립볼을 채워보세요!</span>
+                            <button class="review-write-btn">리뷰 작성하기</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="tab-panel" id="ai-agent">
                 <div class="ai-agent-content">
                     <h3>AI 가상 피팅</h3>
@@ -435,13 +271,13 @@
                         <div class="ai-message">
                             <div class="ai-avatar">SSS</div>
                             <div class="ai-text">
-                                안녕하세요! AI 가상 피팅 서비스입니다. 
+                                안녕하세요! AI 가상 피팅 서비스입니다.
                                 셀카나 전신 사진을 업로드하시면 이 상품을 입어보신 모습을 확인하실 수 있습니다.
                                 전신이 잘 나온 사진일수록 더 정확한 결과를 얻을 수 있어요!
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="photo-upload-area">
                         <div class="upload-section">
                             <div class="upload-box" id="uploadBox">
@@ -453,7 +289,7 @@
                                 </div>
                                 <input type="file" id="photoInput" accept="image/*" style="display: none;">
                             </div>
-                            
+
                             <div class="uploaded-photo" id="uploadedPhoto" style="display: none;">
                                 <div class="photo-preview">
                                     <img id="previewImage" src="" alt="업로드된 사진">
@@ -465,7 +301,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="ai-process-section" id="aiProcessSection" style="display: none;">
                             <button class="ai-process-btn" id="aiProcessBtn">
                                 <span class="btn-icon">✨</span>
@@ -473,7 +309,7 @@
                             </button>
                             <p class="process-hint">AI가 사진을 분석하여 가상 피팅을 진행합니다.</p>
                         </div>
-                        
+
                         <div class="ai-result-section" id="aiResultSection" style="display: none;">
                             <h4>가상 피팅 결과</h4>
                             <div class="result-images">
@@ -500,9 +336,37 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="{% static 'js/products/product-description-or-review.js' %}"></script>
 <script src="{% static 'js/products/detail.js' %}"></script>
 <script src="{% static 'js/products/review_rating.js' %}"></script>
 <script src="{% static 'js/products/size_quantity.js' %}"></script>
 <script src="{% static 'js/favorites/favorite.js' %}"></script>
+<script>
+      window.reviewData = [
+          {% for review in reviews %}
+          {
+              id: {{ review.id }},
+              username: "{{ review.get_masked_username }}",
+              first_name: "{{ review.user.first_name|default:review.get_masked_username }}",
+              rating: "{{ review.get_star_display }}",
+              content: "{{ review.content|escapejs }}",
+              date: "{{ review.created_at|date:'Y.m.d' }}",
+              hasProfileImage: {% if review.user.profile_image %}true{% else %}false{% endif %},
+              profileImage: {% if review.user.profile_image.url %}"{{ review.user.profile_image }}"{% else %}null{% endif %},
+              images: [
+                  {% for image in review.images.all %}
+                  "{{ image.image.url }}"{% if not forloop.last %},{% endif %}
+                  {% endfor %}
+              ],
+              productImages: [
+                  {% for image in products.image.all %}
+                  "{{ image.image.url }}"{% if not forloop.last %},{% endif %}
+                  {% endfor %}
+              ]
+          }{% if not forloop.last %},{% endif %}
+          {% endfor %}
+      ];
+</script>
+<script src="{% static 'js/products/review_3d.js' %}"></script>
 {% endblock %}

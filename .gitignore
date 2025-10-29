@@ -301,3 +301,5 @@ pyrightconfig.json
 .idea/
 
 # static, media
+
+staticfiles

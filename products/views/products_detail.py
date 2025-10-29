@@ -43,6 +43,8 @@ class ProductsDetailView(View):
             "reviews": reviews,
             "avg_rating": review_stats['avg_rating'],
             "review_count": review_stats['review_count'],
+            "photo_review_count": review_stats['photo_review_count'],
+            "rating_distribution": review_stats['rating_distribution'],
             "user_review": user_review,
             "is_favorited": is_favorited,
             "review_form": review_form,

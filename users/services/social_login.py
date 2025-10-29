@@ -340,7 +340,7 @@ class AppleLoginService:
         """
         params = {
             "response_type": "code",
-            "response_mode": "query",
+            "response_mode": "form_post",
             "client_id": os.getenv("APPLE_CLIENT_ID"),
             "redirect_uri": os.getenv("APPLE_REDIRECT_URI"),
             "scope": "name email",

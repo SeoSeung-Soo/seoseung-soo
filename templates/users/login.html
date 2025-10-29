@@ -102,10 +102,10 @@
              <span>네이버 로그인</span>
            </button>
            
-           <button type="button" class="social-icon-btn apple-icon-btn">
-             <img src="{% static 'images/social/apple/Apple_Logo.png' %}" alt="Apple 로고" class="apple-logo-img">
-             <span>Sign in with Apple</span>
-           </button>
+          <button type="button" class="social-icon-btn apple-icon-btn" onclick="window.location.href='{% url 'apple-login' %}'">
+            <img src="{% static 'images/social/apple/Apple_Logo.png' %}" alt="Apple 로고" class="apple-logo-img">
+            <span>Sign in with Apple</span>
+          </button>
          </div>
 
 

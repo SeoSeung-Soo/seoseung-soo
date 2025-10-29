@@ -6,7 +6,6 @@ __pycache__/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media
 
 
 ### Django.Python Stack ###
@@ -204,3 +203,6 @@ tests/
 test_*.py
 */tests/
 */test_*.py
+
+# media
+media
