@@ -33,7 +33,7 @@ class Product(BaseModel):
     is_live = models.BooleanField(default=False)
     is_sold = models.BooleanField(default=False)
     categories = models.ManyToManyField(Category, blank=True, db_table='product_category_cdt')
-    color = models.ForeignKey(Color, blank=True, null=True, on_delete=models.SET_NULL)
+    colors = models.ManyToManyField(Color, blank=True, db_table='product_color_cdt')
     class Meta:
         db_table = 'products'
 

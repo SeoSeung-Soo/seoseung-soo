@@ -379,6 +379,14 @@ function updateDrawerQuantity() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    const colorOptionBtns = document.querySelectorAll('.color-option-btn');
+    colorOptionBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            colorOptionBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
     const mobileFabBtn = document.getElementById('mobileFabBtn');
     const drawerOverlay = document.getElementById('drawerOverlay');
     const drawerClose = document.getElementById('drawerClose');
@@ -399,6 +407,14 @@ document.addEventListener('DOMContentLoaded', function() {
     drawerSizeBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             drawerSizeBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    const drawerColorBtns = document.querySelectorAll('.drawer-color-option-btn');
+    drawerColorBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            drawerColorBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
         });
     });

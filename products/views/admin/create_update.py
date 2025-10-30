@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
 from products.forms.product_form import ProductForm, ProductImageForm
-from products.models import Product, ProductImage
+from products.models import Color, Product, ProductImage
 from users.models import User
 from users.utils.permission import AdminPermission
 
@@ -14,9 +14,11 @@ class ProductCreateView(AdminPermission, View):
     def get(self, request: HttpRequest) -> HttpResponse:
         form = ProductForm()
         image_form = ProductImageForm()
+        colors = Color.objects.all().order_by('name')
         context = {
             'form': form,
             'image_form': image_form,
+            'colors': colors,
             'title': '상품 등록'
         }
         return render(request, 'products/admin/product_create.html', context)
@@ -41,9 +43,11 @@ class ProductCreateView(AdminPermission, View):
             
             return redirect('product-list')
         
+        colors = Color.objects.all().order_by('name')
         context = {
             'form': form,
             'image_form': image_form,
+            'colors': colors,
             'title': '상품 등록'
         }
         return render(request, 'products/admin/product_create.html', context)
@@ -54,10 +58,12 @@ class ProductUpdateView(AdminPermission, View):
         product = get_object_or_404(Product, pk=pk)
         form = ProductForm(instance=product)
         image_form = ProductImageForm()
+        colors = Color.objects.all().order_by('name')
         context = {
             'form': form,
             'image_form': image_form,
             'product': product,
+            'colors': colors,
             'title': '상품 수정'
         }
         return render(request, 'products/admin/product_create.html', context)
@@ -79,10 +85,12 @@ class ProductUpdateView(AdminPermission, View):
             
             return redirect('product-list')
         
+        colors = Color.objects.all().order_by('name')
         context = {
             'form': form,
             'image_form': image_form,
             'product': product,
+            'colors': colors,
             'title': '상품 수정'
         }
         return render(request, 'products/admin/product_create.html', context)

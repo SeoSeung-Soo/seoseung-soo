@@ -1,8 +1,11 @@
+from typing import Any
+
 from django import forms
+
 from products.models import Color
 
 
-class ProductColorForm(forms.ModelForm):
+class ProductColorForm(forms.ModelForm): # type: ignore
     hex_code = forms.CharField(
         max_length=7,
         required=False,
@@ -32,7 +35,7 @@ class ProductColorForm(forms.ModelForm):
             'hex_code': '색상을 선택하거나 HEX 코드를 입력하세요.',
         }
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not self.fields['hex_code'].widget.attrs.get('value') and self.instance.pk:
             self.fields['hex_code'].widget.attrs['value'] = self.instance.hex_code or '#000000'

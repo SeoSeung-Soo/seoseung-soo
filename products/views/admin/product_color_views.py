@@ -1,13 +1,16 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
+from django.http.request import HttpRequest
+from django.http.response import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
+
 from products.forms.product_color import ProductColorForm
 from products.models import Color
 from users.utils.permission import AdminPermission
 
 
 class AdminProductColorView(AdminPermission, View):
-    def get(self, request):
+    def get(self, request: HttpRequest) -> HttpResponse:
         colors = Color.objects.all().order_by('name')
         form = ProductColorForm()
         context = {
@@ -17,7 +20,7 @@ class AdminProductColorView(AdminPermission, View):
         }
         return render(request, 'products/admin/product_color.html', context)
     
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         form = ProductColorForm(request.POST)
         if form.is_valid():
             form.save()
@@ -35,7 +38,7 @@ class AdminProductColorView(AdminPermission, View):
 
 
 class AdminColorUpdateView(AdminPermission, View):
-    def get(self, request, pk):
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         color = get_object_or_404(Color, pk=pk)
         form = ProductColorForm(instance=color)
         colors = Color.objects.all().order_by('name')
@@ -47,7 +50,7 @@ class AdminColorUpdateView(AdminPermission, View):
         }
         return render(request, 'products/admin/product_color.html', context)
     
-    def post(self, request, pk):
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         color = get_object_or_404(Color, pk=pk)
         form = ProductColorForm(request.POST, instance=color)
         if form.is_valid():
@@ -67,7 +70,7 @@ class AdminColorUpdateView(AdminPermission, View):
 
 
 class AdminColorDeleteView(AdminPermission, View):
-    def post(self, request, pk):
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         color = get_object_or_404(Color, pk=pk)
         color_name = color.name
         color.delete()

@@ -35,6 +35,16 @@
             <h1 class="product-name">{{ products.name }}</h1>
             <p class="product-description">{{ products.description }}</p>
             
+            <div class="color-selection-section">
+                <div class="color-selection-options">
+                    {% for color in products.colors.all %}
+                    <button class="color-option-btn{% if forloop.first %} active{% endif %}" data-color="{{ color.id }}">
+                        <span class="color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ color.name }}"></span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            
             <div class="price-section">
                 {% if products.sale_price %}
                     <div class="price-row">
@@ -384,7 +394,15 @@
                     </p>
                 </div>
             </div>
-            
+            <div class="drawer-color-section">
+                <div class="drawer-color-options">
+                    {% for color in products.colors.all %}
+                    <button class="drawer-color-option-btn" data-color="{{ color.id }}">
+                        <span class="drawer-color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};"></span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
             <div class="drawer-options-row">
                 <div class="drawer-size-section">
                     <h5>사이즈</h5>

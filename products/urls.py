@@ -4,9 +4,9 @@ from products.views.admin.create_update import ProductCreateView, ProductUpdateV
 from products.views.admin.delete_image import DeleteProductImageView
 from products.views.admin.detail_or_list import ProductListView
 from products.views.admin.product_color_views import (
-    AdminProductColorView, 
-    AdminColorUpdateView, 
-    AdminColorDeleteView
+    AdminColorDeleteView,
+    AdminColorUpdateView,
+    AdminProductColorView,
 )
 from products.views.products_detail import ProductsDetailView
 
