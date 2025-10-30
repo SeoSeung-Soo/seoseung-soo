@@ -108,6 +108,7 @@ body:not(.menu-open) .product-actions button {
 @media (max-width: 720px) {
   .product-grid { grid-template-columns: repeat(2, 1fr); }
   .product-thumb { height: 200px; }
+  .product-price { font-size: 14px; }
 }
 @media (max-width: 480px) {
   .product-grid { grid-template-columns: repeat(2, 1fr); }
