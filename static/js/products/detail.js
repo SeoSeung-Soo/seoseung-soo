@@ -1,4 +1,3 @@
-// 상품 이미지 변경 기능
 function changeMainImage(imageUrl) {
     document.getElementById('mainImage').src = imageUrl;
     
@@ -316,4 +315,144 @@ function saveReview(reviewId) {
         console.error('Error:', error);
         alert('리뷰 수정 중 오류가 발생했습니다.');
     });
+}
+
+let drawerQuantity = 1;
+
+function openMobileDrawer() {
+    const drawer = document.getElementById('mobilePurchaseDrawer');
+    if (drawer) {
+        drawer.classList.add('active');
+    }
+}
+
+function closeMobileDrawer() {
+    const drawer = document.getElementById('mobilePurchaseDrawer');
+    if (drawer) {
+        drawer.classList.remove('active');
+    }
+}
+
+function increaseDrawerQuantity() {
+    const productStock = document.querySelector('.size-quantity-section')?.dataset.productStock;
+    const maxStock = productStock ? parseInt(productStock) : 0;
+    
+    if (drawerQuantity < maxStock) {
+        drawerQuantity++;
+        updateDrawerQuantity();
+    } else {
+        alert('재고가 부족합니다.');
+    }
+}
+
+function decreaseDrawerQuantity() {
+    if (drawerQuantity > 1) {
+        drawerQuantity--;
+        updateDrawerQuantity();
+    }
+}
+
+function updateDrawerQuantity() {
+    const quantityDisplay = document.getElementById('drawerQuantityDisplay');
+    const quantityDisplay2 = document.getElementById('drawerQuantityDisplay2');
+    const cartQuantity = document.getElementById('drawerCartQuantity');
+    
+    if (quantityDisplay) {
+        quantityDisplay.textContent = drawerQuantity;
+    }
+    if (quantityDisplay2) {
+        quantityDisplay2.textContent = drawerQuantity;
+    }
+    if (cartQuantity) {
+        cartQuantity.value = drawerQuantity;
+    }
+    
+    const unitPriceElement = document.querySelector('.unit-price');
+    const totalPriceElement = document.getElementById('drawerTotalPrice');
+    
+    if (unitPriceElement && totalPriceElement) {
+        const unitPrice = parseInt(unitPriceElement.dataset.price);
+        const totalPrice = unitPrice * drawerQuantity;
+        
+        totalPriceElement.textContent = totalPrice.toLocaleString() + '원';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileFabBtn = document.getElementById('mobileFabBtn');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const drawerClose = document.getElementById('drawerClose');
+    
+    if (mobileFabBtn) {
+        mobileFabBtn.addEventListener('click', openMobileDrawer);
+    }
+    
+    if (drawerOverlay) {
+        drawerOverlay.addEventListener('click', closeMobileDrawer);
+    }
+    
+    if (drawerClose) {
+        drawerClose.addEventListener('click', closeMobileDrawer);
+    }
+    
+    const drawerSizeBtns = document.querySelectorAll('.drawer-size-btn');
+    drawerSizeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            drawerSizeBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    const drawerCartForm = document.querySelector('.drawer-cart-form');
+    if (drawerCartForm) {
+        drawerCartForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(drawerCartForm);
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch(drawerCartForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok');
+            })
+            .then(data => {
+                if (data.success) {
+                    closeMobileDrawer();
+                    if (typeof toast !== 'undefined') {
+                        toast.success(data.message, '장바구니 담기');
+                    } else {
+                        alert(data.message);
+                    }
+                } else {
+                    if (typeof toast !== 'undefined') {
+                        toast.error(data.message, '오류');
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            })
+            .catch(error => {
+                if (typeof toast !== 'undefined') {
+                    toast.error('장바구니 추가 중 오류가 발생했습니다.', '오류');
+                } else {
+                    alert('장바구니 추가 중 오류가 발생했습니다.');
+                }
+            });
+        });
+    }
+    
+});
+
+function handleDrawerBuy() {
+    alert('구매하기 기능은 준비중입니다.');
 }
