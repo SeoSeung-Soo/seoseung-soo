@@ -418,7 +418,9 @@
                             <button type="submit" class="drawer-btn drawer-btn-secondary">장바구니</button>
                         </form>
                     {% else %}
-                        <button type="button" class="drawer-btn drawer-btn-secondary" onclick="window.location.href='{% url 'login' %}'">장바구니</button>
+                        <form method="get" action="{% url 'login' %}" class="drawer-cart-form">
+                            <button type="submit" class="drawer-btn drawer-btn-secondary">장바구니</button>
+                        </form>
                     {% endif %}
                     
                     {% if user.is_authenticated %}
