@@ -698,7 +698,7 @@
 
 .drawer-options-row {
     display: flex;
-    gap: 16px;
+    gap: 48px;
     margin-bottom: 24px;
 }
 
@@ -746,17 +746,20 @@
 .drawer-quantity-controls {
   display: flex;
   align-items: center;
-  gap: 20px;
-  justify-content: center;
+  gap: 16px;
+  background: white;
+  padding: 4px;
+  border: 1px solid #d1d5db;
+  width: 80%;
 }
 
 .drawer-quantity-btn {
-  width: 36px;
-  height: 36px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  font-size: 18px;
-  font-weight: 600;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: white;
+  font-size: 20px;
+  font-weight: 500;
   color: #1b1b1b;
   cursor: pointer;
   display: flex;
@@ -766,15 +769,18 @@
 }
 
 .drawer-quantity-btn:hover {
-  border-color: #1b1b1b;
   background: #f9fafb;
 }
 
+.drawer-quantity-btn:active {
+  background: #f3f4f6;
+}
+
 .drawer-quantity-display {
-  font-size: 18px;
-  font-weight: 600;
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
   color: #1b1b1b;
-  min-width: 30px;
   text-align: center;
 }
 
