@@ -22,7 +22,7 @@
                 </button>
             </div>
             <a href="/" class="logo">
-                <img src="{% static 'images/seoseungsoo/logos/non_backround_black_logo.png' %}" alt="SeoSeung-Soo" class="header-logo">
+                SeoSeung-Soo
             </a>
             <nav class="top-nav">
                 {% if user.is_authenticated and user.role == 'admin' %}
@@ -128,14 +128,14 @@
     </main>
     <div class="floating-chat">
         <div class="chat-button" id="chatButton">
-            <img src="{% static 'images/seoseungsoo/logos/non_backround_white_logo.png' %}" alt="SeoSeung-Soo Logo" class="chat-logo">
+            <img src="{% static 'images/seoseungsoo/logos/non_white_logo.png' %}" alt="SeoSeung-Soo Logo" class="chat-logo">
             <div class="chat-text">CHAT</div>
         </div>
     </div>
 
     <div class="chat-window" id="chatWindow">
         <div class="chat-window-header">
-            <img src="{% static 'images/seoseungsoo/logos/non_backround_black_logo.png' %}" alt="SeoSeung-Soo" class="chat-window-logo">
+            <img src="{% static 'images/seoseungsoo/logos/non_black_logo.png' %}" alt="SeoSeung-Soo" class="chat-window-logo">
             <button class="chat-close-btn" id="chatCloseBtn">×</button>
         </div>
         <div class="chat-window-body">
