@@ -335,7 +335,7 @@ function closeMobileDrawer() {
 
 function increaseDrawerQuantity() {
     const productStock = document.querySelector('.size-quantity-section')?.dataset.productStock;
-    const maxStock = productStock ? parseInt(productStock) : 999;
+    const maxStock = productStock ? parseInt(productStock) : 0;
     
     if (drawerQuantity < maxStock) {
         drawerQuantity++;
@@ -451,13 +451,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    const drawerWishlistBtn = document.getElementById('drawerWishlistBtn');
-    if (drawerWishlistBtn) {
-        drawerWishlistBtn.addEventListener('click', function() {
-            const isFavorited = this.textContent.includes('★');
-            this.textContent = isFavorited ? '☆' : '★';
-        });
-    }
 });
 
 function handleDrawerBuy() {
