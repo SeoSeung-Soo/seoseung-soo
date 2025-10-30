@@ -206,3 +206,4 @@ test_*.py
 
 # media
 media
+staticfiles
