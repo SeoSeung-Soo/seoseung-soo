@@ -380,10 +380,15 @@ function updateDrawerQuantity() {
 
 document.addEventListener('DOMContentLoaded', function() {
     const colorOptionBtns = document.querySelectorAll('.color-option-btn');
+    const hiddenColorInput = document.getElementById('selectedColorId');
     colorOptionBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             colorOptionBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
+            const selectedColor = this.dataset.color;
+            if (hiddenColorInput) {
+                hiddenColorInput.value = selectedColor || '';
+            }
         });
     });
     
@@ -412,10 +417,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     const drawerColorBtns = document.querySelectorAll('.drawer-color-option-btn');
+    const drawerHiddenColorInput = document.getElementById('drawerSelectedColorId');
     drawerColorBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             drawerColorBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
+            const selectedColor = this.dataset.color;
+            if (drawerHiddenColorInput) {
+                drawerHiddenColorInput.value = selectedColor || '';
+            }
         });
     });
     

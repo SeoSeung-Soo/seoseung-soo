@@ -5,12 +5,13 @@ from django.views import View
 
 from products.forms.product_color import ProductColorForm
 from products.models import Color
+from products.services.color import ColorService
 from users.utils.permission import AdminPermission
 
 
 class AdminProductColorView(AdminPermission, View):
     def get(self, request: HttpRequest) -> HttpResponse:
-        colors = Color.objects.all().order_by('name')
+        colors = ColorService.get_all_colors()
         form = ProductColorForm()
         context = {
             'form': form,
@@ -25,7 +26,7 @@ class AdminProductColorView(AdminPermission, View):
             form.save()
             return redirect('admin-product-color')
         else:
-            colors = Color.objects.all().order_by('name')
+            colors = ColorService.get_all_colors()
             context = {
                 'form': form,
                 'colors': colors,
@@ -38,7 +39,7 @@ class AdminColorUpdateView(AdminPermission, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         color = get_object_or_404(Color, pk=pk)
         form = ProductColorForm(instance=color)
-        colors = Color.objects.all().order_by('name')
+        colors = ColorService.get_all_colors()
         context = {
             'form': form,
             'colors': colors,
@@ -54,7 +55,7 @@ class AdminColorUpdateView(AdminPermission, View):
             form.save()
             return redirect('admin-product-color')
         else:
-            colors = Color.objects.all().order_by('name')
+            colors = ColorService.get_all_colors()
             context = {
                 'form': form,
                 'colors': colors,

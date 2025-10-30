@@ -87,6 +87,11 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="product_id" value="{{ products.id }}">
                                 <input type="hidden" name="quantity" id="cartQuantity" value="1">
+                                {% if products.colors.first %}
+                                <input type="hidden" name="color_id" id="selectedColorId" value="{{ products.colors.first.id }}">
+                                {% else %}
+                                <input type="hidden" name="color_id" id="selectedColorId" value="">
+                                {% endif %}
                                 <button type="submit" class="btn btn-secondary">장바구니 담기</button>
                             </form>
                         {% else %}
@@ -433,6 +438,11 @@
                             {% csrf_token %}
                             <input type="hidden" name="product_id" value="{{ products.id }}">
                             <input type="hidden" name="quantity" id="drawerCartQuantity" value="1">
+                            {% if products.colors.first %}
+                            <input type="hidden" name="color_id" id="drawerSelectedColorId" value="{{ products.colors.first.id }}">
+                            {% else %}
+                            <input type="hidden" name="color_id" id="drawerSelectedColorId" value="">
+                            {% endif %}
                             <button type="submit" class="drawer-btn drawer-btn-secondary">장바구니</button>
                         </form>
                     {% else %}

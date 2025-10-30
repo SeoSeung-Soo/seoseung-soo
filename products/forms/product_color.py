@@ -37,9 +37,9 @@ class ProductColorForm(forms.ModelForm): # type: ignore
     
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not self.fields['hex_code'].widget.attrs.get('value') and self.instance.pk:
-            self.fields['hex_code'].widget.attrs['value'] = self.instance.hex_code or '#000000'
-        elif 'data' in kwargs:
-            self.fields['hex_code'].widget.attrs['value'] = kwargs['data'].get('hex_code', '#000000')
-        else:
-            self.fields['hex_code'].widget.attrs['value'] = '#000000'
+        value = '#000000'
+        if self.is_bound:
+            value = self.data.get('hex_code', '#000000')
+        elif self.instance and self.instance.pk:
+            value = self.instance.hex_code or '#000000'
+        self.fields['hex_code'].widget.attrs['value'] = value
