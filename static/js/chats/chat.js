@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const newsFeedPrev = document.getElementById('newsFeedPrev');
     const newsFeedNext = document.getElementById('newsFeedNext');
     const newsFeedContainer = document.querySelector('.news-feed-container');
+    const faqBtn = document.getElementById('faqBtn');
     
     function openChatWindow() {
         if (chatWindow) {
@@ -49,6 +50,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 left: 180,
                 behavior: 'smooth'
             });
+        });
+    }
+    
+    if (faqBtn) {
+        faqBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('자주 묻는 질문 기능은 준비중입니다.');
         });
     }
     

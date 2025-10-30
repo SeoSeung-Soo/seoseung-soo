@@ -308,18 +308,20 @@
     }
     
     .news-feed-container {
-        overflow-x: auto;
+        overflow-x: hidden;
         scroll-behavior: smooth;
     }
     
     .news-feed-grid {
         display: flex;
         grid-template-columns: none;
+        gap: 12px;
     }
     
     .news-feed-item {
-        min-width: 170px;
-        width: 170px;
+        min-width: 120px;
+        width: 120px;
+        flex-shrink: 0;
     }
 }
 
