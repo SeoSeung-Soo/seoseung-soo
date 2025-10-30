@@ -10,7 +10,10 @@
 <div class="admin-container">
     <div class="admin-header">
         <h1 class="admin-title">{{ title }}</h1>
-        <a href="{% url 'product-create' %}" class="btn btn-primary">상품 등록</a>
+        <div class="header-actions">
+            <a href="{% url 'admin-product-color' %}" class="btn btn-secondary">색상 관리</a>
+            <a href="{% url 'product-create' %}" class="btn btn-primary">상품 등록</a>
+        </div>
     </div>
 
     <div class="product-list">

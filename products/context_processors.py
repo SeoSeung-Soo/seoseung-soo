@@ -24,7 +24,7 @@ def new_products_context(request: HttpRequest) -> Dict[str, Any]:
             created_at__gte=one_month_ago,
             is_live=True,
             is_sold=False
-        ).select_related().prefetch_related('image').order_by('-created_at')[:NEW_PRODUCT_LIMIT])
+        ).select_related().prefetch_related('image').order_by('-created_at')[:NEW_PRODUCT_LIMIT]) 
         
         cache.set(cache_key, new_products, NEW_PRODUCT_CACHE_TIMEOUT)
     
