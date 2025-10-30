@@ -37,10 +37,9 @@
     transform: scale(1.05);
 }
 
-.chat-icon {
-    font-size: 20px;
-    font-weight: 700;
-    color: white;
+.chat-logo {
+    width: 28px;
+    height: auto;
     margin-bottom: 2px;
 }
 
@@ -96,10 +95,10 @@
     min-height: 100px;
 }
 
-.chat-window-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: #1b1b1b;
+.chat-window-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
 }
 
 .chat-close-btn {
@@ -335,8 +334,8 @@
         height: 50px;
     }
     
-    .chat-icon {
-        font-size: 16px;
+    .chat-logo {
+        width: 24px;
     }
     
     .chat-text {
@@ -376,8 +375,8 @@
         right: 16px;
     }
     
-    .chat-window-title {
-        font-size: 14px;
+    .chat-window-logo {
+        height: 24px;
     }
 }
 
@@ -387,8 +386,8 @@
         height: 60px;
     }
     
-    .chat-icon {
-        font-size: 18px;
+    .chat-logo {
+        width: 28px;
     }
     
     .chat-text {
