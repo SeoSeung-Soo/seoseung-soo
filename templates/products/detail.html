@@ -418,7 +418,7 @@
                             <button type="submit" class="drawer-btn drawer-btn-secondary">장바구니</button>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}" class="drawer-btn drawer-btn-secondary">장바구니</a>
+                        <button type="button" class="drawer-btn drawer-btn-secondary" onclick="window.location.href='{% url 'login' %}'">장바구니</button>
                     {% endif %}
                     
                     {% if user.is_authenticated %}
@@ -426,7 +426,7 @@
                             {% if is_favorited %}★{% else %}☆{% endif %}
                         </button>
                     {% else %}
-                        <a href="{% url 'login' %}" class="drawer-btn drawer-btn-icon">♡</a>
+                        <button type="button" class="drawer-btn drawer-btn-icon" onclick="window.location.href='{% url 'login' %}'">☆</button>
                     {% endif %}
                 {% endif %}
             </div>
