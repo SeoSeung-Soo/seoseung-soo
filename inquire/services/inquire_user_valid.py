@@ -54,7 +54,7 @@ class InquireUserValidService:
             html_content = render_to_string("inquire/inquire_template.html", context)
             
             if user and user.is_authenticated:
-                user_identifier = user.username
+                user_identifier = user.get_username() or user.username
             else:
                 user_identifier = email
             

@@ -96,8 +96,6 @@
       <div>
         {% if user and user.is_authenticated %}
           <span class="label">이름:</span><span class="value">{{ user.get_full_name|default:user.username }} (회원)</span>
-        {% elif user %}
-          <span class="label">이름:</span><span class="value">SeoSeung-Soo (회원)</span>
         {% else %}
           <span class="label">이름:</span><span class="value">비회원</span>
         {% endif %}
