@@ -45,11 +45,8 @@
         <div class="container main-nav">
             <nav class="category-nav">
                 {% for main_category in main_categories %}
-                <a href="#" data-category="category-{{ main_category.id }}">{{ main_category.name|upper }}</a>
+                <a href="{% url 'customer-product-list' %}?category={{ main_category.name }}" data-category="category-{{ main_category.id }}">{{ main_category.name|upper }}</a>
                 {% endfor %}
-                <a href="#">BEST ITEM</a>
-                <a href="#">EVENT</a>
-                <a href="#">FAQ</a>
                 <a href="{% url 'inquire' %}">INQUIRE</a>
             </nav>
             <div class="search-box">
@@ -83,7 +80,7 @@
             </div>
             <nav class="mobile-main-category">
                 {% for main_category in main_categories %}
-                <a href="#" data-category="category-{{ main_category.id }}">{{ main_category.name|upper }}</a>
+                    <a href="{% url 'customer-product-list' %}?category={{ main_category.name }}" data-category="category-{{ main_category.id }}">{{ main_category.name|upper }}</a>
                 {% endfor %}
             </nav>
             
@@ -92,9 +89,9 @@
                 <div class="sub-category-section" data-parent="category-{{ main_category.id }}">
                     <nav class="sub-category-nav">
                         {% for sub_category in main_category.children.all %}
-                        <a href="#">{{ sub_category.name }}</a>
+                        <a href="{% url 'customer-product-list' %}?category={{ sub_category.name }}" data-category="category-{{ sub_category.id }}">{{ sub_category.name }}</a>
                         {% empty %}
-                        <a href="#" class="no-subcategory">소분류가 없습니다</a>
+                        <a class="no-subcategory">소분류가 없습니다</a>
                         {% endfor %}
                     </nav>
                 </div>

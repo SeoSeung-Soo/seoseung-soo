@@ -8,8 +8,8 @@ from products.views.admin.product_color_views import (
     AdminColorUpdateView,
     AdminProductColorView,
 )
-from products.views.products_detail import ProductsDetailView
 from products.views.customers.product_list import ProductListView
+from products.views.products_detail import ProductsDetailView
 
 urlpatterns = [
     path("<str:product_name>", ProductsDetailView.as_view(), name="products-detail"),

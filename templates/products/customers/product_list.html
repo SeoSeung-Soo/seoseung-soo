@@ -4,16 +4,35 @@
 
 {% block style %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/products/customer_product_list.css' %}">
 {% endblock %}
 
 {% block content %}
 <section class="section">
     {% if search_query %}
-        <h3 class="section-title">검색 결과: "{{ search_query }}"</h3>
-        <p class="section-sub">총 {{ products|length }}개의 상품을 찾았습니다.</p>
+        <h3 class="section-title">"{{ search_query }}" 에 관한 {{ products|length }}개의 상품입니다.</h3>
     {% else %}
-        <h3 class="section-title">ALL PRODUCTS</h3>
-        <p class="section-sub">모든 상품을 둘러보세요.</p>
+        {% if category %}
+            {% if category.parent %}
+                {% with parent_category=category.parent %}
+                <a href="{% url 'customer-product-list' %}?category={{ parent_category.name }}" class="section-title">{{ parent_category.name|upper }}</a>
+                <div class="category-tags">
+                    {% for sub_category in parent_category.children.all %}
+                        <a href="{% url 'customer-product-list' %}?category={{ sub_category.name }}" class="category-tag {% if category.id == sub_category.id %}active{% endif %}">#{{ sub_category.name }}</a>
+                    {% endfor %}
+                </div>
+                {% endwith %}
+            {% else %}
+                <h3 class="section-title">{{ category.name|upper }}</h3>
+                <div class="category-tags">
+                    {% for sub_category in category.children.all %}
+                        <a href="{% url 'customer-product-list' %}?category={{ sub_category.name }}" class="category-tag">#{{ sub_category.name }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <h3 class="section-title">ALL</h3>
+        {% endif %}
     {% endif %}
     <div class="product-grid">
         {% for product in products %}
@@ -51,9 +70,6 @@
             </div>
         </article>
         {% empty %}
-        <div class="empty-products">
-            <p>등록된 상품이 없습니다.</p>
-        </div>
         {% endfor %}
     </div>
 </section>
