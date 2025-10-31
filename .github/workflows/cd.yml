@@ -35,7 +35,7 @@ jobs:
                 command_timeout: 10m
                 script: |
                   docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
-                  docker-compose down
+                  docker compose down
                   docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
                   docker compose up -d
                   docker image prune -af

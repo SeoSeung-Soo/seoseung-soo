@@ -45,16 +45,15 @@
         <div class="container main-nav">
             <nav class="category-nav">
                 {% for main_category in main_categories %}
-                <a href="#" data-category="category-{{ main_category.id }}">{{ main_category.name|upper }}</a>
+                <a href="{% url 'customer-product-list' %}?category={{ main_category.name }}" data-category="category-{{ main_category.id }}">{{ main_category.name|upper }}</a>
                 {% endfor %}
-                <a href="#">BEST ITEM</a>
-                <a href="#">EVENT</a>
-                <a href="#">FAQ</a>
                 <a href="{% url 'inquire' %}">INQUIRE</a>
             </nav>
             <div class="search-box">
-                <input type="text" placeholder="검색어를 입력하세요" class="search-input">
-                <button class="search-btn" aria-label="검색"></button>
+                <form method="get" action="{% url 'customer-product-list' %}" class="search-form">
+                    <input type="text" name="search" placeholder="검색어를 입력하세요" class="search-input" value="{{ request.GET.search }}">
+                    <button type="submit" class="search-btn" aria-label="검색"></button>
+                </form>
             </div>
         </div>
         
@@ -81,7 +80,7 @@
             </div>
             <nav class="mobile-main-category">
                 {% for main_category in main_categories %}
-                <a href="#" data-category="category-{{ main_category.id }}">{{ main_category.name|upper }}</a>
+                    <a href="{% url 'customer-product-list' %}?category={{ main_category.name }}" data-category="category-{{ main_category.id }}">{{ main_category.name|upper }}</a>
                 {% endfor %}
             </nav>
             
@@ -90,9 +89,9 @@
                 <div class="sub-category-section" data-parent="category-{{ main_category.id }}">
                     <nav class="sub-category-nav">
                         {% for sub_category in main_category.children.all %}
-                        <a href="#">{{ sub_category.name }}</a>
+                        <a href="{% url 'customer-product-list' %}?category={{ sub_category.name }}" data-category="category-{{ sub_category.id }}">{{ sub_category.name }}</a>
                         {% empty %}
-                        <a href="#" class="no-subcategory">소분류가 없습니다</a>
+                        <a class="no-subcategory">소분류가 없습니다</a>
                         {% endfor %}
                     </nav>
                 </div>
@@ -101,8 +100,10 @@
             
            
             <div class="mobile-search-box">
-                <input type="text" placeholder="검색어를 입력하세요" class="mobile-search-input">
-                <button class="mobile-search-btn" aria-label="검색"></button>
+                <form method="get" action="{% url 'customer-product-list' %}" class="search-form">
+                    <input type="text" name="search" placeholder="검색어를 입력하세요" class="mobile-search-input" value="{{ request.GET.search }}">
+                    <button type="submit" class="mobile-search-btn" aria-label="검색"></button>
+                </form>
             </div>
             <nav class="mobile-user-nav">
                 {% if user.is_authenticated and user.role == 'admin' %}
