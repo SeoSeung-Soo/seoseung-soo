@@ -1,5 +1,5 @@
 
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 
@@ -20,6 +20,8 @@ class InquireView(View):
         context = {'form': form}
 
         if not form.is_valid():
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'message': '입력한 정보를 확인해주세요.'})
             return render(request, 'inquire/inquire.html', context)
 
         data = form.cleaned_data
@@ -32,6 +34,8 @@ class InquireView(View):
                 email = request.user.email if request.user.is_authenticated else None
 
         if not email:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'message': '이메일 주소를 입력해주세요.'})
             return render(request, 'inquire/inquire.html', context)
 
         success, message = InquireUserValidService.process_inquire(
@@ -41,6 +45,9 @@ class InquireView(View):
             content=data['content'],
             item=data['item']
         )
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': success, 'message': message})
 
         if success:
             return redirect('inquire_success')
