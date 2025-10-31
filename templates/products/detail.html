@@ -35,6 +35,16 @@
             <h1 class="product-name">{{ products.name }}</h1>
             <p class="product-description">{{ products.description }}</p>
             
+            <div class="color-selection-section">
+                <div class="color-selection-options">
+                    {% for color in products.colors.all %}
+                    <button class="color-option-btn{% if forloop.first %} active{% endif %}" data-color="{{ color.id }}">
+                        <span class="color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ color.name }}"></span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            
             <div class="price-section">
                 {% if products.sale_price %}
                     <div class="price-row">
@@ -77,6 +87,11 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="product_id" value="{{ products.id }}">
                                 <input type="hidden" name="quantity" id="cartQuantity" value="1">
+                                {% if products.colors.first %}
+                                <input type="hidden" name="color_id" id="selectedColorId" value="{{ products.colors.first.id }}">
+                                {% else %}
+                                <input type="hidden" name="color_id" id="selectedColorId" value="">
+                                {% endif %}
                                 <button type="submit" class="btn btn-secondary">장바구니 담기</button>
                             </form>
                         {% else %}
@@ -384,7 +399,15 @@
                     </p>
                 </div>
             </div>
-            
+            <div class="drawer-color-section">
+                <div class="drawer-color-options">
+                    {% for color in products.colors.all %}
+                    <button class="drawer-color-option-btn" data-color="{{ color.id }}">
+                        <span class="drawer-color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};"></span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
             <div class="drawer-options-row">
                 <div class="drawer-size-section">
                     <h5>사이즈</h5>
@@ -415,6 +438,11 @@
                             {% csrf_token %}
                             <input type="hidden" name="product_id" value="{{ products.id }}">
                             <input type="hidden" name="quantity" id="drawerCartQuantity" value="1">
+                            {% if products.colors.first %}
+                            <input type="hidden" name="color_id" id="drawerSelectedColorId" value="{{ products.colors.first.id }}">
+                            {% else %}
+                            <input type="hidden" name="color_id" id="drawerSelectedColorId" value="">
+                            {% endif %}
                             <button type="submit" class="drawer-btn drawer-btn-secondary">장바구니</button>
                         </form>
                     {% else %}

@@ -25,7 +25,7 @@ from users import urls as users_urls
 
 def home(request: HttpRequest) -> HttpResponse:
     from products.models import Product
-    products = Product.objects.filter(is_live=True, is_sold=False).order_by('-created_at')
+    products = Product.objects.filter(is_live=True, is_sold=False).prefetch_related('colors', 'image').order_by('-created_at')
     context = {'products': products}
     return render(request, 'home.html', context)
 

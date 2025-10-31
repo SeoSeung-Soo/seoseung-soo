@@ -1,4 +1,3 @@
-/* 어드민 상품 목록 스타일 */
 .admin-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -19,6 +18,11 @@
   font-weight: 600;
   color: var(--text);
   margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
 }
 
 .product-list {

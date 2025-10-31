@@ -13,7 +13,7 @@ from reviews.services.review_count import ReviewCountService
 
 class ProductsDetailView(View):
     def get(self, request: HttpRequest, product_name: str) -> HttpResponse:
-        products = get_object_or_404(Product, name=product_name)
+        products = get_object_or_404(Product.objects.prefetch_related('colors'), name=product_name)
         
         reviews = Review.objects.filter(
             product=products,

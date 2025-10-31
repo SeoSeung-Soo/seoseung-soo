@@ -42,7 +42,24 @@
                         <div class="form-error">{{ form.categories.errors.0 }}</div>
                     {% endif %}
                 </div>
-
+                <div class="form-group">
+                    <label for="{{ form.colors.id_for_label }}" class="form-label">색상</label>
+                    <div class="color-swatch-selector">
+                        {% for color in colors %}
+                        <label class="color-swatch-label">
+                            <input type="checkbox" name="colors" value="{{ color.id }}" 
+                                   {% if color.id in form.colors.value %}checked{% endif %}
+                                   class="color-checkbox" id="color_{{ color.id }}">
+                            <div class="color-swatch-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};">
+                                <span class="checkmark">✓</span>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% if form.colors.errors %}
+                        <div class="form-error">{{ form.colors.errors.0 }}</div>
+                    {% endif %}
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.price.id_for_label }}" class="form-label">가격 *</label>

@@ -16,7 +16,12 @@ class ProductImage(BaseModel):
     class Meta:
         db_table = 'products_image'
 
-# Create your models here.
+class Color(models.Model):
+    name = models.CharField(max_length=50)
+    hex_code = models.CharField(max_length=7, blank=True, null=True)  # 예: #ff0000 (선택적)
+    class Meta:
+        db_table = 'products_color'
+
 class Product(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -28,8 +33,10 @@ class Product(BaseModel):
     is_live = models.BooleanField(default=False)
     is_sold = models.BooleanField(default=False)
     categories = models.ManyToManyField(Category, blank=True, db_table='product_category_cdt')
+    colors = models.ManyToManyField(Color, blank=True, db_table='product_color_cdt')
     class Meta:
         db_table = 'products'
+
 
 class WishList(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
