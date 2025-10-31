@@ -176,6 +176,18 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-bottom: 20px;
+}
+
+.chat-info-message {
+    padding: 14px;
+}
+
+.chat-info-text {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
 }
 
 .chat-action-btn {
@@ -384,10 +396,6 @@
 .news-feed-nav-btn:hover {
     border-color: #1b1b1b;
     background: #f9fafb;
-}
-
-.mobile-only {
-    display: none;
 }
 
 .news-feed-item {
