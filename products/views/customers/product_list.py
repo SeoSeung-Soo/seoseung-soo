@@ -21,13 +21,13 @@ class ProductListView(View):
                 Q(description__icontains=search_query) |
                 Q(categories__name__icontains=search_query)
             ).distinct()
-        
+
         if category_name:
-            try:
-                selected_category = Category.objects.get(name=category_name)
+            selected_category = Category.objects.filter(name=category_name).first()
+            if selected_category:
                 products = products.filter(categories=selected_category)
-            except Category.DoesNotExist:
-                pass
+            else:
+                products = products.none()
         
         context = {
             'products': products,

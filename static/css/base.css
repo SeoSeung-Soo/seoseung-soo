@@ -175,6 +175,10 @@ body.menu-open .site-header {
   backdrop-filter: blur(8px);
 }
 
+.search-form {
+  display: flex;
+}
+
 .search-input {
   border: none;
   padding-left: 12px;

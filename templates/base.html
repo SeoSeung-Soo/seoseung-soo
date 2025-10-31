@@ -50,7 +50,7 @@
                 <a href="{% url 'inquire' %}">INQUIRE</a>
             </nav>
             <div class="search-box">
-                <form method="get" action="{% url 'customer-product-list' %}" style="display: flex;">
+                <form method="get" action="{% url 'customer-product-list' %}" class="search-form">
                     <input type="text" name="search" placeholder="검색어를 입력하세요" class="search-input" value="{{ request.GET.search }}">
                     <button type="submit" class="search-btn" aria-label="검색"></button>
                 </form>
@@ -100,7 +100,7 @@
             
            
             <div class="mobile-search-box">
-                <form method="get" action="{% url 'customer-product-list' %}" style="display: flex;">
+                <form method="get" action="{% url 'customer-product-list' %}" class="search-form">
                     <input type="text" name="search" placeholder="검색어를 입력하세요" class="mobile-search-input" value="{{ request.GET.search }}">
                     <button type="submit" class="mobile-search-btn" aria-label="검색"></button>
                 </form>
