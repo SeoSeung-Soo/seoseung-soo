@@ -53,8 +53,10 @@
                 <a href="{% url 'inquire' %}">INQUIRE</a>
             </nav>
             <div class="search-box">
-                <input type="text" placeholder="검색어를 입력하세요" class="search-input">
-                <button class="search-btn" aria-label="검색"></button>
+                <form method="get" action="{% url 'customer-product-list' %}" style="display: flex;">
+                    <input type="text" name="search" placeholder="검색어를 입력하세요" class="search-input" value="{{ request.GET.search }}">
+                    <button type="submit" class="search-btn" aria-label="검색"></button>
+                </form>
             </div>
         </div>
         
@@ -101,8 +103,10 @@
             
            
             <div class="mobile-search-box">
-                <input type="text" placeholder="검색어를 입력하세요" class="mobile-search-input">
-                <button class="mobile-search-btn" aria-label="검색"></button>
+                <form method="get" action="{% url 'customer-product-list' %}" style="display: flex;">
+                    <input type="text" name="search" placeholder="검색어를 입력하세요" class="mobile-search-input" value="{{ request.GET.search }}">
+                    <button type="submit" class="mobile-search-btn" aria-label="검색"></button>
+                </form>
             </div>
             <nav class="mobile-user-nav">
                 {% if user.is_authenticated and user.role == 'admin' %}

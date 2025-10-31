@@ -18,7 +18,7 @@ class AdminProductColorView(AdminPermission, View):
             'colors': colors,
             'title': '색상 관리'
         }
-        return render(request, 'products/admin/product_color.html', context)
+        return render(request, 'products/admin/admin_product_color.html', context)
     
     def post(self, request: HttpRequest) -> HttpResponse:
         form = ProductColorForm(request.POST)
@@ -32,7 +32,7 @@ class AdminProductColorView(AdminPermission, View):
                 'colors': colors,
                 'title': '색상 관리'
             }
-            return render(request, 'products/admin/product_color.html', context)
+            return render(request, 'products/admin/admin_product_color.html', context)
 
 
 class AdminColorUpdateView(AdminPermission, View):
@@ -46,7 +46,7 @@ class AdminColorUpdateView(AdminPermission, View):
             'color': color,
             'title': '색상 수정'
         }
-        return render(request, 'products/admin/product_color.html', context)
+        return render(request, 'products/admin/admin_product_color.html', context)
     
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         color = get_object_or_404(Color, pk=pk)
@@ -62,7 +62,7 @@ class AdminColorUpdateView(AdminPermission, View):
                 'color': color,
                 'title': '색상 수정'
             }
-            return render(request, 'products/admin/product_color.html', context)
+            return render(request, 'products/admin/admin_product_color.html', context)
 
 
 class AdminColorDeleteView(AdminPermission, View):

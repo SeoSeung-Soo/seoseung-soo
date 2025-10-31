@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+{% load product_filters %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    {% if search_query %}
+        <h3 class="section-title">검색 결과: "{{ search_query }}"</h3>
+        <p class="section-sub">총 {{ products|length }}개의 상품을 찾았습니다.</p>
+    {% else %}
+        <h3 class="section-title">ALL PRODUCTS</h3>
+        <p class="section-sub">모든 상품을 둘러보세요.</p>
+    {% endif %}
+    <div class="product-grid">
+        {% for product in products %}
+        <article class="product-card">
+            <a href="{% url 'products-detail' product.name %}" class="product-thumb" aria-label="상품 상세">
+                {% if product.image.first %}
+                    <img src="{{ product.image.first.image.url }}" alt="{{ product.name }}" class="product-image-primary">
+                    {% if product.image.all|length > 1 %}
+                        <img src="{{ product.image.all.1.image.url }}" alt="{{ product.name }}" class="product-image-hover">
+                    {% else %}
+                        <img src="{{ product.image.first.image.url }}" alt="{{ product.name }}" class="product-image-hover">
+                    {% endif %}
+                {% else %}
+                    <img src="https://picsum.photos/seed/{{ forloop.counter }}/600/750" alt="{{ product.name }}" class="product-image-primary">
+                    <img src="https://picsum.photos/seed/{{ forloop.counter|add:100 }}/600/750" alt="{{ product.name }}" class="product-image-hover">
+                {% endif %}
+            </a>
+            <div class="product-info">
+                <h4 class="product-name">{{ product.name }}</h4>
+                {% if product.colors.all %}
+                <div class="product-colors">
+                    {% for color in product.colors.all %}
+                    <span class="product-color" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};"></span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="product-price">
+                    {% if product.sale_price %}
+                        <span class="sale">{{ product.price|discount_amount:product.sale_price|intcomma }}원</span>
+                        <span class="origin">{{ product.price|intcomma }}원</span>
+                    {% else %}
+                        <span class="price">{{ product.price|intcomma }}원</span>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <div class="empty-products">
+            <p>등록된 상품이 없습니다.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
