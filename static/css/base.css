@@ -94,18 +94,20 @@ a img {
   padding-top: 10px;
   position: relative;
 }
+
 .logo {
-  font-weight: 600;
-  letter-spacing: 8px;
-  text-decoration: none;
-  color: var(--text);
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  white-space: nowrap;
-  word-break: keep-all;
-  overflow-wrap: normal;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-logo {
+  height: 46px;
+  width: auto;
+  object-fit: contain;
 }
 
 /* 햄버거 메뉴 */
@@ -430,9 +432,11 @@ body.menu-open .site-header {
   }
   
   .logo {
-    font-size: 17px;
-    letter-spacing: 6px;
-    white-space: nowrap;
+    height: 36px;
+  }
+  
+  .header-logo {
+    height: 36px;
   }
 
   @media (max-width: 480px) {
@@ -442,8 +446,11 @@ body.menu-open .site-header {
     }
 
     .logo {
-      font-size: 17px;
-      letter-spacing: 4px;
+      height: 32px;
+    }
+    
+    .header-logo {
+      height: 32px;
     }
   }
   

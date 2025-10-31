@@ -94,6 +94,11 @@ function updateWishlistButton(productId, isFavorite) {
             button.textContent = '찜하기';
         }
     }
+    
+    const drawerWishlistBtn = document.getElementById('drawerWishlistBtn');
+    if (drawerWishlistBtn) {
+        drawerWishlistBtn.textContent = isFavorite ? '★' : '☆';
+    }
 }
 
 function showToast(message, type = 'info') {

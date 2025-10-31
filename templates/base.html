@@ -6,6 +6,7 @@
     <title>{% block title %}SeoSeung-Soo{% endblock %}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{% static 'images/favicon/seoseungsoo-logo-circle.png' %}">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/chats/chat.css' %}">
     {% block style %}
@@ -21,7 +22,9 @@
                     <span class="hamburger-line"></span>
                 </button>
             </div>
-            <a href="/" class="logo">SeoSeung-Soo</a>
+            <a href="/" class="logo">
+                SeoSeung-Soo
+            </a>
             <nav class="top-nav">
                 {% if user.is_authenticated and user.role == 'admin' %}
                 <a href="{% url 'product-list' %}">ADMIN</a>
@@ -125,9 +128,57 @@
         {% endblock %}
     </main>
     <div class="floating-chat">
-        <div class="chat-button">
-            <div class="chat-icon">S</div>
+        <div class="chat-button" id="chatButton">
+            <img src="{% static 'images/seoseungsoo/logos/non_white_logo.png' %}" alt="SeoSeung-Soo Logo" class="chat-logo">
             <div class="chat-text">CHAT</div>
+        </div>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-window-header">
+            <img src="{% static 'images/seoseungsoo/logos/non_black_logo.png' %}" alt="SeoSeung-Soo" class="chat-window-logo">
+            <button class="chat-close-btn" id="chatCloseBtn">×</button>
+        </div>
+        <div class="chat-window-body">
+            <div class="chat-news-feed">
+                <div class="news-feed-header">
+                    <h3>NEW PRODUCTS</h3>
+                    <div class="news-feed-nav desktop-only">
+                        <button class="news-feed-nav-btn news-feed-prev" id="newsFeedPrev">‹</button>
+                        <button class="news-feed-nav-btn news-feed-next" id="newsFeedNext">›</button>
+                    </div>
+                </div>
+                <div class="news-feed-container">
+                    <div class="news-feed-grid" id="newsFeedGrid">
+                        {% for product in new_products %}
+                        <a href="{% url 'products-detail' product.name %}" class="news-feed-item">
+                            {% if product.image.first %}
+                                <img src="{{ product.image.first.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <div class="news-feed-placeholder">No Image</div>
+                            {% endif %}
+                            <div class="news-feed-overlay">
+                                <span class="news-feed-name">{{ product.name|truncatechars:15 }}</span>
+                            </div>
+                        </a>
+                        {% empty %}
+                        <div class="no-new-products">
+                            <p>새로운 상품이 없습니다.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="chat-action-buttons">
+                <a href="{% url 'inquire' %}" class="chat-action-btn">
+                    <span>문의하기</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="#" class="chat-action-btn" id="faqBtn">
+                    <span>자주 묻는 질문</span>
+                    <span class="arrow">→</span>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -143,6 +194,7 @@
     <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/prevent-drag.js' %}"></script>
     <script src="{% static 'js/toast.js' %}"></script>
+    <script src="{% static 'js/chats/chat.js' %}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

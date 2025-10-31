@@ -37,12 +37,17 @@
         </a>
         <div class="product-info">
           <h4 class="product-name">{{ product.name }}</h4>
+          <div class="product-colors">
+            {% for color in product.colors.all %}
+            <span class="product-color" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};"></span>
+            {% endfor %}
+          </div>
           <div class="product-price">
             {% if product.sale_price %}
-              <span class="sale">{{ product.price|discount_amount:product.sale_price }}원</span>
-              <span class="origin">{{ product.price|floatformat:0 }}원</span>
+              <span class="sale">{{ product.price|discount_amount:product.sale_price|intcomma }}원</span>
+              <span class="origin">{{ product.price|intcomma }}원</span>
             {% else %}
-              <span class="price">{{ product.price|floatformat:0 }}원</span>
+              <span class="price">{{ product.price|intcomma }}원</span>
             {% endif %}
           </div>
         </div>

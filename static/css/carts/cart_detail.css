@@ -97,6 +97,21 @@
     text-decoration-color: #1b1b1b;
 }
 
+.item-color {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0 8px 0;
+}
+
+.item-color-circle {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #e5e7eb;
+    display: inline-block;
+}
+
 .item-description {
     font-size: 14px;
     color: #666;

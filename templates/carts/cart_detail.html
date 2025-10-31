@@ -80,6 +80,11 @@
                         
                         <div class="item-info">
                             <h3 class="item-name" onclick="window.location.href='{% url 'products-detail' item.product.name %}'" style="cursor: pointer;">{{ item.product.name }}</h3>
+                            {% if item.color %}
+                            <div class="item-color">
+                                <span class="item-color-circle" style="background-color: {% if item.color.hex_code %}{{ item.color.hex_code }}{% else %}#e5e7eb{% endif %};"></span>
+                            </div>
+                            {% endif %}
                             
                             <div class="item-price">
                                 {% if item.product.sale_price %}

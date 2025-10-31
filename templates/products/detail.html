@@ -35,16 +35,26 @@
             <h1 class="product-name">{{ products.name }}</h1>
             <p class="product-description">{{ products.description }}</p>
             
+            <div class="color-selection-section">
+                <div class="color-selection-options">
+                    {% for color in products.colors.all %}
+                    <button class="color-option-btn{% if forloop.first %} active{% endif %}" data-color="{{ color.id }}">
+                        <span class="color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ color.name }}"></span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            
             <div class="price-section">
                 {% if products.sale_price %}
                     <div class="price-row">
-                        <span class="sale-price">{{ products.price|discount_amount:products.sale_price }}원</span>
-                        <span class="original-price">{{ products.price|floatformat:0 }}원</span>
-                        <span class="discount-rate">{{ products.sale_price|floatformat:0 }}원 할인</span>
+                        <span class="sale-price">{{ products.price|discount_amount:products.sale_price|intcomma }}원</span>
+                        <span class="original-price">{{ products.price|intcomma }}원</span>
+                        <span class="discount-rate">{{ products.sale_price|intcomma }}원 할인</span>
                     </div>
                 {% else %}
                     <div class="price-row">
-                        <span class="price">{{ products.price|floatformat:0 }}원</span>
+                        <span class="price">{{ products.price|intcomma }}원</span>
                     </div>
                 {% endif %}
             </div>
@@ -77,6 +87,11 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="product_id" value="{{ products.id }}">
                                 <input type="hidden" name="quantity" id="cartQuantity" value="1">
+                                {% if products.colors.first %}
+                                <input type="hidden" name="color_id" id="selectedColorId" value="{{ products.colors.first.id }}">
+                                {% else %}
+                                <input type="hidden" name="color_id" id="selectedColorId" value="">
+                                {% endif %}
                                 <button type="submit" class="btn btn-secondary">장바구니 담기</button>
                             </form>
                         {% else %}
@@ -142,12 +157,12 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">가격:</span>
-                            <span class="info-value">{{ products.price|floatformat:0 }}원</span>
+                            <span class="info-value">{{ products.price|intcomma }}원</span>
                         </div>
                         {% if products.sale_price %}
                         <div class="info-item">
                             <span class="info-label">할인가:</span>
-                            <span class="info-value">{{ products.sale_price|floatformat:0 }}원</span>
+                            <span class="info-value">{{ products.sale_price|intcomma }}원</span>
                         </div>
                         {% endif %}
                         <div class="info-item">
@@ -362,6 +377,96 @@
         </div>
     </div>
 </div>
+
+<div class="mobile-purchase-drawer" id="mobilePurchaseDrawer">
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <div class="drawer-content">
+        <div class="drawer-header">
+            <h3>구매 옵션</h3>
+            <button class="drawer-close" id="drawerClose">×</button>
+        </div>
+        
+        <div class="drawer-body">
+            <div class="drawer-product-info">
+                <div class="drawer-product-details">
+                    <h4 class="drawer-product-name">{{ products.name }}</h4>
+                    <p class="drawer-product-price">
+                        {% if products.sale_price %}
+                            <span class="unit-price" data-price="{{ products.price|discount_amount:products.sale_price }}"><span class="total-price" id="drawerTotalPrice">{{ products.price|discount_amount:products.sale_price|intcomma }}원</span>
+                        {% else %}
+                            <span class="unit-price" data-price="{{ products.price }}"><span class="total-price" id="drawerTotalPrice">{{ products.price|intcomma }}원</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="drawer-color-section">
+                <div class="drawer-color-options">
+                    {% for color in products.colors.all %}
+                    <button class="drawer-color-option-btn" data-color="{{ color.id }}">
+                        <span class="drawer-color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};"></span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="drawer-options-row">
+                <div class="drawer-size-section">
+                    <h5>사이즈</h5>
+                    <div class="drawer-size-options">
+                        <button class="drawer-size-btn active" data-size="S">S</button>
+                        <button class="drawer-size-btn" data-size="M">M</button>
+                        <button class="drawer-size-btn" data-size="L">L</button>
+                    </div>
+                </div>
+                
+                <div class="drawer-quantity-section">
+                    <h5>수량</h5>
+                    <div class="drawer-quantity-controls">
+                        <button class="drawer-quantity-btn" onclick="decreaseDrawerQuantity()">-</button>
+                        <span class="drawer-quantity-display" id="drawerQuantityDisplay">1</span>
+                        <button class="drawer-quantity-btn" onclick="increaseDrawerQuantity()">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="drawer-footer">
+            <div class="drawer-actions">
+                <button class="drawer-btn drawer-btn-primary" id="drawerBuyBtn" onclick="handleDrawerBuy()">구매하기</button>
+                {% if products.is_live and not products.is_sold %}
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'cart-create' %}" class="drawer-cart-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ products.id }}">
+                            <input type="hidden" name="quantity" id="drawerCartQuantity" value="1">
+                            {% if products.colors.first %}
+                            <input type="hidden" name="color_id" id="drawerSelectedColorId" value="{{ products.colors.first.id }}">
+                            {% else %}
+                            <input type="hidden" name="color_id" id="drawerSelectedColorId" value="">
+                            {% endif %}
+                            <button type="submit" class="drawer-btn drawer-btn-secondary">장바구니</button>
+                        </form>
+                    {% else %}
+                        <form method="get" action="{% url 'login' %}" class="drawer-cart-form">
+                            <button type="submit" class="drawer-btn drawer-btn-secondary">장바구니</button>
+                        </form>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+                        <button type="button" class="drawer-btn drawer-btn-icon" onclick="addToWishlist({{ products.id }})" id="drawerWishlistBtn">
+                            {% if is_favorited %}★{% else %}☆{% endif %}
+                        </button>
+                    {% else %}
+                        <button type="button" class="drawer-btn drawer-btn-icon" onclick="window.location.href='{% url 'login' %}'">☆</button>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<button class="mobile-fab-btn" id="mobileFabBtn">
+    <span>구매하기</span>
+</button>
 {% endblock %}
 
 {% block scripts %}
