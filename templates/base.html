@@ -47,7 +47,6 @@
                 {% for main_category in main_categories %}
                 <a href="{% url 'customer-product-list' %}?category={{ main_category.name }}" data-category="category-{{ main_category.id }}">{{ main_category.name|upper }}</a>
                 {% endfor %}
-                <a href="{% url 'inquire' %}">INQUIRE</a>
             </nav>
             <div class="search-box">
                 <form method="get" action="{% url 'customer-product-list' %}" class="search-form">
