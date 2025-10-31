@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 import pytest
@@ -12,23 +13,13 @@ class TestInquire(TestSetupMixin):
     def setup_method(self) -> None:
         self.setup_test_user_data()
 
-    def test_inquire_page_render(self) -> None:
+    def test_inquire_post_view_invalid_data(self) -> None:
         url = reverse("inquire")
-        response = self.client.get(url)
-
+        response = self.client.post(url, data={}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        data = json.loads(response.content)
         assert response.status_code == 200
-
-    def test_success_inquire_page_render(self) -> None:
-        url = reverse("inquire_success")
-        response = self.client.get(url)
-        assert response.status_code == 200
-
-    def test_inquire_post_view(self) -> None:
-        url = reverse("inquire")
-        response = self.client.post(url, data={})
-
-        assert response.status_code == 200
-
+        assert data['success'] is False
+        assert '입력한 정보를 확인해주세요' in data['message']
 
     def test_inquire_post_view_authenticated_user(self) -> None:
         url = reverse("inquire")
@@ -39,8 +30,10 @@ class TestInquire(TestSetupMixin):
             'content': '문의 내용',
             'item': 'delivery',
         }
-        response = self.client.post(url, data)
-        assert response.status_code == 302
+        response = self.client.post(url, data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        assert response.status_code == 200
+        result = json.loads(response.content)
+        assert result['success'] is True
 
     def test_post_email_in_data_for_anonymous_user(self) -> None:
         url = reverse("inquire")
@@ -50,9 +43,10 @@ class TestInquire(TestSetupMixin):
             'item': 'etc',
             'email': 'guest@example.com',
         }
-        response = self.client.post(url, data)
-
-        assert response.status_code in [200, 302]
+        response = self.client.post(url, data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        assert response.status_code == 200
+        result = json.loads(response.content)
+        assert result['success'] is True
 
     def test_post_process_inquire_failure(self) -> None:
         url = reverse("inquire")
@@ -66,9 +60,11 @@ class TestInquire(TestSetupMixin):
 
         with patch('inquire.services.inquire_user_valid.InquireUserValidService.process_inquire',
                    return_value=(False, "실패 메시지")):
-            response = self.client.post(url, data)
-
-        assert response.status_code == 200
+            response = self.client.post(url, data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+            assert response.status_code == 200
+            result = json.loads(response.content)
+            assert result['success'] is False
+            assert result['message'] == "실패 메시지"
 
     def test_post_inquire_user_without_email(self) -> None:
         user = User.objects.create_user(
@@ -87,7 +83,8 @@ class TestInquire(TestSetupMixin):
             'item': 'delivery',
         }
 
-        response = self.client.post(url, data)
-
+        response = self.client.post(url, data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         assert response.status_code == 200
-        assert "inquire/inquire.html" in [t.name for t in response.templates]
+        result = json.loads(response.content)
+        assert result['success'] is False
+        assert '이메일 주소를 입력해주세요' in result['message']
