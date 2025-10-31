@@ -16,6 +16,15 @@ margin: 0 auto;
 border-bottom: 2px solid #1b1b1b;
 margin-bottom: 20px;
 padding-bottom: 15px;
+display: flex;
+align-items: center;
+gap: 15px;
+}
+
+.header .logo {
+width: 40px;
+height: auto;
+object-fit: contain;
 }
 .header h2 {
 color: #1b1b1b;

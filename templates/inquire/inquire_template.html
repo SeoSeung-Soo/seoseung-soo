@@ -1,22 +1,103 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SeoSeung-Soo 문의</title>
-  <link rel="stylesheet" href="{% static 'css/inquire/inquire_template.css' %}">
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+      margin: 0;
+    }
+    .email-container {
+      background-color: #ffffff;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .header {
+      border-bottom: 2px solid #1b1b1b;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      text-align: center;
+    }
+    .header .logo-link {
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .header .logo {
+      width: 120px;
+      height: auto;
+      object-fit: contain;
+    }
+    .header h2 {
+      color: #1b1b1b;
+      margin: 0;
+      font-size: 20px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .label {
+      font-weight: bold;
+      color: #333333;
+      display: inline-block;
+      min-width: 80px;
+    }
+    .value {
+      color: #555555;
+      margin-left: 10px;
+    }
+    .content-section {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-left: 4px solid #1b1b1b;
+    }
+    .content-section .value {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      margin-left: 0;
+    }
+    .timestamp {
+      font-size: 0.8em;
+      color: #999;
+      text-align: right;
+      margin-top: 10px;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #888888;
+      text-align: center;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+    }
+    .subject-value {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
   <div class="email-container">
     <div class="header">
-      <h2>💬 SeoSeung-Soo 새 문의가 도착했습니다</h2>
+      <a href="https://seoseung-soo.com" class="logo-link" style="text-decoration: none;">
+        <img src="https://seoseung-soo.com/static/images/seoseungsoo/logos/non_black_logo.png" alt="SeoSeung-Soo" class="logo">
+      </a>
+      <h2>새 문의가 도착했습니다</h2>
     </div>
     
     <div class="section">
       <div>
         {% if user and user.is_authenticated %}
           <span class="label">이름:</span><span class="value">{{ user.get_full_name|default:user.username }} (회원)</span>
+        {% elif user %}
+          <span class="label">이름:</span><span class="value">SeoSeung-Soo (회원)</span>
         {% else %}
           <span class="label">이름:</span><span class="value">비회원</span>
         {% endif %}
@@ -27,13 +108,13 @@
     
     <div class="section">
       <div class="label">제목:</div>
-      <div class="value" style="font-size: 18px; font-weight: 600; margin-top: 5px;">{{ title }}</div>
+      <div class="subject-value value">{{ title }}</div>
     </div>
     
     <div class="section">
       <div class="label">문의 내용:</div>
       <div class="content-section">
-        <div class="value" style="white-space: pre-wrap; line-height: 1.6;">{{ content }}</div>
+        <div class="value">{{ content }}</div>
       </div>
     </div>
     
