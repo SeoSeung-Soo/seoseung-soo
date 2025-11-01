@@ -31,10 +31,6 @@
     margin: 0;
 }
 
-.form-group {
-    margin-bottom: 24px;
-}
-
 .form-group:last-child {
     margin-bottom: 0;
 }
@@ -44,7 +40,6 @@
     font-size: 14px;
     font-weight: 600;
     color: #333;
-    margin-bottom: 8px;
 }
 
 .form-input,
@@ -125,60 +120,6 @@
     transform: none;
 }
 
-.success-container {
-    max-width: 600px;
-    margin: 60px auto;
-    padding: 0;
-    text-align: center;
-}
-
-.success-card {
-    background: white;
-    padding: 50px 40px;
-    margin: 0 20px;
-}
-
-.success-icon {
-    font-size: 80px;
-    margin-bottom: 24px;
-    display: block;
-}
-
-.success-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1b1b1b;
-    margin-bottom: 16px;
-}
-
-.success-message {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 32px;
-}
-
-.success-info {
-    background: #f8f9fa;
-    padding: 24px;
-    margin-bottom: 32px;
-    border-left: 4px solid #1b1b1b;
-}
-
-.success-info h3 {
-    color: #333;
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 12px;
-}
-
-.success-info p {
-    color: #666;
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
 .action-buttons {
     display: flex;
     gap: 16px;
@@ -247,25 +188,11 @@
         font-size: 24px;
     }
     
-    .success-container {
-        margin: 40px auto;
-        padding: 0;
-    }
-    
-    .success-card {
-        padding: 30px 20px;
-        margin: 0 16px;
-    }
-    
-    .success-title {
-        font-size: 24px;
-    }
-    
     .action-buttons {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .btn {
         width: 100%;
         max-width: 280px;
@@ -285,20 +212,6 @@
         padding: 0 20px 20px 20px;
     }
     
-    .success-icon {
-        font-size: 60px;
-    }
-    
-    .success-title {
-        font-size: 18px;
-    }
-
-    .success-info {
-        padding: 10px 20px;
-    }
-    .success-info h3 {
-        font-size: 16px;
-    }
     .action-buttons {
         flex-direction: column;
         gap: 10px;

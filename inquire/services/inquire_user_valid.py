@@ -52,11 +52,13 @@ class InquireUserValidService:
             }
             
             html_content = render_to_string("inquire/inquire_template.html", context)
-            subject = f"[SeoSeung-Soo 문의] {title}"
+            
             if user and user.is_authenticated:
-                subject += f" - {user.get_full_name() or user.username}"
+                user_identifier = user.get_username() or user.username
             else:
-                subject += f" - 비회원 ({email})"
+                user_identifier = email
+            
+            subject = f"[SeoSeung-Soo 문의] {title} - {user_identifier}"
 
             email_msg = EmailMessage(
                 subject=subject,
