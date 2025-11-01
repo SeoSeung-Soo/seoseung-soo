@@ -22,7 +22,7 @@ class ProductCreateView(AdminPermission, View):
             'colors': colors,
             'title': '상품 등록'
         }
-        return render(request, 'products/admin/product_create.html', context)
+        return render(request, 'products/admin/admin_product_create.html', context)
 
     def post(self, request: HttpRequest) -> HttpResponse:
         form = ProductForm(request.POST)
@@ -51,7 +51,7 @@ class ProductCreateView(AdminPermission, View):
             'colors': colors,
             'title': '상품 등록'
         }
-        return render(request, 'products/admin/product_create.html', context)
+        return render(request, 'products/admin/admin_product_create.html', context)
 
 
 class ProductUpdateView(AdminPermission, View):
@@ -67,7 +67,7 @@ class ProductUpdateView(AdminPermission, View):
             'colors': colors,
             'title': '상품 수정'
         }
-        return render(request, 'products/admin/product_create.html', context)
+        return render(request, 'products/admin/admin_product_create.html', context)
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         product = get_object_or_404(Product, pk=pk)
@@ -94,6 +94,6 @@ class ProductUpdateView(AdminPermission, View):
             'colors': colors,
             'title': '상품 수정'
         }
-        return render(request, 'products/admin/product_create.html', context)
+        return render(request, 'products/admin/admin_product_create.html', context)
 
 
