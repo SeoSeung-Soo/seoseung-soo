@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from config.basemodel import BaseModel
+from membership.models import Coupon
 
 
 # Create your models here.
@@ -20,6 +21,7 @@ class User(AbstractUser, BaseModel):
     profile_image = models.URLField(max_length=500, null=True, blank=True, verbose_name="프로필 이미지")
     personal_info_consent = models.BooleanField(verbose_name="개인정보수집")
     terms_of_use = models.BooleanField(verbose_name="이용약관")
+    coupon = models.ForeignKey(Coupon, on_delete=models.PROTECT, null=True, blank=True)
     sns_consent_to_receive = models.BooleanField(null=True, blank=True, default=False, verbose_name="sns수신")
     email_consent_to_receive = models.BooleanField(null=True, blank=True, default=False, verbose_name="email수신")
 
