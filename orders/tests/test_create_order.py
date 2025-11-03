@@ -90,7 +90,7 @@ class TestCreateOrderView:
 
         assert data["success"] is True
         assert "orderId" in data
-        assert int(float(data["amount"])) == 70000
+        assert Decimal(data["amount"]) == 70000
 
         order = Order.objects.get(order_id=data["orderId"])
         assert order.user == user

@@ -34,6 +34,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS: list[str]= ["143.47.104.74", "seoseung-soo.com", "www.seoseung-soo.com"]
 
+HOST_URL = "https://seoseung-soo.com"
+
 
 # Application definition
 

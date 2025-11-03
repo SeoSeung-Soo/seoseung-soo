@@ -7,6 +7,7 @@ from typing import Any, Dict
 
 import requests
 from django.conf import settings
+from django.db import transaction
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
@@ -58,7 +59,7 @@ def toss_payment_request_view(request: HttpRequest) -> JsonResponse:
         }, status=400)
 
     # 운영/로컬 URL 분기
-    base_url = "https://seoseung-soo.com" if not settings.DEBUG else request.build_absolute_uri("/")[:-1]
+    base_url = settings.HOST_URL if not settings.DEBUG else request.build_absolute_uri("/")[:-1]
     success_url = f"{base_url}/payments/toss/success/"
     fail_url = f"{base_url}/payments/toss/fail/"
 
@@ -140,17 +141,21 @@ def toss_confirm_view(request: HttpRequest) -> JsonResponse:
 
     order = get_object_or_404(Order, order_id=order_id)
 
-    Payment.objects.create(
-        order=order,
-        provider="toss",
-        method=data.get("method", "CARD"),
-        payment_key=data.get("paymentKey", ""),
-        amount=data.get("totalAmount", amount),
-        approved_at=timezone.now(),
-        receipt_url=data.get("receipt", {}).get("url"),
-        status="APPROVED",
-        raw_response=data,
-    )
+    if order.total_amount != amount:
+        return JsonResponse({"success": False, "error": "주문 금액이 일치하지 않습니다."}, status=400)
+
+    with transaction.atomic():
+        Payment.objects.create(
+            order=order,
+            provider="toss",
+            method=data.get("method", "CARD"),
+            payment_key=data.get("paymentKey", ""),
+            amount=data.get("totalAmount", amount),
+            approved_at=timezone.now(),
+            receipt_url=data.get("receipt", {}).get("url"),
+            status="APPROVED",
+            raw_response=data,
+        )
 
     order.status = "PAID"
     order.save(update_fields=["status"])

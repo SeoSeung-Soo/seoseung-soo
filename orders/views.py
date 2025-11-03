@@ -3,6 +3,7 @@ import uuid
 from decimal import Decimal
 from typing import Any, Dict, List, Tuple
 
+from django.db import transaction
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -55,24 +56,23 @@ def create_order_view(request: HttpRequest) -> JsonResponse:
         total_amount += price * quantity
         order_items.append((product, quantity, price))
 
-    order_id = generate_order_id()
-
-    order = Order.objects.create(
-        user=request.user,
-        order_id=order_id,
-        product_name=_build_order_name(items_data),
-        total_amount=int(total_amount),
-        status="PENDING",
-    )
-
-    for product, quantity, price in order_items:
-        OrderItem.objects.create(
-            order=order,
-            product_id=product.id,
-            product_name=product.name,
-            quantity=quantity,
-            unit_price=int(price)
+    with transaction.atomic():
+        order_id = generate_order_id()
+        order = Order.objects.create(
+            user=request.user,
+            order_id=order_id,
+            product_name=_build_order_name(items_data),
+            total_amount=int(total_amount),
+            status="PENDING",
         )
+        for product, quantity, price in order_items:
+            OrderItem.objects.create(
+                order=order,
+                product_id=product.id,
+                product_name=product.name,
+                quantity=quantity,
+                unit_price=int(price)
+            )
 
     return JsonResponse({
         "success": True,
