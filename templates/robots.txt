@@ -1,0 +1,32 @@
+# robots.txt for SeoSeung-Soo
+# 서승수 쇼핑몰 검색 엔진 크롤러 관리 파일
+
+# Sitemap 위치
+Sitemap: https://www.seoseung-soo.com/sitemap.xml
+
+# Googlebot 설정
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /static/
+Disallow: /media/
+Disallow: /api/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /orders/
+
+# 네이버 봇 설정
+User-agent: Yeti
+Allow: /
+Disallow: /admin/
+Disallow: /static/
+Disallow: /media/
+Disallow: /api/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /orders/
+
+# 기타 모든 봇 차단
+User-agent: *
+Disallow: /
+

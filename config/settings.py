@@ -90,7 +90,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'categories.context_processors.categories_context',
-                'products.context_processors.new_products_context',
+                'products.utils.context_processors.new_products_context',
             ],
         },
     },
@@ -270,6 +270,10 @@ EMAIL_PORT = env.int('EMAIL_PORT', default=587)
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+
+# elasticsearch
+ES_HOST = env('ES_HOST', default='')
+ES_API_KEY = env('ES_API_KEY', default='')
 
 # Redis 설정
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
