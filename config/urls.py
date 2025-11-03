@@ -27,7 +27,7 @@ urlpatterns = [
     path("inquire/", include("inquire.urls"), name='inquire'),
     path("carts/", include("carts.urls"), name='carts'),
     path("favorites/", include("favorites.urls"), name='favorites'),
-    path('robots.txt', TemplateView.as_view(template_name="../robots.txt", content_type='text/plain')),
+    path('robots.txt/', TemplateView.as_view(template_name="../templates/users/robots.txt", content_type='text/plain')),
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
