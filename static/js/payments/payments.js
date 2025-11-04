@@ -407,8 +407,6 @@ function initializeTossPaymentWidget(paymentData, amount) {
         customerEmail: document.querySelector('.email-input')?.value || '',
         customerName: document.querySelector('.form-input[placeholder*="이름"]')?.value || '',
     })
-    .then(function(data) {
-    })
     .catch(function (error) {
         const paymentButton = document.getElementById('tossPaymentBtn');
         const finalAmount = parseInt(paymentButton.getAttribute('data-amount')) || amount || 0;
