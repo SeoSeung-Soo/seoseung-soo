@@ -3,7 +3,6 @@ from typing import Any, Dict
 from unittest.mock import patch
 
 import pytest
-from django.test import Client
 from django.urls import reverse
 
 from config.utils.setup_test_method import TestSetupMixin
@@ -18,7 +17,6 @@ class TestTossPaymentViews(TestSetupMixin):
     def setup_method(self) -> None:
         self.setup_test_user_data()
         self.setup_test_products_data()
-        self.client = Client()
 
         # 임시 주문 생성
         self.order = Order.objects.create(

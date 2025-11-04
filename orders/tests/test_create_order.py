@@ -5,7 +5,6 @@ from decimal import Decimal
 from typing import Any, Dict
 
 import pytest
-from django.test import Client
 from django.urls import reverse
 
 from config.utils.setup_test_method import TestSetupMixin
@@ -18,7 +17,6 @@ class TestCreateOrderView(TestSetupMixin):
     def setup_method(self) -> None:
         self.setup_test_user_data()
         self.setup_test_products_data()
-        self.client = Client()
 
     def test_requires_authentication(self) -> None:
         response = self.client.post(reverse("orders:create"))
