@@ -5,6 +5,7 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 
 from config import settings
+from config.utils.naver_sitemap import sitemap
 from users import urls as users_urls
 
 
@@ -16,6 +17,7 @@ def home(request: HttpRequest) -> HttpResponse:
 
 urlpatterns = [
     path('', home, name='home'),
+    path('sitemap.xml/', sitemap, name='sitemap'),
     path('payments/', include("payments.urls"), name='payments'),
     path("users/", include(users_urls), name='users'),
     path("products/", include("products.urls"), name='products'),

@@ -10,3 +10,5 @@ Allow: /
 User-agent: *
 Disallow: /
 
+Sitemap: https://seoseung-soo.com/sitemap.xml
+
