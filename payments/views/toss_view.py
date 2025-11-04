@@ -1,6 +1,5 @@
 import base64
 import json
-import os
 import time
 from typing import Any, Dict
 
@@ -15,14 +14,12 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from orders.models import Order
 from payments.models import Payment, PaymentLog
 
-TOSS_API_BASE = os.getenv("TOSS_API_BASE")
-
 
 def _toss_headers() -> Dict[str, str]:
     """Toss API 공통 헤더"""
-    secret_key = os.getenv("TOSS_SECRET_KEY", "")
+    secret_key = getattr(settings, 'TOSS_SECRET_KEY', '')
     if not secret_key:
-        raise ValueError("TOSS_SECRET_KEY not found in environment")
+        raise ValueError("TOSS_SECRET_KEY not found in settings")
 
     encoded_key = base64.b64encode(f"{secret_key}:".encode("utf-8")).decode("utf-8")
 
@@ -39,6 +36,9 @@ def toss_payment_request_view(request: HttpRequest) -> JsonResponse:
     if request.method != "POST":
         return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
 
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "로그인이 필요합니다."}, status=401)
+
     try:
         data: Dict[str, Any] = json.loads(request.body)
     except json.JSONDecodeError:
@@ -48,12 +48,16 @@ def toss_payment_request_view(request: HttpRequest) -> JsonResponse:
     if not order_id:
         return JsonResponse({"error": "orderId가 누락되었습니다."}, status=400)
 
-    order = get_object_or_404(Order, order_id=order_id)
+    order = get_object_or_404(Order, order_id=order_id, user=request.user)
 
     if order.status != "PENDING":
         return JsonResponse({
             "error": f"이 주문은 이미 {order.status} 상태입니다."
         }, status=400)
+
+    # 배송비 계산 (5만원 이상 무료, 미만 3000원)
+    shipping_fee = 0 if order.total_amount >= 50000 else 3000
+    final_amount = order.total_amount + shipping_fee
 
     # 운영/로컬 URL 분기
     base_url = settings.HOST_URL if not settings.DEBUG else request.build_absolute_uri("/")[:-1]
@@ -63,7 +67,7 @@ def toss_payment_request_view(request: HttpRequest) -> JsonResponse:
     return JsonResponse({
         "success": True,
         "orderId": order.order_id,
-        "amount": order.total_amount,
+        "amount": final_amount,  # 배송비 포함 최종 금액
         "orderName": order.product_name,
         "successUrl": success_url,
         "failUrl": fail_url,
@@ -106,7 +110,8 @@ def toss_confirm_view(request: HttpRequest) -> JsonResponse:
     if not all([payment_key, order_id, amount]):
         return JsonResponse({"success": False, "error": "요청 정보 누락"}, status=400)
 
-    url = f"{TOSS_API_BASE}/payments/confirm"
+    toss_api_base = getattr(settings, 'TOSS_API_BASE', 'https://api.tosspayments.com/v1')
+    url = f"{toss_api_base}/payments/confirm"
     payload = {
         "paymentKey": payment_key,
         "orderId": order_id,
@@ -128,19 +133,23 @@ def toss_confirm_view(request: HttpRequest) -> JsonResponse:
             status_code=res.status_code,
             response_time_ms=elapsed,
         )
-    except Exception:
-        return JsonResponse({"success": False, "error": "결제 승인 요청 중 오류 발생"}, status=500)
+    except Exception as e:
+        return JsonResponse({"success": False, "error": f"결제 승인 요청 중 오류 발생: {str(e)}"}, status=500)
 
     if res.status_code != 200:
         return JsonResponse({"success": False, "error": data.get("message", "결제 승인 실패")}, status=400)
 
     order = get_object_or_404(Order, order_id=order_id)
 
+    # 배송비 포함 금액 검증
     shipping_fee = 0 if order.total_amount >= 50000 else 3000
     expected_amount = order.total_amount + shipping_fee
 
     if expected_amount != amount:
-        return JsonResponse({"success": False, "error": "주문 금액이 일치하지 않습니다."}, status=400)
+        return JsonResponse({
+            "success": False, 
+            "error": f"주문 금액이 일치하지 않습니다. 예상: {expected_amount}, 실제: {amount}"
+        }, status=400)
 
     with transaction.atomic():
         Payment.objects.create(
@@ -155,8 +164,8 @@ def toss_confirm_view(request: HttpRequest) -> JsonResponse:
             raw_response=data,
         )
 
-    order.status = "PAID"
-    order.save(update_fields=["status"])
+        order.status = "PAID"
+        order.save(update_fields=["status"])
 
     return JsonResponse({
         "success": True,

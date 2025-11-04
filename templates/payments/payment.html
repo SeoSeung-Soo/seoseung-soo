@@ -160,56 +160,17 @@
                     {% endwith %}
                     {% endfor %}
                 {% else %}
-                    <div class="order-item">
-                        <div class="item-info">
-                            <div class="item-name">주문 정보가 없습니다.</div>
-                        </div>
+                <div class="order-item">
+                    <div class="item-info">
+                        <div class="item-name">주문 정보가 없습니다.</div>
                     </div>
+                </div>
                 {% endif %}
             </div>
         </div>
-        </div>
-
-        <div class="payment-info-container">
+    </div>
+    <div class="discount-info-container">
         <div class="form-section">
-            <div class="shipping-info">
-                <span class="shipping-label">배송비</span>
-                <span class="shipping-value">
-                    {% if order %}
-                        {% if shipping_fee == 0 %}
-                            0 (무료)원
-                        {% else %}
-                            {{ shipping_fee|intcomma }}원
-                        {% endif %}
-                    {% else %}
-                        0원
-                    {% endif %}
-                </span>
-            </div>
-            
-            {% if order %}
-                <div class="payment-summary">
-                    <div class="summary-row">
-                        <span class="label">상품 금액:</span>
-                        <span class="value">{{ actual_total|intcomma }}원</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="label">배송비:</span>
-                        <span class="value">
-                            {% if shipping_fee == 0 %}
-                                무료
-                            {% else %}
-                                {{ shipping_fee|intcomma }}원
-                            {% endif %}
-                        </span>
-                    </div>
-                    <div class="summary-row total">
-                        <span class="label">총 결제 금액:</span>
-                        <span class="value">{{ final_amount|intcomma }}원</span>
-                    </div>
-                </div>
-            {% endif %}
-            
             <div class="discount-section">
                 <h4 class="discount-title">할인/부가결제</h4>
                 <div class="discount-item">
@@ -227,25 +188,53 @@
                 </div>
             </div>
         </div>
-        </div>
-        <div class="payment-method-container">
-        <div class="form-section">
-            <h3 class="section-title">결제 방법</h3>
-            <div class="payment-methods">
-                <label class="payment-method">
-                    <input type="radio" name="payment-method" value="toss" checked>
-                    <span class="payment-method-label">토스페이</span>
-                    <span class="payment-method-desc">간편한 토스 결제</span>
-                </label>
-                
-                <label class="payment-method">
-                    <input type="radio" name="payment-method" value="bank">
-                    <span class="payment-method-label">무통장 입금</span>
-                    <span class="payment-method-desc">가상계좌 입금</span>
-                </label>
+    </div>
+
+        <div class="payment-info-container">
+            <div class="payment-summary-container">
+                <div class="section-header">
+                    <h3>주문 요약</h3>
+                </div>
+                {% if order %}
+                    <div class="summary-content">
+                        <div class="summary-row">
+                            <span class="label">상품 금액:</span>
+                            <span class="value">{{ actual_total|intcomma }}원</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">배송비:</span>
+                            <span class="value">
+                                {% if shipping_fee == 0 %}
+                                    무료
+                                {% else %}
+                                    {{ shipping_fee|intcomma }}원
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="summary-row total">
+                            <span class="label">총 결제 금액:</span>
+                            <span class="value">{{ final_amount|intcomma }}원</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="summary-content">
+                        <div class="summary-row">
+                            <span class="label">상품 금액:</span>
+                            <span class="value">0원</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">배송비:</span>
+                            <span class="value">0원</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span class="label">총 결제 금액:</span>
+                            <span class="value">0원</span>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
-        </div>
+
         <div class="payment-button-container">
         <div class="payment-section">
             {% if order %}
@@ -266,7 +255,6 @@
     </div>
 </div>
 
-<!-- Toss Payments 설정 (항상 생성) -->
 <input type="hidden" id="tossClientKey" value="{% if TOSS_CLIENT_KEY %}{{ TOSS_CLIENT_KEY }}{% endif %}">
 {% if order %}
 <input type="hidden" id="orderId" value="{{ order.order_id }}">

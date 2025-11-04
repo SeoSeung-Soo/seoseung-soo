@@ -20,14 +20,12 @@ def generate_order_id() -> str:
     return str(f"ORD-{now}-{rand}")
 
 
-# 주문명 생성기
 def _build_order_name(items: List[Dict[str, Any]]) -> str:
     if len(items) == 1:
         return str(items[0].get("product_name", "상품"))
     return f"{items[0].get('product_name', '상품')} 외 {len(items) - 1}건"
 
 
-# 주문 생성
 @csrf_protect
 def create_order_view(request: HttpRequest) -> JsonResponse:
     if request.method != "POST":

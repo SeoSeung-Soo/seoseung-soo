@@ -481,14 +481,76 @@ body {
     color: #e74c3c;
 }
 
-.shipping-info {
+/* .shipping-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 16px 0;
     border-bottom: 1px solid #f0f0f0;
     margin-bottom: 24px;
+} */
+.payment-summary-container {
+    background: white;
+    padding: 30px;
+    border-bottom: 1px solid #f0f0f0;
 }
+
+.payment-summary-container .section-header {
+    margin-bottom: 20px;
+}
+
+.payment-summary-container .section-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1b1b1b;
+    margin: 0;
+}
+
+.summary-content {
+    margin-bottom: 30px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row.total {
+    border-top: 2px solid #333;
+    margin-top: 30px;
+    padding-top: 20px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.summary-row .label {
+    font-size: 14px;
+    color: #666;
+}
+
+.summary-row .value {
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+}
+
+.summary-row.total .label,
+.summary-row.total .value {
+    font-size: 18px;
+    color: #333;
+}
+
+.payment-summary {
+    padding: 0px 32px;
+}
+
 
 .shipping-label {
     font-size: 14px;
@@ -502,7 +564,8 @@ body {
 }
 
 .discount-section {
-    margin-top: 24px;
+    padding: 10px 120px;
+    margin: 24px 0px;
 }
 
 .discount-title {
@@ -601,12 +664,6 @@ body {
 
 .payment-method input[type="radio"] {
     display: none;
-}
-
-.payment-method-label {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1b1b1b;
 }
 
 .payment-method-desc {
@@ -731,6 +788,40 @@ body {
 
 .payment-button:hover {
     background: #333;
+}
+
+.payment-button-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.payment-amount {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.product-amount {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.4;
+}
+
+.total-amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.4;
+}
+
+.payment-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
 }
 
 .payment-button:disabled {
@@ -1008,15 +1099,7 @@ body {
     .remove-item:hover {
         color: #e74c3c;
     }
-    
-    .shipping-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 0;
-        border-bottom: 1px solid #f0f0f0;
-        margin-bottom: 24px;
-    }
+
     
     .shipping-label {
         font-size: 14px;
@@ -1066,10 +1149,6 @@ body {
     .payment-method {
         padding: 12px;
         margin-bottom: 8px;
-    }
-    
-    .payment-method-label {
-        font-size: 14px;
     }
     
     .payment-method-desc {

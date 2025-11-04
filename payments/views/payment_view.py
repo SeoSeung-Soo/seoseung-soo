@@ -1,11 +1,13 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from decimal import Decimal
 
 from orders.models import Order
 from products.models import Product
 
+@login_required
 def payment(request: HttpRequest) -> HttpResponse:
     
     order_id = request.GET.get('order_id')
