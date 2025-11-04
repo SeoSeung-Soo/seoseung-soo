@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import json
-from decimal import Decimal
 from typing import Any, Dict
 
 import pytest
+from django.core.cache import cache
 from django.urls import reverse
 
 from config.utils.setup_test_method import TestSetupMixin
-from orders.models import Order, OrderItem
 
 
 @pytest.mark.django_db
@@ -17,6 +16,7 @@ class TestCreateOrderView(TestSetupMixin):
     def setup_method(self) -> None:
         self.setup_test_user_data()
         self.setup_test_products_data()
+        cache.clear()
 
     def test_requires_authentication(self) -> None:
         response = self.client.post(reverse("orders:create"))
@@ -35,6 +35,7 @@ class TestCreateOrderView(TestSetupMixin):
         assert "잘못된 JSON 형식" in response.json()["error"]
 
     def test_create_order_success(self) -> None:
+        """PreOrder(임시 주문 캐시) 생성 성공"""
         self.client.force_login(self.customer_user)
 
         self.product.price = 35000
@@ -57,23 +58,17 @@ class TestCreateOrderView(TestSetupMixin):
             content_type="application/json",
         )
 
-        assert response.status_code == 201
+        assert response.status_code == 200
         data = response.json()
 
         assert data["success"] is True
-        assert "orderId" in data
-        assert Decimal(str(data["amount"])) == Decimal("70000.00")
+        assert "preOrderKey" in data
+        assert data["amount"] == 70000
+        assert len(data["items"]) == 1
+        assert "orderId" not in data
 
-        order = Order.objects.get(order_id=data["orderId"])
-        assert order.user == self.customer_user
-        assert order.total_amount == 70000
-        assert order.status == "PENDING"
-
-        items = OrderItem.objects.filter(order=order)
-        assert items.count() == 1
-
-        item = items.first()
-        assert item is not None
-        assert item.product_id == self.product.id
-        assert item.quantity == 2
-        assert int(item.unit_price) == 35000
+        cached = cache.get(data["preOrderKey"])
+        assert cached is not None
+        assert cached["amount"] == 70000
+        assert cached["user_id"] == self.customer_user.id
+        assert len(cached["items"]) == 1
