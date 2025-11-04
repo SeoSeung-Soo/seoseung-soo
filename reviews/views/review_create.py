@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
 from products.models import Product
+from products.utils.url_slug import product_name_to_slug
 from reviews.forms.review_create import ReviewForm, ReviewImageForm
 from reviews.models import Review, ReviewImage
 from users.models import User
@@ -22,7 +23,7 @@ class ReviewCreateView(LoginRequiredMixin, View):
         ).first()
 
         if existing_review:
-            return redirect('products-detail', product_name=product.name)
+            return redirect('products-detail', product_name=product_name_to_slug(product.name))
 
         form = ReviewForm(request.POST)
         image_form = ReviewImageForm(request.POST, request.FILES)
@@ -39,6 +40,6 @@ class ReviewCreateView(LoginRequiredMixin, View):
                     review_image = ReviewImage.objects.create(image=image)
                     review.images.add(review_image)
 
-            return redirect('products-detail', product_name=product.name)
+            return redirect('products-detail', product_name=product_name_to_slug(product.name))
 
-        return redirect('products-detail', product_name=product.name)
+        return redirect('products-detail', product_name=product_name_to_slug(product.name))

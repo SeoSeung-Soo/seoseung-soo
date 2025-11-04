@@ -8,6 +8,7 @@ from django.views import View
 
 from carts.forms.create import CartCreateForm
 from carts.models import Cart
+from products.utils.url_slug import product_name_to_slug
 from users.models import User
 
 
@@ -31,7 +32,7 @@ class CartCreateView(LoginRequiredMixin, View):
                             'message': f'재고가 부족합니다. (현재 재고: {product.stock}개)'
                         })
                     messages.error(request, f'재고가 부족합니다. (현재 재고: {product.stock}개)')
-                    return redirect('products-detail', product_name=product.name)
+                    return redirect('products-detail', product_name=product_name_to_slug(product.name))
 
                 existing_cart.quantity = new_quantity
                 existing_cart.save()
@@ -52,7 +53,7 @@ class CartCreateView(LoginRequiredMixin, View):
                 })
 
             messages.success(request, message)
-            return redirect('products-detail', product_name=product.name)
+            return redirect('products-detail', product_name=product_name_to_slug(product.name))
 
         error_messages = []
         for field, errors in form.errors.items():
@@ -69,4 +70,7 @@ class CartCreateView(LoginRequiredMixin, View):
             for error in errors:
                 messages.error(request, str(error))
 
-        return redirect('products-detail', product_name=request.POST.get('product_name'))
+        product_name_from_post = request.POST.get('product_name', '')
+        if product_name_from_post:
+            return redirect('products-detail', product_name=product_name_to_slug(product_name_from_post))
+        return redirect('customer-product-list')

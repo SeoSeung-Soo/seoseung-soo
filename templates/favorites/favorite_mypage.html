@@ -63,7 +63,7 @@
                     <div class="favorite-item">
                         <div class="item-image">
                             {% if favorite.product.image.first %}
-                                <img src="{{ favorite.product.image.first.image.url }}" alt="{{ favorite.product.name }}" onclick="window.location.href='{% url 'products-detail' favorite.product.name %}'" style="cursor: pointer;">
+                                <img src="{{ favorite.product.image.first.image.url }}" alt="{{ favorite.product.name }}" onclick="window.location.href='{% url 'products-detail' favorite.product.name|product_slug %}'" style="cursor: pointer;">
                             {% else %}
                                 <div class="no-image">이미지 없음</div>
                             {% endif %}
@@ -71,7 +71,7 @@
                         
                         <div class="item-info">
                             <h4 class="item-name">
-                                <a href="{% url 'products-detail' favorite.product.name %}">{{ favorite.product.name }}</a>
+                                <a href="{% url 'products-detail' favorite.product.name|product_slug %}">{{ favorite.product.name }}</a>
                             </h4>
                             <div class="item-description">{{ favorite.product.description|truncatechars:100 }}</div>
                             

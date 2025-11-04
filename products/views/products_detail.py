@@ -1,11 +1,12 @@
 from django.db.models import Prefetch
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.http.response import Http404, HttpResponse
+from django.shortcuts import render
 from django.views.generic.base import View
 
 from favorites.services.favorite_service import FavoriteService
 from products.models import Product
+from products.utils.url_slug import find_product_by_slug
 from reviews.forms.review_create import ReviewCommentForm, ReviewForm, ReviewImageForm
 from reviews.models import Review, ReviewComment
 from reviews.services.review_count import ReviewCountService
@@ -13,7 +14,9 @@ from reviews.services.review_count import ReviewCountService
 
 class ProductsDetailView(View):
     def get(self, request: HttpRequest, product_name: str) -> HttpResponse:
-        products = get_object_or_404(Product.objects.prefetch_related('colors'), name=product_name)
+        products = find_product_by_slug(Product.objects.prefetch_related('colors'), product_name)
+        if not products:
+            raise Http404("상품을 찾을 수 없습니다.")
         
         reviews = Review.objects.filter(
             product=products,

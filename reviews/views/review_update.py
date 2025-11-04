@@ -5,6 +5,7 @@ from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
+from products.utils.url_slug import product_name_to_slug
 from reviews.forms.review_create import ReviewForm, ReviewImageForm
 from reviews.models import Review, ReviewImage
 
@@ -88,7 +89,7 @@ class ReviewUpdateView(LoginRequiredMixin, View):
                     review_image = ReviewImage.objects.create(image=image)
                     review.images.add(review_image)
 
-            return redirect('products-detail', product_name=review.product.name)
+            return redirect('products-detail', product_name=product_name_to_slug(review.product.name))
 
         context = {
             'form': form,

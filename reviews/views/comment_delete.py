@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
+from products.utils.url_slug import product_name_to_slug
 from reviews.models import ReviewComment
 from users.utils.permission import AdminPermission
 
@@ -15,4 +16,4 @@ class ReviewCommentDeleteView(AdminPermission, View):
         product_name = comment.review.product.name
         comment.delete()
 
-        return redirect('products-detail', product_name=product_name)
+        return redirect('products-detail', product_name=product_name_to_slug(product_name))

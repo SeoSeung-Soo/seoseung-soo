@@ -70,7 +70,7 @@
                 <div class="cart-items">
                     {% for item in cart_items %}
                     <div class="cart-item" data-cart-id="{{ item.id }}">
-                        <div class="item-image" onclick="window.location.href='{% url 'products-detail' item.product.name %}'" style="cursor: pointer;">
+                        <div class="item-image" onclick="window.location.href='{% url 'products-detail' item.product.name|product_slug %}'" style="cursor: pointer;">
                             {% if item.product.image.all %}
                                 <img src="{{ item.product.image.first.image.url }}" alt="{{ item.product.name }}">
                             {% else %}
@@ -79,7 +79,7 @@
                         </div>
                         
                         <div class="item-info">
-                            <h3 class="item-name" onclick="window.location.href='{% url 'products-detail' item.product.name %}'" style="cursor: pointer;">{{ item.product.name }}</h3>
+                            <h3 class="item-name" onclick="window.location.href='{% url 'products-detail' item.product.name|product_slug %}'" style="cursor: pointer;">{{ item.product.name }}</h3>
                             {% if item.color %}
                             <div class="item-color">
                                 <span class="item-color-circle" style="background-color: {% if item.color.hex_code %}{{ item.color.hex_code }}{% else %}#e5e7eb{% endif %};"></span>

@@ -2,6 +2,7 @@ import pytest
 from django.urls import reverse
 
 from config.utils.setup_test_method import TestSetupMixin
+from products.utils.url_slug import product_name_to_slug
 
 
 @pytest.mark.django_db
@@ -12,7 +13,8 @@ class TestProductDetail(TestSetupMixin):
 
     def test_product_detail_get(self) -> None:
         self.client.force_login(self.customer_user)
-        url = reverse('products-detail', kwargs={'product_name': "Test Product"})
+        slug = product_name_to_slug("Test Product")
+        url = reverse('products-detail', kwargs={'product_name': slug})
         response = self.client.get(url)
 
         assert response.status_code == 200

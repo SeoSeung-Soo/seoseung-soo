@@ -8,6 +8,7 @@ from django.views import View
 from favorites.forms.favorite import FavoriteForm
 from favorites.models import Favorite
 from favorites.services.favorite_service import FavoriteService
+from products.utils.url_slug import product_name_to_slug
 from users.models import User
 
 
@@ -34,7 +35,10 @@ class FavoriteCreateView(LoginRequiredMixin, View):
                     request.session['favorite_message'] = result['message']
                 else:
                     request.session['favorite_error'] = result['message']
-                return redirect('products-detail', product_name=request.POST.get('product_name'))
+                product_name_from_post = request.POST.get('product_name', '')
+                if product_name_from_post:
+                    return redirect('products-detail', product_name=product_name_to_slug(product_name_from_post))
+                return redirect('customer-product-list')
         else:
             error_message = "잘못된 요청입니다."
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -45,7 +49,10 @@ class FavoriteCreateView(LoginRequiredMixin, View):
                 })
             else:
                 request.session['favorite_error'] = error_message
-                return redirect('products-detail', product_name=request.POST.get('product_name'))
+                product_name_from_post = request.POST.get('product_name', '')
+                if product_name_from_post:
+                    return redirect('products-detail', product_name=product_name_to_slug(product_name_from_post))
+                return redirect('customer-product-list')
 
 
 class FavoriteDeleteView(LoginRequiredMixin, View):
