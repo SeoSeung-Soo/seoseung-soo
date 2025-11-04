@@ -5,7 +5,6 @@ from django.shortcuts import render
 from django.views.generic.base import View
 
 from favorites.services.favorite_service import FavoriteService
-from products.models import Product
 from products.utils.url_slug import find_product_by_slug
 from reviews.forms.review_create import ReviewCommentForm, ReviewForm, ReviewImageForm
 from reviews.models import Review, ReviewComment
@@ -14,19 +13,19 @@ from reviews.services.review_count import ReviewCountService
 
 class ProductsDetailView(View):
     def get(self, request: HttpRequest, product_name: str) -> HttpResponse:
-        products = find_product_by_slug(Product.objects.prefetch_related('colors'), product_name)
-        if not products:
+        product = find_product_by_slug(product_name)
+        if not product:
             raise Http404("상품을 찾을 수 없습니다.")
         
         reviews = Review.objects.filter(
-            product=products,
+            product=product,
             is_published=True
         ).select_related('user').prefetch_related(
             'images', 
             Prefetch('comments', queryset=ReviewComment.objects.all().select_related('user'))
         ).order_by('-created_at')
         
-        review_stats = ReviewCountService.get_product_review_stats(products)
+        review_stats = ReviewCountService.get_product_review_stats(product)
         
         user_review = None
         if request.user.is_authenticated:
@@ -34,7 +33,7 @@ class ProductsDetailView(View):
         
         is_favorited = False
         if request.user.is_authenticated:
-            is_favorited = FavoriteService.is_product_favorited(request.user, products.id)
+            is_favorited = FavoriteService.is_product_favorited(request.user, product.id)
         
         review_form = ReviewForm()
         review_image_form = ReviewImageForm()
@@ -42,7 +41,7 @@ class ProductsDetailView(View):
         comment_form = ReviewCommentForm()
         
         context = {
-            "products": products,
+            "products": product,
             "reviews": reviews,
             "avg_rating": review_stats['avg_rating'],
             "review_count": review_stats['review_count'],
