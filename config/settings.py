@@ -296,3 +296,8 @@ CACHES = {
         "TIMEOUT": 600,  # 기본 TTL (10분)
     }
 }
+
+# Toss Payments 설정
+TOSS_CLIENT_KEY = env('TOSS_CLIENT_KEY', default='')
+TOSS_SECRET_KEY = env('TOSS_SECRET_KEY', default='')
+TOSS_API_BASE = env('TOSS_API_BASE', default='https://api.tosspayments.com/v1')

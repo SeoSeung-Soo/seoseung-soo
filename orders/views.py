@@ -45,13 +45,15 @@ def create_order_view(request: HttpRequest) -> JsonResponse:
     if not items_data:
         return JsonResponse({"error": "주문 항목이 비어있습니다."}, status=400)
 
-    # 실제 DB 기준으로 금액 계산
     total_amount: Decimal = Decimal("0.0")
     order_items: List[Tuple[Product, int, Decimal]] = []
 
     for item in items_data:
         product = get_object_or_404(Product, id=item["product_id"])
-        price = Decimal(product.sale_price or product.price)
+        if product.sale_price:
+            price = Decimal(str(product.price)) - Decimal(str(product.sale_price))
+        else:
+            price = Decimal(str(product.price))
         quantity = int(item.get("quantity", 1))
         total_amount += price * quantity
         order_items.append((product, quantity, price))

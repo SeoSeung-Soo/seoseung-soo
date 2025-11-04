@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load product_filters %}
 
 {% block title %}결제하기 - SeoSeung-Soo{% endblock %}
 
@@ -107,20 +108,64 @@
         <div class="form-section">
             <h3 class="section-title">주문상품</h3>
             <div class="order-items">
-                <div class="order-item">
-                    <img src="https://seoseung-soo.com/media/products/images/3cfce465-55f3-4f50-b58e-3b679699a953.png" alt="상품 이미지" class="item-image">
-                    <div class="item-info">
-                        <div class="item-name">[MADE]버드 스티치 트위드 자켓</div>
-                        <div class="item-options">[옵션: 블랙/FREE]</div>
-                        <div class="item-quantity">수량: 1개</div>
-                        <div class="item-discount">할인금액: -5,690원</div>
-                        <div class="item-price">
-                            <span class="current-price">51,210원</span>
-                            <span class="original-price">56,900원</span>
+                {% if order and order_items_with_products %}
+                    {% for item_data in order_items_with_products %}
+                    {% with item=item_data.item product=item_data.product %}
+                    <div class="order-item">
+                        {% if product and product.image.all %}
+                            <img src="{{ product.image.first.image.url }}" alt="{{ item.product_name }}" class="item-image">
+                        {% else %}
+                            <div class="item-image no-image">이미지 없음</div>
+                        {% endif %}
+                        <div class="item-info">
+                            <div class="item-name">{{ item.product_name }}</div>
+                            {% if product and product.colors.all %}
+                            <div class="item-color">
+                                {% for color in product.colors.all %}
+                                    <span class="item-color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ color.name }}"></span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="item-quantity">수량: {{ item.quantity }}개</div>
+                            <div class="item-price">
+                                {% if product %}
+                                    {% if product.sale_price %}
+                                        <span class="sale-price">{{ product.price|discount_amount:product.sale_price|intcomma }}원</span>
+                                        <span class="original-price">{{ product.price|intcomma }}원</span>
+                                    {% else %}
+                                        <span class="current-price">{{ product.price|intcomma }}원</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="current-price">{{ item.unit_price|intcomma }}원</span>
+                                {% endif %}
+                            </div>
+                            <div class="item-subtotal">
+                                <span class="subtotal-label">소계:</span>
+                                <span class="subtotal-value">
+                                    {% if product and product.sale_price %}
+                                        {% with discounted_price=product.price|discount_amount:product.sale_price %}
+                                            {% widthratio discounted_price 1 item.quantity as item_total %}
+                                            {{ item_total|intcomma }}원
+                                        {% endwith %}
+                                    {% elif product %}
+                                        {% widthratio product.price 1 item.quantity as item_total %}
+                                        {{ item_total|intcomma }}원
+                                    {% else %}
+                                        {{ item.subtotal|intcomma }}원
+                                    {% endif %}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <button class="remove-item">✕</button>
-                </div>
+                    {% endwith %}
+                    {% endfor %}
+                {% else %}
+                    <div class="order-item">
+                        <div class="item-info">
+                            <div class="item-name">주문 정보가 없습니다.</div>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
         </div>
@@ -129,15 +174,47 @@
         <div class="form-section">
             <div class="shipping-info">
                 <span class="shipping-label">배송비</span>
-                <span class="shipping-value">0 (무료)원</span>
+                <span class="shipping-value">
+                    {% if order %}
+                        {% if shipping_fee == 0 %}
+                            0 (무료)원
+                        {% else %}
+                            {{ shipping_fee|intcomma }}원
+                        {% endif %}
+                    {% else %}
+                        0원
+                    {% endif %}
+                </span>
             </div>
+            
+            {% if order %}
+                <div class="payment-summary">
+                    <div class="summary-row">
+                        <span class="label">상품 금액:</span>
+                        <span class="value">{{ actual_total|intcomma }}원</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label">배송비:</span>
+                        <span class="value">
+                            {% if shipping_fee == 0 %}
+                                무료
+                            {% else %}
+                                {{ shipping_fee|intcomma }}원
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="summary-row total">
+                        <span class="label">총 결제 금액:</span>
+                        <span class="value">{{ final_amount|intcomma }}원</span>
+                    </div>
+                </div>
+            {% endif %}
             
             <div class="discount-section">
                 <h4 class="discount-title">할인/부가결제</h4>
                 <div class="discount-item">
                     <span class="discount-label">자동 할인</span>
                     <select class="discount-select">
-                        <option value="5690">5,690원</option>
                         <option value="0">할인 없음</option>
                     </select>
                 </div>
@@ -156,27 +233,10 @@
             <h3 class="section-title">결제 방법</h3>
             <div class="payment-methods">
                 <label class="payment-method">
-                    <input type="radio" name="payment-method" value="card">
-                    <span class="payment-method-label">신용카드</span>
-                    <span class="payment-method-desc">안전한 카드 결제</span>
+                    <input type="radio" name="payment-method" value="toss" checked>
+                    <span class="payment-method-label">토스페이</span>
+                    <span class="payment-method-desc">간편한 토스 결제</span>
                 </label>
-                
-                <div class="card-dropdown-container">
-                    <div class="card-dropdown">
-                        <div class="card-option" data-value="kakao-card">
-                            <div class="card-icon kakao-icon">K</div>
-                            <span>카카오페이 카드</span>
-                        </div>
-                        <div class="card-option" data-value="toss-card">
-                            <div class="card-icon toss-icon">T</div>
-                            <span>토스 페이 카드</span>
-                        </div>
-                        <div class="card-option" data-value="naver-card">
-                            <div class="card-icon naver-icon">N</div>
-                            <span>네이버페이 카드</span>
-                        </div>
-                    </div>
-                </div>
                 
                 <label class="payment-method">
                     <input type="radio" name="payment-method" value="bank">
@@ -188,9 +248,15 @@
         </div>
         <div class="payment-button-container">
         <div class="payment-section">
-            <button type="button" class="payment-button" onclick="processPayment()">
-                <span class="payment-text">51,210원 결제하기</span>
-            </button>
+            {% if order %}
+                <button type="button" class="payment-button" id="tossPaymentBtn" data-order-id="{{ order.order_id }}" data-amount="{{ final_amount }}">
+                    <span class="payment-text">{{ final_amount|intcomma }}원 결제하기</span>
+                </button>
+            {% else %}
+                <button type="button" class="payment-button" disabled>
+                    <span class="payment-text">주문 정보가 없습니다.</span>
+                </button>
+            {% endif %}
             <div class="terms-agreement">
                 <p>결제하기 버튼을 클릭하시면 <a href="#">이용약관</a> 및 <a href="#">개인정보처리방침</a>에 동의하는 것으로 간주됩니다.</p>
             </div>
@@ -199,8 +265,17 @@
         </div>
     </div>
 </div>
+
+<!-- Toss Payments 설정 (항상 생성) -->
+<input type="hidden" id="tossClientKey" value="{% if TOSS_CLIENT_KEY %}{{ TOSS_CLIENT_KEY }}{% endif %}">
+{% if order %}
+<input type="hidden" id="orderId" value="{{ order.order_id }}">
+<input type="hidden" id="orderAmount" value="{{ final_amount }}">
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}
+<script src="https://js.tosspayments.com/v1/payment"></script>
 <script src="{% static 'js/payments/payments.js' %}" defer></script>
 {% endblock %}

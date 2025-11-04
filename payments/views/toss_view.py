@@ -136,7 +136,10 @@ def toss_confirm_view(request: HttpRequest) -> JsonResponse:
 
     order = get_object_or_404(Order, order_id=order_id)
 
-    if order.total_amount != amount:
+    shipping_fee = 0 if order.total_amount >= 50000 else 3000
+    expected_amount = order.total_amount + shipping_fee
+
+    if expected_amount != amount:
         return JsonResponse({"success": False, "error": "주문 금액이 일치하지 않습니다."}, status=400)
 
     with transaction.atomic():
