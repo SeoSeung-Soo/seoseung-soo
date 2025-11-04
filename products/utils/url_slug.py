@@ -1,0 +1,20 @@
+from typing import Optional, cast
+
+from django.utils.text import slugify
+
+from products.models import Product
+
+
+def product_name_to_slug(product_name: str) -> str:
+    return slugify(product_name, allow_unicode=False)
+
+
+def find_product_by_slug(slug: str) -> Optional[Product]:
+    if not slug:
+        return None
+    
+    for product in Product.objects.only('name').iterator():
+        if product_name_to_slug(product.name) == slug:
+            return Product.objects.prefetch_related('colors').get(pk=product.pk)
+    
+    return None

@@ -2,7 +2,15 @@ from typing import Union
 
 from django import template
 
+from products.utils.url_slug import product_name_to_slug
+
 register = template.Library()
+
+@register.filter
+def product_slug(value: str) -> str:
+    if not value:
+        return ''
+    return product_name_to_slug(value)
 
 @register.filter
 def discount_rate(price: Union[int, float], sale_price: Union[int, float]) -> int:

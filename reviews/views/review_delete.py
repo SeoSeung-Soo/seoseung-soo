@@ -3,6 +3,7 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
+from products.utils.url_slug import product_name_to_slug
 from reviews.models import Review
 
 
@@ -19,7 +20,7 @@ class ReviewDeleteView(LoginRequiredMixin, View):
         product_name = review.product.name
         review.delete()
 
-        return redirect('products-detail', product_name=product_name)
+        return redirect('products-detail', product_name=product_name_to_slug(product_name))
 
 
 
