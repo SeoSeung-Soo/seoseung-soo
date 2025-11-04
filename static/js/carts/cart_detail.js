@@ -163,13 +163,18 @@ function createOrderFromCartAPI() {
         const productId = parseInt(item.dataset.productId);
         const quantity = parseInt(item.querySelector('.quantity-input')?.value || 1);
         const productName = item.querySelector('.item-name')?.textContent?.trim() || '';
+        const colorId = item.dataset.colorId ? parseInt(item.dataset.colorId) : null;
         
         if (productId) {
-            items.push({
+            const itemData = {
                 product_id: productId,
                 product_name: productName,
                 quantity: quantity
-            });
+            };
+            if (colorId) {
+                itemData.color_id = colorId;
+            }
+            items.push(itemData);
         }
     });
     

@@ -17,7 +17,6 @@ body {
     gap: 40px;
 }
 
-/* 배송 정보 입력란 (회원가입 스타일) */
 .delivery-info-container {
     margin-top: 40px;
     background: #ffffff1a;
@@ -109,6 +108,7 @@ body {
     font-size: 14px;
     transition: all 0.3s ease;
     background: #fff;
+    border-radius: 0px;
 }
 
 .delivery-form .form-input:focus {
@@ -188,6 +188,7 @@ body {
     cursor: pointer;
     flex-shrink: 0;
     margin-top: 1px;
+    border-radius: 0px;
 }
 
 .delivery-form .checkbox-text {
@@ -451,10 +452,25 @@ body {
     gap: 8px;
 }
 
-.current-price {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1b1b1b;
+.item-color {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0 8px 0;
+}
+
+.item-color-circle {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #e5e7eb;
+    display: inline-block;
+}
+
+.sale-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
 }
 
 .original-price {
@@ -481,14 +497,6 @@ body {
     color: #e74c3c;
 }
 
-/* .shipping-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid #f0f0f0;
-    margin-bottom: 24px;
-} */
 .payment-summary-container {
     background: white;
     padding: 30px;
@@ -563,9 +571,15 @@ body {
     color: #1b1b1b;
 }
 
-.discount-section {
+.discount-info-container {
+    background: #ffffff1a;
     padding: 10px 120px;
-    margin: 24px 0px;
+    border-radius: 8px;
+}
+
+.discount-section {
+    padding: 0;
+    margin: 0;
 }
 
 .discount-title {
@@ -617,7 +631,6 @@ body {
     flex: 1;
     padding: 12px 16px;
     border: 1px solid #e0e0e0;
-    border-radius: 4px;
     font-size: 14px;
 }
 
@@ -625,7 +638,6 @@ body {
     padding: 12px 20px;
     background: #f8f9fa;
     border: 1px solid #e0e0e0;
-    border-radius: 4px;
     font-size: 14px;
     font-weight: 600;
     color: #1b1b1b;
@@ -904,9 +916,44 @@ body {
         padding: 10px 12px;
         font-size: 13px;
     }
-    
+
+    .discount-info-container {
+        padding: 20px 18px;
+        margin-bottom: 20px;
+    }
+
+    .discount-section {
+        margin: 0px;
+        padding: 0;
+    }
+
+    .discount-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .discount-select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .coupon-input-group {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .coupon-input {
+        flex: 1;
+    }
+
+    .coupon-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
     .form-section {
-        padding: 24px 20px;
+        padding: 0;
     }
     
     .phone-input-group {
@@ -957,9 +1004,36 @@ body {
     .order-items-container,
     .payment-info-container,
     .payment-method-container,
-    .payment-button-container {
+    .payment-button-container,
+    .discount-info-container {
         padding: 15px 12px;
         margin-bottom: 15px;
+    }
+
+    .discount-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .discount-select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .coupon-input-group {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .coupon-input {
+        flex: 1;
+    }
+
+    .coupon-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 10px 16px;
     }
     
     .delivery-title {
@@ -1062,12 +1136,6 @@ body {
         display: flex;
         align-items: center;
         gap: 8px;
-    }
-    
-    .current-price {
-        font-size: 14px;
-        font-weight: 700;
-        color: #1b1b1b;
     }
     
     .original-price {

@@ -20,7 +20,7 @@ def payment(request: HttpRequest) -> HttpResponse:
     if order_id:
         order = get_object_or_404(Order, order_id=order_id, user=request.user)
         
-        order_items = list(order.items.all())
+        order_items = list(order.items.select_related('color').all())
         product_ids = [item.product_id for item in order_items]
         
         products = Product.objects.filter(id__in=product_ids).prefetch_related('image', 'colors')
@@ -40,19 +40,14 @@ def payment(request: HttpRequest) -> HttpResponse:
                 
                 item_total = item_price * Decimal(str(item.quantity))
                 actual_total += item_total
-                
-                order_items_with_products.append({
-                    'item': item,
-                    'product': product,
-                })
             else:
                 item_total = Decimal(str(item.unit_price)) * Decimal(str(item.quantity))
                 actual_total += item_total
-                
-                order_items_with_products.append({
-                    'item': item,
-                    'product': None,
-                })
+            
+            order_items_with_products.append({
+                'item': item,
+                'product': product,
+            })
         
         shipping_fee = Decimal('0') if actual_total >= Decimal('50000') else Decimal('3000')
         final_amount = actual_total + shipping_fee

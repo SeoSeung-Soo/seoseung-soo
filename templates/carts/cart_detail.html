@@ -69,7 +69,7 @@
             <div class="cart-items-section">
                 <div class="cart-items">
                     {% for item in cart_items %}
-                    <div class="cart-item" data-cart-id="{{ item.id }}" data-product-id="{{ item.product.id }}">
+                    <div class="cart-item" data-cart-id="{{ item.id }}" data-product-id="{{ item.product.id }}" {% if item.color %}data-color-id="{{ item.color.id }}"{% endif %}>
                         <div class="item-image" onclick="window.location.href='{% url 'products-detail' item.product.name|product_slug %}'" style="cursor: pointer;">
                             {% if item.product.image.all %}
                                 <img src="{{ item.product.image.first.image.url }}" alt="{{ item.product.name }}">

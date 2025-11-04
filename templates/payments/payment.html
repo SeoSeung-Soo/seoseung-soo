@@ -118,15 +118,17 @@
                             <div class="item-image no-image">이미지 없음</div>
                         {% endif %}
                         <div class="item-info">
-                            <div class="item-name">{{ item.product_name }}</div>
-                            {% if product and product.colors.all %}
-                            <div class="item-color">
-                                {% for color in product.colors.all %}
-                                    <span class="item-color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ color.name }}"></span>
-                                {% endfor %}
-                            </div>
+                            {% if product %}
+                                <h3 class="item-name" onclick="window.location.href='{% url 'products-detail' product.name|product_slug %}'" style="cursor: pointer;">{{ product.name }}</h3>
+                            {% else %}
+                                <h3 class="item-name">{{ item.product_name }}</h3>
                             {% endif %}
                             <div class="item-quantity">수량: {{ item.quantity }}개</div>
+                            {% if item.color %}
+                            <div class="item-color">
+                                <span class="item-color-circle" style="background-color: {% if item.color.hex_code %}{{ item.color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ item.color.name }}"></span>
+                            </div>
+                            {% endif %}
                             <div class="item-price">
                                 {% if product %}
                                     {% if product.sale_price %}
@@ -138,22 +140,6 @@
                                 {% else %}
                                     <span class="current-price">{{ item.unit_price|intcomma }}원</span>
                                 {% endif %}
-                            </div>
-                            <div class="item-subtotal">
-                                <span class="subtotal-label">소계:</span>
-                                <span class="subtotal-value">
-                                    {% if product and product.sale_price %}
-                                        {% with discounted_price=product.price|discount_amount:product.sale_price %}
-                                            {% widthratio discounted_price 1 item.quantity as item_total %}
-                                            {{ item_total|intcomma }}원
-                                        {% endwith %}
-                                    {% elif product %}
-                                        {% widthratio product.price 1 item.quantity as item_total %}
-                                        {{ item_total|intcomma }}원
-                                    {% else %}
-                                        {{ item.subtotal|intcomma }}원
-                                    {% endif %}
-                                </span>
                             </div>
                         </div>
                     </div>
