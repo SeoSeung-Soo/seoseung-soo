@@ -15,7 +15,6 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from orders.models import Order
 from payments.models import Payment, PaymentLog
 
-
 TOSS_API_BASE = os.getenv("TOSS_API_BASE")
 
 
@@ -129,7 +128,7 @@ def toss_confirm_view(request: HttpRequest) -> JsonResponse:
             status_code=res.status_code,
             response_time_ms=elapsed,
         )
-    except Exception as e:
+    except Exception:
         return JsonResponse({"success": False, "error": "결제 승인 요청 중 오류 발생"}, status=500)
 
     if res.status_code != 200:
