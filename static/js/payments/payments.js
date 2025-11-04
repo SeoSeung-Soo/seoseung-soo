@@ -8,8 +8,8 @@ function initializePaymentPage() {
     setupAddressSearch();
     setupFormValidation();
     setupDiscountSelection();
-    calculateTotalAmount();
     setupDropdownCloseOnOutsideClick();
+    setupTossPayment();
 }
 
 function setupPaymentMethodSelection() {
@@ -44,7 +44,6 @@ function setupPaymentMethodSelection() {
             this.classList.add('selected');
             radio.checked = true;
             
-            // 신용카드인 경우 드롭다운 표시
             if (radio.value === 'card' && dropdownContainer) {
                 setTimeout(() => {
                     dropdownContainer.classList.add('show');
@@ -100,7 +99,6 @@ function setupDropdownCloseOnOutsideClick() {
     });
 }
 
-// 쿠폰 적용 기능
 function setupCouponApplication() {
     const couponBtn = document.querySelector('.coupon-btn');
     const couponInput = document.querySelector('.coupon-input');
@@ -265,16 +263,25 @@ function removeErrorMessage(field) {
 }
 
 function calculateTotalAmount() {
-    const productAmount = 51210;
-    const shippingFee = 0;
+    const paymentButton = document.getElementById('tossPaymentBtn');
+    if (!paymentButton) {
+        return;
+    }
+    
+    let originalAmount = parseInt(paymentButton.getAttribute('data-original-amount')) || 0;
+    if (originalAmount === 0) {
+        originalAmount = parseInt(paymentButton.getAttribute('data-amount')) || 0;
+        paymentButton.setAttribute('data-original-amount', originalAmount);
+    }
+    
     const discountAmount = getCurrentDiscountAmount();
+    const finalAmount = originalAmount - discountAmount;
     
-    const totalAmount = productAmount + shippingFee - discountAmount;
+    const paymentText = paymentButton.querySelector('.payment-text');
     
-    const paymentButton = document.querySelector('.payment-button .payment-text');
-    
-    if (paymentButton) {
-        paymentButton.textContent = `${totalAmount.toLocaleString()}원 결제하기`;
+    if (paymentText) {
+        paymentText.textContent = `${finalAmount.toLocaleString()}원 결제하기`;
+        paymentButton.setAttribute('data-amount', finalAmount);
     }
 }
 
@@ -303,8 +310,16 @@ function processPayment() {
         return;
     }
     
+    // 실제 결제 버튼의 data-amount에서 금액 가져오기
+    const paymentButton = document.getElementById('tossPaymentBtn');
+    if (!paymentButton) {
+        showErrorMessage(null, '결제 버튼을 찾을 수 없습니다.');
+        return;
+    }
+    
     const discountAmount = getCurrentDiscountAmount();
-    const finalAmount = 51210 - discountAmount;
+    const totalAmount = parseInt(paymentButton.getAttribute('data-amount')) || 0;
+    const finalAmount = totalAmount;
     
     if (!confirm(`${finalAmount.toLocaleString()}원을 결제하시겠습니까?`)) {
         return;
@@ -375,3 +390,137 @@ window.addEventListener('beforeunload', function(e) {
         e.returnValue = '입력한 정보가 사라집니다. 정말 나가시겠습니까?';
     }
 });
+
+function initializeTossPaymentWidget(paymentData, amount) {
+    const clientKeyElement = document.getElementById('tossClientKey');
+    const clientKey = clientKeyElement ? clientKeyElement.value : '';
+    
+    // 디버깅 정보
+    console.log('tossClientKey element:', clientKeyElement);
+    console.log('clientKey value:', clientKey);
+    console.log('paymentData:', paymentData);
+    
+    if (!clientKey) {
+        alert('결제 시스템을 초기화할 수 없습니다. 클라이언트 키가 설정되지 않았습니다.\n\n디버깅 정보:\n- tossClientKey element: ' + (clientKeyElement ? '존재' : '없음') + '\n- clientKey value: ' + clientKey);
+        const paymentButton = document.getElementById('tossPaymentBtn');
+        if (paymentButton) {
+            paymentButton.innerHTML = '<span class="payment-text">결제하기</span>';
+            paymentButton.disabled = false;
+        }
+        return;
+    }
+    
+    const tossPayments = TossPayments(clientKey);
+    
+    tossPayments.requestPayment('카드', {
+        amount: amount,
+        orderId: paymentData.orderId,
+        orderName: paymentData.orderName,
+        successUrl: paymentData.successUrl,
+        failUrl: paymentData.failUrl,
+        customerEmail: document.querySelector('.email-input')?.value || '',
+        customerName: document.querySelector('.form-input[placeholder*="이름"]')?.value || '',
+    })
+    .then(function(data) {
+        // 결제 성공 - Toss가 successUrl로 리다이렉트하므로 여기서는 처리하지 않음
+        console.log('Payment successful:', data);
+    })
+    .catch(function (error) {
+        const paymentButton = document.getElementById('tossPaymentBtn');
+        
+        if (error.code === 'USER_CANCEL') {
+            // 사용자가 결제를 취소한 경우
+            paymentButton.innerHTML = '<span class="payment-text">결제하기</span>';
+            paymentButton.disabled = false;
+        } else {
+            // 다른 오류 발생
+            alert('결제 요청 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류'));
+            paymentButton.innerHTML = '<span class="payment-text">결제하기</span>';
+            paymentButton.disabled = false;
+        }
+    });
+}
+
+function setupTossPayment() {
+    const tossPaymentBtn = document.getElementById('tossPaymentBtn');
+    if (!tossPaymentBtn) {
+        console.warn('tossPaymentBtn을 찾을 수 없습니다.');
+        return;
+    }
+    
+    tossPaymentBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const orderId = tossPaymentBtn.getAttribute('data-order-id');
+        const amount = parseInt(tossPaymentBtn.getAttribute('data-amount')) || 0;
+        
+        console.log('Toss payment button clicked:', { orderId, amount });
+        
+        if (!orderId) {
+            alert('주문 정보를 찾을 수 없습니다.');
+            return;
+        }
+        
+        if (amount <= 0) {
+            alert('결제 금액이 올바르지 않습니다.');
+            return;
+        }
+        
+        // 결제 요청 API 호출
+        requestTossPayment(orderId, amount);
+    });
+}
+
+function requestTossPayment(orderId, amount) {
+    const paymentButton = document.getElementById('tossPaymentBtn');
+    const originalText = paymentButton.innerHTML;
+    
+    paymentButton.innerHTML = '<span class="payment-text">결제 요청 중...</span>';
+    paymentButton.disabled = true;
+    
+    fetch('/payments/toss/request/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            orderId: orderId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Toss Payments 위젯 초기화
+            initializeTossPaymentWidget(data, amount);
+        } else {
+            alert(data.error || '결제 요청에 실패했습니다.');
+            paymentButton.innerHTML = originalText;
+            paymentButton.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('결제 요청 중 오류가 발생했습니다.');
+        paymentButton.innerHTML = originalText;
+        paymentButton.disabled = false;
+    });
+}
+
+function getCsrfToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfToken) {
+        return csrfToken.value;
+    }
+    
+    // 쿠키에서 CSRF 토큰 가져오기
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'csrftoken') {
+            return value;
+        }
+    }
+    
+    return '';
+}

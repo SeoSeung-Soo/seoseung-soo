@@ -14,9 +14,6 @@ def home(request: HttpRequest) -> HttpResponse:
     context = {'products': products}
     return render(request, 'home.html', context)
 
-def payment(request: HttpRequest) -> HttpResponse:
-    return render(request, 'payments/payment.html')
-
 urlpatterns = [
     path('', home, name='home'),
     path('payments/', include("payments.urls"), name='payments'),
