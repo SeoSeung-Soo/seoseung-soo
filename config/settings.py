@@ -34,6 +34,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS: list[str]= ["143.47.104.74", "seoseung-soo.com", "www.seoseung-soo.com"]
 
+HOST_URL = "https://seoseung-soo.com"
+
 
 # Application definition
 
@@ -55,6 +57,8 @@ THIRD_PARTY_APPS = [
     "inquire.apps.InquireConfig",
     "carts.apps.CartsConfig",
     "favorites.apps.FavoriteConfig",
+    "orders.apps.OrdersConfig",
+    "payments.apps.PaymentsConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
