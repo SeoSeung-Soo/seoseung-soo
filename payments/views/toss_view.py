@@ -1,6 +1,5 @@
 import base64
 import json
-import logging
 import os
 import time
 from typing import Any, Dict
@@ -16,9 +15,8 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from orders.models import Order
 from payments.models import Payment, PaymentLog
 
-logger = logging.getLogger(__name__)
 
-TOSS_API_BASE = "https://api.tosspayments.com/v1"
+TOSS_API_BASE = os.getenv("TOSS_API_BASE")
 
 
 def _toss_headers() -> Dict[str, str]:
@@ -132,11 +130,9 @@ def toss_confirm_view(request: HttpRequest) -> JsonResponse:
             response_time_ms=elapsed,
         )
     except Exception as e:
-        logger.exception(f"Toss 결제 승인 요청 실패: {e}")
         return JsonResponse({"success": False, "error": "결제 승인 요청 중 오류 발생"}, status=500)
 
     if res.status_code != 200:
-        logger.warning(f"Toss 결제 실패 응답: {data}")
         return JsonResponse({"success": False, "error": data.get("message", "결제 승인 실패")}, status=400)
 
     order = get_object_or_404(Order, order_id=order_id)
@@ -159,8 +155,6 @@ def toss_confirm_view(request: HttpRequest) -> JsonResponse:
 
     order.status = "PAID"
     order.save(update_fields=["status"])
-
-    logger.info(f"결제 완료: orderId={order_id}, amount={amount}")
 
     return JsonResponse({
         "success": True,
