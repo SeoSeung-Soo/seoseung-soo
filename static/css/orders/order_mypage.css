@@ -200,6 +200,112 @@ a.benefit-label {
     font-size: 16px;
 }
 
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.order-group {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.order-id {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.order-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.order-status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #e5e7eb;
+    color: #666;
+}
+
+.order-status-badge.status-paid {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.order-status-badge.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.order-status-badge.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.order-items {
+    padding: 0;
+}
+
+.order-item {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.quantity-display {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.order-footer {
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.order-total {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.total-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.total-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
 @media (max-width: 768px) {
     .user-header {
         flex-direction: column;
@@ -249,6 +355,26 @@ a.benefit-label {
 
     .main-content {
         order: 1;
+    }
+    
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .order-items .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .order-items .item-quantity,
+    .order-items .item-total {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 }
 

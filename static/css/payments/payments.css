@@ -17,7 +17,6 @@ body {
     gap: 40px;
 }
 
-/* 배송 정보 입력란 (회원가입 스타일) */
 .delivery-info-container {
     margin-top: 40px;
     background: #ffffff1a;
@@ -109,6 +108,7 @@ body {
     font-size: 14px;
     transition: all 0.3s ease;
     background: #fff;
+    border-radius: 0px;
 }
 
 .delivery-form .form-input:focus {
@@ -188,6 +188,7 @@ body {
     cursor: pointer;
     flex-shrink: 0;
     margin-top: 1px;
+    border-radius: 0px;
 }
 
 .delivery-form .checkbox-text {
@@ -451,10 +452,25 @@ body {
     gap: 8px;
 }
 
-.current-price {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1b1b1b;
+.item-color {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0 8px 0;
+}
+
+.item-color-circle {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #e5e7eb;
+    display: inline-block;
+}
+
+.sale-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
 }
 
 .original-price {
@@ -481,14 +497,68 @@ body {
     color: #e74c3c;
 }
 
-.shipping-info {
+.payment-summary-container {
+    background: white;
+    padding: 30px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.payment-summary-container .section-header {
+    margin-bottom: 20px;
+}
+
+.payment-summary-container .section-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1b1b1b;
+    margin: 0;
+}
+
+.summary-content {
+    margin-bottom: 30px;
+}
+
+.summary-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
+    padding: 12px 0;
     border-bottom: 1px solid #f0f0f0;
-    margin-bottom: 24px;
 }
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row.total {
+    border-top: 2px solid #333;
+    margin-top: 30px;
+    padding-top: 20px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.summary-row .label {
+    font-size: 14px;
+    color: #666;
+}
+
+.summary-row .value {
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+}
+
+.summary-row.total .label,
+.summary-row.total .value {
+    font-size: 18px;
+    color: #333;
+}
+
+.payment-summary {
+    padding: 0px 32px;
+}
+
 
 .shipping-label {
     font-size: 14px;
@@ -501,8 +571,15 @@ body {
     color: #1b1b1b;
 }
 
+.discount-info-container {
+    background: #ffffff1a;
+    padding: 10px 120px;
+    border-radius: 8px;
+}
+
 .discount-section {
-    margin-top: 24px;
+    padding: 0;
+    margin: 0;
 }
 
 .discount-title {
@@ -554,7 +631,6 @@ body {
     flex: 1;
     padding: 12px 16px;
     border: 1px solid #e0e0e0;
-    border-radius: 4px;
     font-size: 14px;
 }
 
@@ -562,7 +638,6 @@ body {
     padding: 12px 20px;
     background: #f8f9fa;
     border: 1px solid #e0e0e0;
-    border-radius: 4px;
     font-size: 14px;
     font-weight: 600;
     color: #1b1b1b;
@@ -601,18 +676,6 @@ body {
 
 .payment-method input[type="radio"] {
     display: none;
-}
-
-.payment-method-label {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1b1b1b;
-}
-
-.payment-method-desc {
-    font-size: 14px;
-    color: #666;
-    margin-left: 8px;
 }
 
 .card-dropdown-container {
@@ -733,6 +796,40 @@ body {
     background: #333;
 }
 
+.payment-button-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.payment-amount {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.product-amount {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.4;
+}
+
+.total-amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.4;
+}
+
+.payment-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+}
+
 .payment-button:disabled {
     background: #ccc;
     cursor: not-allowed;
@@ -819,9 +916,44 @@ body {
         padding: 10px 12px;
         font-size: 13px;
     }
-    
+
+    .discount-info-container {
+        padding: 20px 18px;
+        margin-bottom: 20px;
+    }
+
+    .discount-section {
+        margin: 0px;
+        padding: 0;
+    }
+
+    .discount-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .discount-select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .coupon-input-group {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .coupon-input {
+        flex: 1;
+    }
+
+    .coupon-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
     .form-section {
-        padding: 24px 20px;
+        padding: 0;
     }
     
     .phone-input-group {
@@ -872,9 +1004,36 @@ body {
     .order-items-container,
     .payment-info-container,
     .payment-method-container,
-    .payment-button-container {
+    .payment-button-container,
+    .discount-info-container {
         padding: 15px 12px;
         margin-bottom: 15px;
+    }
+
+    .discount-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .discount-select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .coupon-input-group {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .coupon-input {
+        flex: 1;
+    }
+
+    .coupon-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 10px 16px;
     }
     
     .delivery-title {
@@ -979,12 +1138,6 @@ body {
         gap: 8px;
     }
     
-    .current-price {
-        font-size: 14px;
-        font-weight: 700;
-        color: #1b1b1b;
-    }
-    
     .original-price {
         font-size: 12px;
         color: #999;
@@ -1008,15 +1161,7 @@ body {
     .remove-item:hover {
         color: #e74c3c;
     }
-    
-    .shipping-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 0;
-        border-bottom: 1px solid #f0f0f0;
-        margin-bottom: 24px;
-    }
+
     
     .shipping-label {
         font-size: 14px;
@@ -1066,15 +1211,6 @@ body {
     .payment-method {
         padding: 12px;
         margin-bottom: 8px;
-    }
-    
-    .payment-method-label {
-        font-size: 14px;
-    }
-    
-    .payment-method-desc {
-        font-size: 12px;
-        margin-left: 6px;
     }
     
     .card-option {

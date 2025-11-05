@@ -3,6 +3,8 @@ from typing import Any
 from django.conf import settings
 from django.db import models
 
+from products.models import Color
+
 
 class Order(models.Model):
     """주문 기본 정보"""
@@ -37,6 +39,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     unit_price = models.PositiveIntegerField()
     subtotal = models.PositiveIntegerField()
+    color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

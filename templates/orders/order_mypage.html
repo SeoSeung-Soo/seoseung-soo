@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
+{% load product_filters %}
 
 {% block title %}주문 현황{% endblock %}
 
 {% block style %}
 <link rel="stylesheet" href="{% static 'css/orders/order_mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/carts/cart_detail.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -26,7 +28,7 @@
                 <div class="order-category-container">
                     <h4>주문/배송조회</h4>
                 <ul>
-                    <li><a href="{% url 'orders' %}" class="active">배송현황</a></li>
+                    <li><a href="{% url 'orders:status' %}" class="active">배송현황</a></li>
                     <li><a href="#">취소/교환/반품 내역</a></li>
                     <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
                 </ul>
@@ -101,18 +103,78 @@
                     <h3>최근 주문 내역</h3>
                     <a href="#" class="view-all">전체보기 ></a>
                 </div>
-                <div class="order-table">
-                    <div class="table-header">
-                        <div class="col">주문번호</div>
-                        <div class="col">주문일시</div>
-                        <div class="col">주문자</div>
+                
+                {% if recent_orders %}
+                <div class="orders-list">
+                    {% for order in recent_orders %}
+                    <div class="order-group">
+                        <div class="order-header">
+                            <div class="order-header-info">
+                                <span class="order-id">주문번호: {{ order.order_id }}</span>
+                                <span class="order-date">{{ order.created_at|date:"Y년 m월 d일 H:i" }}</span>
+                            </div>
+                            <div class="order-status-badge status-{{ order.status|lower }}">
+                                {{ order.get_status_display }}
+                            </div>
+                        </div>
+                        
+                        <div class="order-items">
+                            {% for item in order.items_list %}
+                            <div class="cart-item order-item">
+                                <div class="item-image" onclick="window.location.href='{% url 'products-detail' item.product_name|product_slug %}'" style="cursor: pointer;">
+                                    {% if item.product and item.product.image.all %}
+                                        <img src="{{ item.product.image.first.image.url }}" alt="{{ item.product_name }}">
+                                    {% else %}
+                                        <div class="no-image">이미지 없음</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="item-info">
+                                    <h3 class="item-name" onclick="window.location.href='{% url 'products-detail' item.product_name|product_slug %}'" style="cursor: pointer;">
+                                        {{ item.product_name }}
+                                    </h3>
+                                    {% if item.color %}
+                                    <div class="item-color">
+                                        <span class="item-color-circle" style="background-color: {% if item.color.hex_code %}{{ item.color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ item.color.name }}"></span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="item-price">
+                                        <span class="price">{{ item.unit_price|floatformat:0 }}원</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="item-quantity">
+                                    <span class="quantity-display">수량: {{ item.quantity }}개</span>
+                                </div>
+                                
+                                <div class="item-total">
+                                    <span class="total-price">{{ item.subtotal|floatformat:0|intcomma }}원</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="order-footer">
+                            <div class="order-total">
+                                <span class="total-label">주문 금액:</span>
+                                <span class="total-value">{{ order.total_amount|floatformat:0|intcomma }}원</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="no-orders">
-                        <p>주문 내역이 없습니다.</p>
-                    </div>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <div class="no-orders">
+                    <p>주문 내역이 없습니다.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/orders/order_mypage.js' %}"></script>
 {% endblock %}

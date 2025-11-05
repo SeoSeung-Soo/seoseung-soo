@@ -42,7 +42,7 @@
                 <div class="desktop-mypage-order-container">
                     <h4>주문/배송조회</h4>
                         <ul>
-                        <li><a href="{% url 'orders' %}">배송현황</a></li>
+                        <li><a href="{% url 'orders:status' %}">배송현황</a></li>
                         <li><a href="#">취소/교환/반품 내역</a></li>
                         <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
                     </ul>
@@ -76,7 +76,7 @@
             <div class="mobile-order-container">
                 <h4>주문/배송조회</h4>
                 <ul>
-                    <li><a href="{% url 'orders' %}">배송현황</a></li>
+                    <li><a href="{% url 'orders:status' %}">배송현황</a></li>
                     <li><a href="#">취소/교환/반품 내역</a></li>
                     <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
                 </ul>
