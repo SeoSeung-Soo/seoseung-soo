@@ -151,18 +151,24 @@ class TossPaymentService:
             color_ids = [item["color_id"] for item in items_data if item.get("color_id")]
             colors_map = {color.id: color for color in Color.objects.filter(id__in=color_ids)} if color_ids else {}
 
-            order_items = [
-                OrderItem(
-                    order=order,
-                    product_id=item_data["product_id"],
-                    product_name=item_data["product_name"],
-                    quantity=item_data["quantity"],
-                    unit_price=item_data["unit_price"],
-                    subtotal=item_data["quantity"] * item_data["unit_price"],
-                    color=colors_map.get(item_data.get("color_id")) if item_data.get("color_id") else None,
+            order_items = []
+            for item_data in items_data:
+                color_id = item_data.get("color_id")
+                color = None
+                if color_id and isinstance(color_id, int):
+                    color = colors_map.get(color_id)
+                
+                order_items.append(
+                    OrderItem(
+                        order=order,
+                        product_id=item_data["product_id"],
+                        product_name=item_data["product_name"],
+                        quantity=item_data["quantity"],
+                        unit_price=item_data["unit_price"],
+                        subtotal=item_data["quantity"] * item_data["unit_price"],
+                        color=color,
+                    )
                 )
-                for item_data in items_data
-            ]
             OrderItem.objects.bulk_create(order_items)
 
             Payment.objects.create(
