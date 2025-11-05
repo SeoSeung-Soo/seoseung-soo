@@ -5,7 +5,6 @@ from typing import Any, Dict, List
 
 from django.core.cache import cache
 from django.http import HttpRequest, JsonResponse
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 
@@ -25,6 +24,7 @@ def create_order_view(request: HttpRequest) -> JsonResponse:
     if not request.user.is_authenticated:
         return JsonResponse({"error": "로그인이 필요합니다."}, status=401)
 
+    # JSON 파싱
     try:
         data: Dict[str, Any] = json.loads(request.body)
     except json.JSONDecodeError:
@@ -34,12 +34,21 @@ def create_order_view(request: HttpRequest) -> JsonResponse:
     if not items_data:
         return JsonResponse({"error": "주문 항목이 비어있습니다."}, status=400)
 
+    product_ids = [item["product_id"] for item in items_data if "product_id" in item]
+    products = Product.objects.filter(id__in=product_ids)
+    product_map = {p.id: p for p in products}
+
+    # 존재하지 않는 상품 확인
+    if len(product_ids) != len(product_map):
+        return JsonResponse({"error": "존재하지 않는 상품이 포함되어 있습니다."}, status=404)
+
     total_amount = Decimal("0.0")
     validated_items: List[Dict[str, Any]] = []
 
-    # DB 기준 가격 검증 및 총액 계산
     for item in items_data:
-        product = get_object_or_404(Product, id=item["product_id"])
+        product_id = item["product_id"]
+        product = product_map[product_id]
+
         quantity = int(item.get("quantity", 1))
         price = Decimal(product.sale_price or product.price)
 
@@ -52,7 +61,6 @@ def create_order_view(request: HttpRequest) -> JsonResponse:
             "unit_price": int(price),
         })
 
-    # 캐시 키 생성
     preorder_key = generate_preorder_key()
     cache_data = {
         "user_id": request.user.id,
@@ -61,7 +69,7 @@ def create_order_view(request: HttpRequest) -> JsonResponse:
         "created_at": timezone.now().isoformat(),
     }
 
-    # Redis / Django Cache에 15분 저장
+    # Redis / Django Cache에 15분간 저장
     cache.set(preorder_key, cache_data, timeout=60 * 15)
 
     return JsonResponse({
