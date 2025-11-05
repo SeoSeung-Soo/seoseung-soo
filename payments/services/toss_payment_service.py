@@ -209,15 +209,15 @@ class TossPaymentService:
             product_id__in=product_ids
         ).select_related('color').order_by('id')
 
-        cart_items_by_key: Dict[tuple[int, int | None], List[Any]] = {}
+        cart_items_by_key: Dict[tuple[int, int | None], List[Cart]] = {}
         for cart_item in all_cart_items:
             key = (cart_item.product_id, cart_item.color_id)
             if key not in cart_items_by_key:
                 cart_items_by_key[key] = []
             cart_items_by_key[key].append(cart_item)
 
-        items_to_delete: List[Any] = []
-        items_to_update: List[Any] = []
+        items_to_delete: List[Cart] = []
+        items_to_update: List[Cart] = []
 
         for item_data in items_data:
             product_id = item_data.get("product_id")
