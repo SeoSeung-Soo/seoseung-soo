@@ -28,11 +28,13 @@ class OrderView(LoginRequiredMixin, View):
             'reviews': 0,
         }
 
-        recent_orders = orders.order_by('-created_at')[:10]
+        recent_orders = orders.order_by('-created_at').prefetch_related(
+            'items__color'
+        )[:10]
 
         all_product_ids = []
         for order in recent_orders:
-            order.items_list = list(order.items.select_related('color').all())  # type: ignore[attr-defined]
+            order.items_list = list(order.items.all())  # type: ignore[attr-defined]
             for item in order.items_list:  # type: ignore[attr-defined]
                 if item.product_id not in all_product_ids:
                     all_product_ids.append(item.product_id)

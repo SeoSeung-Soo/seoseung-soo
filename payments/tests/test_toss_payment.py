@@ -140,3 +140,104 @@ class TestTossPaymentCacheFlow(TestSetupMixin):
         assert response.status_code == 400
         assert data["success"] is False
         assert "preOrderKey" in data["error"] or "만료" in data["error"]
+
+    @patch("payments.services.toss_payment_service.requests.post")
+    def test_toss_confirm_amount_mismatch(self, mock_post: Any) -> None:
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"status": "ok"}
+
+        self.client.force_login(self.customer_user)
+
+        pre_order_key = "order:preorder:test123"
+        product_amount = int(self.product.price)
+        CacheHelper.set(
+            pre_order_key,
+            {
+                "user_id": self.customer_user.id,
+                "items": [
+                    {
+                        "product_id": self.product.id,
+                        "product_name": self.product.name,
+                        "quantity": 1,
+                        "unit_price": product_amount,
+                    }
+                ],
+                "amount": product_amount,
+            },
+            timeout=60 * 15,
+        )
+
+        url = reverse("payments:toss-confirm")
+        params = {
+            "paymentKey": f"mock_{uuid.uuid4().hex}",
+            "orderId": f"ORD-{uuid.uuid4().hex[:6].upper()}",
+            "amount": "99999",
+            "preOrderKey": pre_order_key,
+        }
+
+        response = self.client.get(url, params)
+        data: Dict[str, Any] = response.json()
+
+        assert response.status_code == 400
+        assert data["success"] is False
+        assert "금액" in data["error"]
+
+    @patch("payments.services.toss_payment_service.requests.post")
+    def test_toss_confirm_duplicate_payment(self, mock_post: Any) -> None:
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"status": "ok"}
+
+        self.client.force_login(self.customer_user)
+
+        payment_key = f"duplicate_{uuid.uuid4().hex}"
+        Payment.objects.create(
+            order=Order.objects.create(
+                order_id="ORD-DUP",
+                user=self.customer_user,
+                product_name="테스트",
+                total_amount=10000,
+                status="PAID"
+            ),
+            provider="toss",
+            method="CARD",
+            payment_key=payment_key,
+            amount=10000,
+            status="APPROVED"
+        )
+
+        pre_order_key = "order:preorder:test123"
+        product_amount = int(self.product.price)
+        shipping_fee = 0 if product_amount >= 50000 else 3000
+        final_amount = product_amount + shipping_fee
+
+        CacheHelper.set(
+            pre_order_key,
+            {
+                "user_id": self.customer_user.id,
+                "items": [
+                    {
+                        "product_id": self.product.id,
+                        "product_name": self.product.name,
+                        "quantity": 1,
+                        "unit_price": product_amount,
+                    }
+                ],
+                "amount": product_amount,
+            },
+            timeout=60 * 15,
+        )
+
+        url = reverse("payments:toss-confirm")
+        params = {
+            "paymentKey": payment_key,
+            "orderId": f"ORD-{uuid.uuid4().hex[:6].upper()}",
+            "amount": str(final_amount),
+            "preOrderKey": pre_order_key,
+        }
+
+        response = self.client.get(url, params)
+        data: Dict[str, Any] = response.json()
+
+        assert response.status_code == 200
+        assert data["success"] is True
+        assert "이미 승인된 결제" in data["message"]

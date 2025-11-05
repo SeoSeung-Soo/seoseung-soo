@@ -148,22 +148,22 @@ class TossPaymentService:
                 status="PENDING",
             )
 
-            for item_data in items_data:
-                color = None
-                if item_data.get("color_id"):
-                    try:
-                        color = Color.objects.get(id=item_data["color_id"])
-                    except Color.DoesNotExist:
-                        pass
+            color_ids = [item["color_id"] for item in items_data if item.get("color_id")]
+            colors_map = {color.id: color for color in Color.objects.filter(id__in=color_ids)} if color_ids else {}
 
-                OrderItem.objects.create(
+            order_items = [
+                OrderItem(
                     order=order,
                     product_id=item_data["product_id"],
                     product_name=item_data["product_name"],
                     quantity=item_data["quantity"],
                     unit_price=item_data["unit_price"],
-                    color=color,
+                    subtotal=item_data["quantity"] * item_data["unit_price"],
+                    color=colors_map.get(item_data.get("color_id")) if item_data.get("color_id") else None,
                 )
+                for item_data in items_data
+            ]
+            OrderItem.objects.bulk_create(order_items)
 
             Payment.objects.create(
                 order=order,
@@ -194,6 +194,25 @@ class TossPaymentService:
     def clear_cart_after_payment(user_id: int, items_data: List[Dict[str, Any]]) -> None:
         user = get_user_model().objects.get(id=user_id)
 
+        product_ids = [item["product_id"] for item in items_data if item.get("product_id") is not None]
+        if not product_ids:
+            return
+
+        all_cart_items = Cart.objects.filter(
+            user=user,
+            product_id__in=product_ids
+        ).select_related('color').order_by('id')
+
+        cart_items_by_key: Dict[tuple[int, int | None], List[Any]] = {}
+        for cart_item in all_cart_items:
+            key = (cart_item.product_id, cart_item.color_id)
+            if key not in cart_items_by_key:
+                cart_items_by_key[key] = []
+            cart_items_by_key[key].append(cart_item)
+
+        items_to_delete: List[Any] = []
+        items_to_update: List[Any] = []
+
         for item_data in items_data:
             product_id = item_data.get("product_id")
             color_id = item_data.get("color_id")
@@ -202,22 +221,27 @@ class TossPaymentService:
             if product_id is None:
                 continue
 
-            cart_query = Cart.objects.filter(user=user, product_id=product_id)
+            key = (product_id, color_id)
+            cart_items = cart_items_by_key.get(key, [])
 
-            if color_id:
-                cart_query = cart_query.filter(color_id=color_id)
-            else:
-                cart_query = cart_query.filter(color__isnull=True)
+            if not cart_items:
+                continue
 
             remaining_quantity = order_quantity
-            for cart_item in cart_query.order_by('id'):
+            for cart_item in cart_items:
                 if remaining_quantity <= 0:
                     break
 
                 if cart_item.quantity <= remaining_quantity:
                     remaining_quantity -= cart_item.quantity
-                    cart_item.delete()
+                    items_to_delete.append(cart_item)
                 else:
                     cart_item.quantity -= remaining_quantity
-                    cart_item.save()
+                    items_to_update.append(cart_item)
                     remaining_quantity = 0
+
+        if items_to_delete:
+            Cart.objects.filter(id__in=[item.id for item in items_to_delete]).delete()
+
+        if items_to_update:
+            Cart.objects.bulk_update(items_to_update, ['quantity'])
