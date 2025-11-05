@@ -3,6 +3,7 @@ from typing import Any, Dict, cast
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import IntegrityError
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -10,7 +11,6 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from config.utils.cache_helper import CacheHelper
-from payments.models import Payment
 from payments.services.toss_payment_service import TossPaymentService
 
 
@@ -131,26 +131,25 @@ class TossConfirmView(View):
         if not is_valid:
             return JsonResponse({"success": False, "error": error_message}, status=400)
 
-        # 중복 결제 확인
-        if Payment.objects.filter(payment_key=payment_key).exists():
-            return JsonResponse({"success": True, "message": "이미 승인된 결제입니다."}, status=200)
-
         # 주문 및 결제 정보 생성
         items_data = cache_data.get("items", [])
         request_url = f"{settings.TOSS_API_BASE}/payments/confirm"
         request_payload = {"paymentKey": payment_key, "orderId": order_id, "amount": amount}
 
-        TossPaymentService.create_order_and_payment(
-            order_id=order_id,
-            user_id=user_id,
-            items_data=items_data,
-            amount=amount,
-            payment_key=payment_key,
-            payment_data=payment_data,
-            request_url=request_url,
-            request_payload=request_payload,
-            response_status_code=status_code
-        )
+        try:
+            TossPaymentService.create_order_and_payment(
+                order_id=order_id,
+                user_id=user_id,
+                items_data=items_data,
+                amount=amount,
+                payment_key=payment_key,
+                payment_data=payment_data,
+                request_url=request_url,
+                request_payload=request_payload,
+                response_status_code=status_code
+            )
+        except IntegrityError:
+            return JsonResponse({"success": True, "message": "이미 승인된 결제입니다."}, status=200)
 
         # 캐시 삭제
         CacheHelper.delete(pre_order_key)

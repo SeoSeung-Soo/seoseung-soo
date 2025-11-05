@@ -190,5 +190,5 @@ def search_products(query: str, limit: int = 100) -> List[Dict[str, Any]]:
 def delete_product_from_index(product_id: int) -> None:
     try:
         es_client.delete(index=PRODUCT_INDEX_NAME, id=str(product_id))
-    except Exception as e:
-        print(f"Elasticsearch 삭제 오류: {e}")
+    except Exception:
+        pass  # Index doesn't exist, ignore
