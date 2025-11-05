@@ -117,16 +117,14 @@ class TestTossPaymentCacheFlow(TestSetupMixin):
 
         assert cache.get(pre_order_key) is None
 
-    def test_toss_confirm_invalid_preorder_key_returns_400(self) -> None:
-        """
-        preOrderKey가 만료되었거나 존재하지 않는 경우
-        toss_confirm_view가 400 에러를 반환하는지 검증합니다.
-        """
+    @patch("payments.views.toss_view.requests.post")
+    def test_toss_confirm_invalid_preorder_key_returns_400(self, mock_post: Any) -> None:
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"status": "ok"}
+
         self.client.force_login(self.customer_user)
 
-        # 사전 주문 캐시를 일부러 설정하지 않음 (만료 또는 삭제된 상태 가정)
         invalid_preorder_key = "preorder:nonexistent"
-
         url = reverse("payments:toss-confirm")
         params = {
             "paymentKey": f"mock_{uuid.uuid4().hex}",
