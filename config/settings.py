@@ -252,6 +252,8 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'None'
+    CSRF_COOKIE_SAMESITE = 'None'
     # CSRF 설정 추가
     CSRF_TRUSTED_ORIGINS = [
         "https://seoseung-soo.com",
@@ -263,6 +265,8 @@ else:
     SECURE_REFERRER_POLICY = None  # type: ignore[assignment]
     SECURE_BROWSER_XSS_FILTER = False
     SECURE_CONTENT_TYPE_NOSNIFF = False
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
 
 
 if DEBUG:
