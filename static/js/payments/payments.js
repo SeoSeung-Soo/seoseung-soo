@@ -398,12 +398,24 @@ function initializeTossPaymentWidget(paymentData, amount) {
     
     const tossPayments = TossPayments(clientKey);
     
+    let successUrl = paymentData.successUrl;
+    let failUrl = paymentData.failUrl;
+    
+    if (paymentData.preOrderKey) {
+        if (!successUrl.includes('preOrderKey=')) {
+            successUrl += (successUrl.includes('?') ? '&' : '?') + `preOrderKey=${paymentData.preOrderKey}`;
+        }
+        if (!failUrl.includes('preOrderKey=')) {
+            failUrl += (failUrl.includes('?') ? '&' : '?') + `preOrderKey=${paymentData.preOrderKey}`;
+        }
+    }
+    
     tossPayments.requestPayment('카드', {
         amount: amount,
         orderId: paymentData.orderId,
         orderName: paymentData.orderName,
-        successUrl: paymentData.successUrl,
-        failUrl: paymentData.failUrl,
+        successUrl: successUrl,
+        failUrl: failUrl,
         customerEmail: document.querySelector('.email-input')?.value || '',
         customerName: document.querySelector('.form-input[placeholder*="이름"]')?.value || '',
     })
@@ -431,10 +443,10 @@ function setupTossPayment() {
     tossPaymentBtn.addEventListener('click', function(e) {
         e.preventDefault();
         
-        const orderId = tossPaymentBtn.getAttribute('data-order-id');
+        const preOrderKey = tossPaymentBtn.getAttribute('data-pre-order-key');
         const amount = parseInt(tossPaymentBtn.getAttribute('data-amount')) || 0;
         
-        if (!orderId) {
+        if (!preOrderKey) {
             alert('주문 정보를 찾을 수 없습니다.');
             return;
         }
@@ -444,11 +456,11 @@ function setupTossPayment() {
             return;
         }
         
-        requestTossPayment(orderId, amount);
+        requestTossPayment(preOrderKey, amount);
     });
 }
 
-function requestTossPayment(orderId, amount) {
+function requestTossPayment(preOrderKey, amount) {
     const paymentButton = document.getElementById('tossPaymentBtn');
     const originalText = paymentButton.innerHTML;
     
@@ -462,13 +474,14 @@ function requestTossPayment(orderId, amount) {
             'X-CSRFToken': getCsrfToken()
         },
         body: JSON.stringify({
-            orderId: orderId
+            preOrderKey: preOrderKey
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             const finalAmount = data.amount || amount;
+            data.preOrderKey = preOrderKey;
             initializeTossPaymentWidget(data, finalAmount);
         } else {
             alert(data.error || '결제 요청에 실패했습니다.');

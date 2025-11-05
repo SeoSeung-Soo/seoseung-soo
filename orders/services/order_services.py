@@ -1,0 +1,97 @@
+import uuid
+from decimal import Decimal
+from typing import Any, Dict, List, Tuple
+
+from django.utils import timezone
+
+from config.utils.cache_helper import CacheHelper
+from products.models import Color, Product
+
+
+class OrderService:
+    @staticmethod
+    def generate_preorder_key() -> str:
+        return f"order:preorder:{uuid.uuid4().hex[:10]}"
+
+    @staticmethod
+    def validate_products(product_ids: List[int]) -> Tuple[bool, str, Dict[int, Product]]:
+        products = Product.objects.filter(id__in=product_ids).prefetch_related('colors')
+        product_map = {p.id: p for p in products}
+
+        if len(product_ids) != len(product_map):
+            return False, "존재하지 않는 상품이 포함되어 있습니다.", {}
+
+        return True, "", product_map
+
+    @staticmethod
+    def validate_color(color_id: int, product: Product) -> Tuple[bool, str]:
+        if not Color.objects.filter(id=color_id).exists():
+            return False, "존재하지 않는 색상입니다."
+
+        if not product.colors.filter(id=color_id).exists():
+            return False, f"'{product.name}' 상품에 선택하신 색상이 존재하지 않습니다."
+
+        return True, ""
+
+    @staticmethod
+    def calculate_item_price(product: Product) -> Decimal:
+        if product.sale_price:
+            return Decimal(str(product.price)) - Decimal(str(product.sale_price))
+        return Decimal(str(product.price))
+
+    @staticmethod
+    def validate_and_prepare_order_items(
+        items_data: List[Dict[str, Any]]
+    ) -> Tuple[bool, str, List[Dict[str, Any]], Decimal]:
+        if not items_data:
+            return False, "주문 항목이 비어있습니다.", [], Decimal("0.0")
+
+        product_ids = list(set([item["product_id"] for item in items_data if "product_id" in item]))
+
+        is_valid, error_message, product_map = OrderService.validate_products(product_ids)
+        if not is_valid:
+            return False, error_message, [], Decimal("0.0")
+
+        validated_items: List[Dict[str, Any]] = []
+        total_amount = Decimal("0.0")
+
+        for item in items_data:
+            product_id = item["product_id"]
+            product = product_map[product_id]
+            color_id = item.get("color_id")
+
+            if color_id:
+                is_valid, error_message = OrderService.validate_color(color_id, product)
+                if not is_valid:
+                    return False, error_message, [], Decimal("0.0")
+
+            quantity = int(item.get("quantity", 1))
+            price = OrderService.calculate_item_price(product)
+            item_total = price * quantity
+            total_amount += item_total
+
+            validated_items.append({
+                "product_id": product.id,
+                "product_name": product.name,
+                "quantity": quantity,
+                "unit_price": int(price),
+                "color_id": color_id,
+            })
+
+        return True, "", validated_items, total_amount
+
+    @staticmethod
+    def create_preorder_cache(
+        user_id: int, validated_items: List[Dict[str, Any]], total_amount: Decimal
+    ) -> str:
+        preorder_key = OrderService.generate_preorder_key()
+        cache_data = {
+            "user_id": user_id,
+            "items": validated_items,
+            "amount": int(total_amount),
+            "created_at": timezone.now().isoformat(),
+        }
+
+        CacheHelper.set(preorder_key, cache_data, timeout=60 * 15)
+
+        return preorder_key

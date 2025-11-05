@@ -196,7 +196,7 @@ function createOrderFromCartAPI() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = `/payments/?order_id=${data.orderId}`;
+            window.location.href = `/payments/?preOrderKey=${data.preOrderKey}`;
         } else {
             alert(data.error || '주문 생성에 실패했습니다.');
         }

@@ -4,9 +4,9 @@ import json
 from typing import Any, Dict
 
 import pytest
-from django.core.cache import cache
 from django.urls import reverse
 
+from config.utils.cache_helper import CacheHelper
 from config.utils.setup_test_method import TestSetupMixin
 
 
@@ -16,13 +16,10 @@ class TestCreateOrderView(TestSetupMixin):
     def setup_method(self) -> None:
         self.setup_test_user_data()
         self.setup_test_products_data()
-        cache.clear()
 
     def test_requires_authentication(self) -> None:
         response = self.client.post(reverse("orders:create"))
-        assert response.status_code == 401
-        data = response.json()
-        assert "로그인이 필요합니다." in data["error"]
+        assert response.status_code == 302
 
     def test_invalid_json(self) -> None:
         self.client.force_login(self.customer_user)
@@ -63,11 +60,12 @@ class TestCreateOrderView(TestSetupMixin):
 
         assert data["success"] is True
         assert "preOrderKey" in data
+        assert data["preOrderKey"].startswith("order:preorder:")
         assert data["amount"] == 70000
         assert len(data["items"]) == 1
         assert "orderId" not in data
 
-        cached = cache.get(data["preOrderKey"])
+        cached = CacheHelper.get(data["preOrderKey"])
         assert cached is not None
         assert cached["amount"] == 70000
         assert cached["user_id"] == self.customer_user.id

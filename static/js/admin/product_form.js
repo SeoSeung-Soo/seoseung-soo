@@ -4,15 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedFiles = [];
   
   if (fileInput) {
-    console.log('File input found:', fileInput);
-    console.log('Multiple attribute:', fileInput.multiple);
-    
     fileInput.addEventListener('change', (e) => {
       const newFiles = Array.from(e.target.files);
-      console.log('New files selected:', newFiles.length, newFiles);
       
       selectedFiles = [...selectedFiles, ...newFiles];
-      console.log('Total selected files:', selectedFiles.length, selectedFiles);
       
       let existingImages = document.querySelector('.existing-images');
       if (!imageGrid && !existingImages) {
@@ -93,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         form.appendChild(newFileInput);
         
-        console.log('Form submitted with files:', selectedFiles.length);
       }
     });
   }
@@ -101,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function removePreviewImage(button, fileName) {
   selectedFiles = selectedFiles.filter(file => file.name !== fileName);
-  console.log('Removed file:', fileName, 'Remaining files:', selectedFiles.length);
   
   button.parentElement.remove();
 }
@@ -128,7 +121,6 @@ function removeExistingImage(imageId) {
       }
     })
     .catch(error => {
-      console.error('Error:', error);
       alert('오류가 발생했습니다.');
     });
   }

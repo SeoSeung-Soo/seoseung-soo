@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
     pwdConfirm.parentNode.insertAdjacentElement('afterend', pwdConfirmHelp);
   }
 
-  // 동의 항목들
   const allConsent = document.getElementById('all_consent');
   const termsConsent = document.getElementById('terms_consent');
   const privacyConsent = document.getElementById('privacy_consent');
@@ -72,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullNumber = phone1.value + phone2.value + phone3.value;
     phone_number.value = fullNumber;
     
-    // 각 필드의 입력 상태에 따라 빨간색 테두리 표시
     if (phone1.value.length < 3) {
       phone1.classList.add('border-red-500');
     } else {
@@ -99,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateConsentStatus() {
-    // 필수 동의 항목 상태 업데이트
     if (termsConsent) {
       const checkmark = termsConsent.nextElementSibling;
       if (checkmark && checkmark.classList.contains('checkmark')) {
@@ -200,7 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       })
       .catch(error => {
-        console.error('중복 체크 오류:', error);
       });
   }
 
@@ -249,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 전체 동의 체크박스 기능
   if (allConsent) {
     allConsent.addEventListener('change', () => {
       const isChecked = allConsent.checked;
@@ -262,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 개별 체크박스 변경 시 전체 동의 상태 업데이트
   function updateAllConsent() {
     if (!allConsent) return;
     
@@ -288,7 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 쇼핑정보 수신 동의 체크 시 하위 항목들도 체크
   if (marketingConsent) {
     marketingConsent.addEventListener('change', () => {
       if (marketingConsent.checked) {
@@ -302,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 하위 항목 체크 시 상위 항목도 체크
   if (snsConsent) {
     snsConsent.addEventListener('change', () => {
       if (marketingConsent) {
@@ -373,7 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // 필수 동의 항목 체크
       if (termsConsent && !termsConsent.checked) {
         const checkmark = termsConsent.nextElementSibling;
         if (checkmark && checkmark.classList.contains('checkmark')) {
@@ -394,13 +385,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!valid) {
         e.preventDefault();
-        // 폼 제출 실패 시 모든 상태 업데이트
         updateConsentStatus();
       }
     });
   }
   
-  // 페이지 로드 시 휴대폰 번호 필드 및 동의 항목 초기 상태 설정
   updatePhoneNumber();
   updateConsentStatus();
 });

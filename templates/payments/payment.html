@@ -124,10 +124,20 @@
                                 <h3 class="item-name">{{ item.product_name }}</h3>
                             {% endif %}
                             <div class="item-quantity">수량: {{ item.quantity }}개</div>
-                            {% if item.color %}
-                            <div class="item-color">
-                                <span class="item-color-circle" style="background-color: {% if item.color.hex_code %}{{ item.color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ item.color.name }}"></span>
-                            </div>
+                            {% if item.color_id and product %}
+                                {% for color in product.colors.all %}
+                                    {% if color.id == item.color_id %}
+                                    <div class="item-color">
+                                        <span class="item-color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ color.name }}"></span>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% elif product and product.colors.all %}
+                                {% for color in product.colors.all %}
+                                <div class="item-color">
+                                    <span class="item-color-circle" style="background-color: {% if color.hex_code %}{{ color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ color.name }}"></span>
+                                </div>
+                                {% endfor %}
                             {% endif %}
                             <div class="item-price">
                                 {% if product %}
@@ -223,13 +233,13 @@
 
         <div class="payment-button-container">
         <div class="payment-section">
-            {% if order %}
-                <button type="button" class="payment-button" id="tossPaymentBtn" data-order-id="{{ order.order_id }}" data-amount="{{ final_amount }}">
+            {% if pre_order_key %}
+                <button type="button" class="payment-button" id="tossPaymentBtn" data-pre-order-key="{{ pre_order_key }}" data-amount="{{ final_amount }}">
                     <span class="payment-text">{{ final_amount|intcomma }}원 결제하기</span>
                 </button>
             {% else %}
                 <button type="button" class="payment-button" disabled>
-                    <span class="payment-text">주문 정보가 없습니다.</span>
+                    <span class="payment-text">{% if error %}{{ error }}{% else %}주문 정보가 없습니다.{% endif %}</span>
                 </button>
             {% endif %}
             <div class="terms-agreement">
@@ -242,8 +252,8 @@
 </div>
 
 <input type="hidden" id="tossClientKey" value="{% if TOSS_CLIENT_KEY %}{{ TOSS_CLIENT_KEY }}{% endif %}">
-{% if order %}
-<input type="hidden" id="orderId" value="{{ order.order_id }}">
+{% if pre_order_key %}
+<input type="hidden" id="preOrderKey" value="{{ pre_order_key }}">
 <input type="hidden" id="orderAmount" value="{{ final_amount }}">
 {% endif %}
 
