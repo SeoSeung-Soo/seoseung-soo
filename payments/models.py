@@ -1,5 +1,6 @@
 from django.db import models
 
+from membership.models import UserPoint
 from orders.models import Order
 
 
@@ -53,6 +54,9 @@ class Payment(models.Model):
     amount = models.PositiveIntegerField()
     approved_at = models.DateTimeField(null=True, blank=True)
     receipt_url = models.URLField(null=True, blank=True)
+    is_used_point = models.BooleanField(default=False, verbose_name="포인트 사용 여부")
+    used_point = models.PositiveIntegerField(default=0, verbose_name="사용 포인트 금액")
+    earned_point = models.PositiveIntegerField(default=0, verbose_name="포인트 적립금")
 
     status = models.CharField(
         max_length=20,
@@ -83,6 +87,45 @@ class Payment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.provider.upper()} | {self.payment_key} ({self.status})"
+
+    def approve(self):
+        """결제 승인 처리 (포인트 차감 및 적립)"""
+        user = self.order.user
+
+        if self.used_point > 0:
+            current_balance = UserPoint.get_user_balance(user)
+            if current_balance < self.used_point:
+                raise ValueError("보유 포인트가 부족합니다.")
+
+            UserPoint.objects.create(
+                user=user,
+                point_type=UserPoint.PointType.USE,
+                amount=-self.used_point,
+                description=f"주문 {self.order.order_id} 결제 사용",
+                balance_after=current_balance - self.used_point,
+                related_order=self.order,
+            )
+
+        self.status = "APPROVED"
+        from datetime import timezone
+        self.approved_at = timezone.now()
+        self.save()
+        self.order.status = "PAID"
+        self.order.save()
+
+        earn_amount = int(self.order.total_amount * 0.05)  # 예: 5% 적립
+        if earn_amount > 0:
+            new_balance = UserPoint.get_user_balance(user) + earn_amount
+            UserPoint.objects.create(
+                user=user,
+                point_type=UserPoint.PointType.EARN,
+                amount=earn_amount,
+                description=f"주문 {self.order.order_id} 결제 적립",
+                balance_after=new_balance,
+                related_order=self.order,
+            )
+            self.earned_point = earn_amount
+            self.save()
 
 
 class PaymentLog(models.Model):
