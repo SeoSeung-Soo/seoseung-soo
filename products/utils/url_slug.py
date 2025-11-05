@@ -13,8 +13,4 @@ def find_product_by_slug(slug: str) -> Optional[Product]:
     if not slug:
         return None
     
-    for product in Product.objects.only('name').iterator():
-        if product_name_to_slug(product.name) == slug:
-            return Product.objects.prefetch_related('colors').get(pk=product.pk)
-    
-    return None
+    return Product.objects.prefetch_related('colors').filter(slug=slug).first()

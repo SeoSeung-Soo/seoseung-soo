@@ -1,4 +1,7 @@
+from typing import Any
+
 from django.db import models
+from django.utils.text import slugify
 
 from categories.models import Category
 from config.basemodel import BaseModel
@@ -25,6 +28,7 @@ class Color(models.Model):
 class Product(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True, null=True, blank=True, db_index=True)
     description = models.TextField()
     image = models.ManyToManyField(ProductImage, blank=True, db_table='product_image_cdt')
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -34,8 +38,32 @@ class Product(BaseModel):
     is_sold = models.BooleanField(default=False)
     categories = models.ManyToManyField(Category, blank=True, db_table='product_category_cdt')
     colors = models.ManyToManyField(Color, blank=True, db_table='product_color_cdt')
+    
     class Meta:
         db_table = 'products'
+    
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        from products.utils.url_slug import product_name_to_slug
+        
+        if not self.slug:
+            base_slug = product_name_to_slug(self.name)
+            slug = base_slug
+            counter = 1
+            while Product.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        elif self.pk:
+            old_product = Product.objects.filter(pk=self.pk).first()
+            if old_product and old_product.name != self.name:
+                base_slug = product_name_to_slug(self.name)
+                slug = base_slug
+                counter = 1
+                while Product.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
+                self.slug = slug
+        super().save(*args, **kwargs)
 
 
 class WishList(BaseModel):
