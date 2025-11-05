@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 
 from elasticsearch import Elasticsearch, helpers
+from elasticsearch.exceptions import NotFoundError
 
 from config import settings
 from products.utils.elasticsearch.elastic_services import ElasticSearchService
@@ -103,8 +104,8 @@ def create_product_index(force_reset: bool = False) -> None:
     elif force_reset:
         try:
             es_client.indices.delete(index=PRODUCT_INDEX_NAME)
-        except Exception:
-            pass  # Index doesn't exist, ignore
+        except NotFoundError:
+            pass  # 인덱스가 존재하지 않으므로 무시
         es_client.indices.create(index=PRODUCT_INDEX_NAME, body=index_mapping)
         
 
@@ -190,5 +191,5 @@ def search_products(query: str, limit: int = 100) -> List[Dict[str, Any]]:
 def delete_product_from_index(product_id: int) -> None:
     try:
         es_client.delete(index=PRODUCT_INDEX_NAME, id=str(product_id))
-    except Exception:
-        pass  # Index doesn't exist, ignore
+    except NotFoundError:
+        pass  # 문서 또는 인덱스가 존재하지 않으므로 무시

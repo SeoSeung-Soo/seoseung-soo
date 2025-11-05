@@ -1,7 +1,6 @@
 from typing import Any
 
 from django.db import models
-from django.utils.text import slugify
 
 from categories.models import Category
 from config.basemodel import BaseModel
@@ -45,7 +44,16 @@ class Product(BaseModel):
     def save(self, *args: Any, **kwargs: Any) -> None:
         from products.utils.url_slug import product_name_to_slug
         
-        if not self.slug:
+        should_regenerate_slug = not self.slug
+        if self.pk and not should_regenerate_slug:
+            try:
+                old_product = Product.objects.get(pk=self.pk)
+                if old_product.name != self.name:
+                    should_regenerate_slug = True
+            except Product.DoesNotExist:
+                should_regenerate_slug = True
+
+        if should_regenerate_slug:
             base_slug = product_name_to_slug(self.name)
             slug = base_slug
             counter = 1
@@ -53,16 +61,6 @@ class Product(BaseModel):
                 slug = f"{base_slug}-{counter}"
                 counter += 1
             self.slug = slug
-        elif self.pk:
-            old_product = Product.objects.filter(pk=self.pk).first()
-            if old_product and old_product.name != self.name:
-                base_slug = product_name_to_slug(self.name)
-                slug = base_slug
-                counter = 1
-                while Product.objects.filter(slug=slug).exclude(pk=self.pk).exists():
-                    slug = f"{base_slug}-{counter}"
-                    counter += 1
-                self.slug = slug
         super().save(*args, **kwargs)
 
 
