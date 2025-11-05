@@ -29,7 +29,7 @@
                 <div class="order-category-container">
                     <h4>주문/배송조회</h4>
                     <ul>
-                        <li><a href="{% url 'orders' %}">배송현황</a></li>
+                        <li><a href="{% url 'orders:status' %}">배송현황</a></li>
                         <li><a href="#">취소/교환/반품 내역</a></li>
                         <li><a href="{% url 'cart-detail' %}" class="active">장바구니</a></li>
                     </ul>
@@ -69,8 +69,8 @@
             <div class="cart-items-section">
                 <div class="cart-items">
                     {% for item in cart_items %}
-                    <div class="cart-item" data-cart-id="{{ item.id }}">
-                        <div class="item-image" onclick="window.location.href='{% url 'products-detail' item.product.name %}'" style="cursor: pointer;">
+                    <div class="cart-item" data-cart-id="{{ item.id }}" data-product-id="{{ item.product.id }}" {% if item.color %}data-color-id="{{ item.color.id }}"{% endif %}>
+                        <div class="item-image" onclick="window.location.href='{% url 'products-detail' item.product.name|product_slug %}'" style="cursor: pointer;">
                             {% if item.product.image.all %}
                                 <img src="{{ item.product.image.first.image.url }}" alt="{{ item.product.name }}">
                             {% else %}
@@ -79,7 +79,7 @@
                         </div>
                         
                         <div class="item-info">
-                            <h3 class="item-name" onclick="window.location.href='{% url 'products-detail' item.product.name %}'" style="cursor: pointer;">{{ item.product.name }}</h3>
+                            <h3 class="item-name" onclick="window.location.href='{% url 'products-detail' item.product.name|product_slug %}'" style="cursor: pointer;">{{ item.product.name }}</h3>
                             {% if item.color %}
                             <div class="item-color">
                                 <span class="item-color-circle" style="background-color: {% if item.color.hex_code %}{{ item.color.hex_code }}{% else %}#e5e7eb{% endif %};"></span>
@@ -161,7 +161,7 @@
                 </div>
                 
                 <div class="summary-actions">
-                    <button class="btn btn-primary btn-large">주문하기</button>
+                    <button type="button" class="btn btn-primary btn-large" id="orderBtn">주문하기</button>
                     <a href="{% url 'home' %}" class="btn btn-secondary btn-large">쇼핑 계속하기</a>
                 </div>
             </div>

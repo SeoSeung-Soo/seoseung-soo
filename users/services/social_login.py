@@ -93,7 +93,8 @@ class GoogleLoginService:
             idinfo = cast(Dict[str, Any], id_token.verify_oauth2_token(  # type: ignore
                 credential,
                 request,
-                settings.GOOGLE_OAUTH2_CLIENT_ID
+                settings.GOOGLE_OAUTH2_CLIENT_ID,
+                clock_skew_in_seconds=30
             ))
 
             if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:

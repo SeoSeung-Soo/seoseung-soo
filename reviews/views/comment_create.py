@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
+from products.utils.url_slug import product_name_to_slug
 from reviews.forms.review_create import ReviewCommentForm
 from reviews.models import Review
 from users.models import User
@@ -22,5 +23,5 @@ class ReviewCommentCreateView(AdminPermission, View):
             comment.review = review
             comment.save()
 
-        return redirect('products-detail', product_name=review.product.name)
+        return redirect('products-detail', product_name=product_name_to_slug(review.product.name))
 

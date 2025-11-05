@@ -1,0 +1,14 @@
+# robots.txt for SeoSeung-Soo
+# 서승수 쇼핑몰 검색 엔진 크롤러 관리 파일
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+User-agent: *
+Disallow: /
+
+Sitemap: https://seoseung-soo.com/sitemap.xml
+

@@ -155,6 +155,58 @@ function formatAllPrices() {
     });
 }
 
+function createOrderFromCartAPI() {
+    const items = [];
+    const cartItems = document.querySelectorAll('.cart-item[data-cart-id]');
+    
+    cartItems.forEach(item => {
+        const productId = parseInt(item.dataset.productId);
+        const quantity = parseInt(item.querySelector('.quantity-input')?.value || 1);
+        const productName = item.querySelector('.item-name')?.textContent?.trim() || '';
+        const colorId = item.dataset.colorId ? parseInt(item.dataset.colorId) : null;
+        
+        if (productId) {
+            const itemData = {
+                product_id: productId,
+                product_name: productName,
+                quantity: quantity
+            };
+            if (colorId) {
+                itemData.color_id = colorId;
+            }
+            items.push(itemData);
+        }
+    });
+    
+    if (items.length === 0) {
+        alert('주문할 상품이 없습니다.');
+        return;
+    }
+    
+    fetch('/orders/create/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            items: items
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = `/payments/?preOrderKey=${data.preOrderKey}`;
+        } else {
+            alert(data.error || '주문 생성에 실패했습니다.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('주문 생성 중 오류가 발생했습니다.');
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     formatAllPrices();
     
@@ -193,4 +245,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    const orderBtn = document.getElementById('orderBtn');
+    if (orderBtn) {
+        orderBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            createOrderFromCartAPI();
+        });
+    }
 });

@@ -34,6 +34,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS: list[str]= ["143.47.104.74", "seoseung-soo.com", "www.seoseung-soo.com"]
 
+HOST_URL = "https://seoseung-soo.com"
+
 
 # Application definition
 
@@ -55,6 +57,8 @@ THIRD_PARTY_APPS = [
     "inquire.apps.InquireConfig",
     "carts.apps.CartsConfig",
     "favorites.apps.FavoriteConfig",
+    "orders.apps.OrdersConfig",
+    "payments.apps.PaymentsConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
@@ -90,7 +94,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'categories.context_processors.categories_context',
-                'products.context_processors.new_products_context',
+                'products.utils.context_processors.new_products_context',
             ],
         },
     },
@@ -248,6 +252,8 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'None'
+    CSRF_COOKIE_SAMESITE = 'None'
     # CSRF 설정 추가
     CSRF_TRUSTED_ORIGINS = [
         "https://seoseung-soo.com",
@@ -259,6 +265,8 @@ else:
     SECURE_REFERRER_POLICY = None  # type: ignore[assignment]
     SECURE_BROWSER_XSS_FILTER = False
     SECURE_CONTENT_TYPE_NOSNIFF = False
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
 
 
 if DEBUG:
@@ -270,6 +278,10 @@ EMAIL_PORT = env.int('EMAIL_PORT', default=587)
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+
+# elasticsearch
+ES_HOST = env('ES_HOST', default='')
+ES_API_KEY = env('ES_API_KEY', default='')
 
 # Redis 설정
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
@@ -288,3 +300,8 @@ CACHES = {
         "TIMEOUT": 600,  # 기본 TTL (10분)
     }
 }
+
+# Toss Payments 설정
+TOSS_CLIENT_KEY = env('TOSS_CLIENT_KEY', default='')
+TOSS_SECRET_KEY = env('TOSS_SECRET_KEY', default='')
+TOSS_API_BASE = env('TOSS_API_BASE', default='https://api.tosspayments.com/v1')
