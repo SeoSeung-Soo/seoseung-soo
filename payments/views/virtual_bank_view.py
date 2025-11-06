@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from orders.models import Order
 from payments.models import BankChoices, Payment
@@ -19,7 +19,7 @@ from payments.services.toss_payment_service import TossPaymentService
 TOSS_API_BASE = settings.TOSS_API_BASE
 
 
-@method_decorator(csrf_exempt, name="dispatch")
+@method_decorator(csrf_protect, name="dispatch")
 class TossVirtualRequestView(View):
     """무통장입금(가상계좌) 결제 요청 (기존 주문 기반)"""
 
@@ -139,18 +139,19 @@ class TossVirtualWebhookView(View):
         if not (payment_key and order_id):
             return JsonResponse({"error": "필수 필드 누락"}, status=400)
 
-        payment = Payment.objects.filter(payment_key=payment_key).first()
+        payment = Payment.objects.filter(payment_key=payment_key).select_related("order").first()
         if not payment:
             return JsonResponse({"error": "유효하지 않은 paymentKey입니다."}, status=404)
 
         if status == "DONE":
-            payment = get_object_or_404(Payment, payment_key=payment_key)
             with transaction.atomic():
                 payment.status = "APPROVED"
                 payment.approved_at = timezone.now()
                 payment.save(update_fields=["status", "approved_at"])
+
                 payment.order.status = "PAID"
                 payment.order.save(update_fields=["status"])
+
             return JsonResponse({"success": True, "message": "입금 완료 처리됨"})
 
         return JsonResponse({"success": True, "message": f"상태: {status}"})

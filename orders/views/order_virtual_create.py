@@ -4,7 +4,6 @@ from typing import Any, Dict, cast
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.http import HttpRequest, JsonResponse
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_protect
@@ -12,6 +11,7 @@ from django.views.decorators.csrf import csrf_protect
 from orders.models import Order, OrderItem
 from orders.services.order_services import OrderService
 from payments.services.toss_payment_service import TossPaymentService
+from products.models import Color
 from users.models import User
 
 
@@ -28,7 +28,6 @@ class OrderCreateVirtualView(LoginRequiredMixin, View):
             return JsonResponse({"error": "잘못된 JSON 형식입니다."}, status=400)
 
         items_data = data.get("items", [])
-
         is_valid, error_message, validated_items, total_amount = (
             OrderService.validate_and_prepare_order_items(items_data)
         )
@@ -45,19 +44,30 @@ class OrderCreateVirtualView(LoginRequiredMixin, View):
                 user=user,
                 order_id=order_id,
                 product_name=order_name,
-                total_amount=float(total_amount),
+                total_amount=int(total_amount),
                 status="PENDING",
-                created_at=timezone.now()
             )
 
+            color_ids = [item["color_id"] for item in validated_items if item.get("color_id")]
+            colors_map = {color.id: color for color in Color.objects.filter(id__in=color_ids)}
+
+            order_items = []
             for item in validated_items:
-                OrderItem.objects.create(
-                    order=order,
-                    product_id=item["product_id"],
-                    product_name=item["product_name"],
-                    quantity=item["quantity"],
-                    unit_price=item["unit_price"],
+                color_id = item.get("color_id")
+                color = colors_map.get(color_id) if isinstance(color_id, int) else None
+                order_items.append(
+                    OrderItem(
+                        order=order,
+                        product_id=int(item["product_id"]),
+                        product_name=item["product_name"],
+                        quantity=int(item["quantity"]),
+                        unit_price=int(item["unit_price"]),
+                        subtotal=int(item["quantity"]) * int(item["unit_price"]),
+                        color=color,
+                    )
                 )
+
+            OrderItem.objects.bulk_create(order_items)
 
         return JsonResponse({
             "success": True,

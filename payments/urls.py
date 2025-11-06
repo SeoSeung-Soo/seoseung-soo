@@ -21,5 +21,5 @@ urlpatterns = [
     path("toss/fail/", TossFailView.as_view(), name="toss-fail"),
     path("toss/confirm/", TossConfirmView.as_view(), name="toss-confirm"),
     path("toss/virtual/request/", TossVirtualRequestView.as_view(), name="toss-virtual-request"),
-    path("toss/virtual/webhook/", TossVirtualWebhookView.as_view(), name="toss-virtual-webhook"),
+    path("toss/webhook/", TossVirtualWebhookView.as_view(), name="toss-webhook"),
 ]

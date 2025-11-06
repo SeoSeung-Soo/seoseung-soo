@@ -78,7 +78,7 @@ class TestTossVirtualAccountFlow(TestSetupMixin):
             status="WAITING_FOR_DEPOSIT",
         )
 
-        url = reverse("payments:toss-virtual-webhook")
+        url = reverse("payments:toss-webhook")
         payload = {
             "paymentKey": payment.payment_key,
             "orderId": self.order.order_id,
@@ -98,7 +98,7 @@ class TestTossVirtualAccountFlow(TestSetupMixin):
         assert payment.approved_at is not None
 
     def test_virtual_account_webhook_invalid_payment_key(self, client: Any) -> None:
-        url = reverse("payments:toss-virtual-webhook")
+        url = reverse("payments:toss-webhook")
         payload = {
             "paymentKey": "invalid_key_999",
             "orderId": self.order.order_id,

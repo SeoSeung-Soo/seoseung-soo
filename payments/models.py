@@ -45,6 +45,7 @@ class Payment(models.Model):
             ("EASY_PAY", "간편결제"),
             ("TRANSFER", "계좌이체"),
             ("VBANK", "가상계좌"),
+            ("VIRTUAL_ACCOUNT", "무통장입금"),
         ],
     )
 
@@ -57,6 +58,7 @@ class Payment(models.Model):
         max_length=20,
         choices=[
             ("REQUESTED", "요청됨"),
+            ("WAITING_FOR_DEPOSIT", "입금대기"),
             ("APPROVED", "승인됨"),
             ("CANCELLED", "취소됨"),
             ("FAILED", "실패"),
