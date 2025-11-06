@@ -829,13 +829,13 @@ class TestAppleLoginView:
 
     @patch("users.services.social_login.AppleLoginService.authenticate_user", autospec=True)
     @patch("users.services.social_login.AppleLoginService.exchange_token", autospec=True)
-    def test_successful_login_renders_home(
+    def test_successful_login_redirects_to_home(
             self,
             mock_exchange: MagicMock,
             mock_auth: MagicMock,
             client_with_session: Client
     ) -> None:
-        """정상 로그인 시 home.html 렌더링"""
+        """정상 로그인 시 홈페이지로 리다이렉트"""
         state = OAuthStateService.create_state()
 
         user = User.objects.create_user(
@@ -850,5 +850,7 @@ class TestAppleLoginView:
 
         url = reverse("apple-callback")
         res = client_with_session.post(url, {"code": "abc123", "state": state})
-        assert res.status_code == 200
-        assert "home.html" in [t.name for t in res.templates if t.name]
+
+        assert res.status_code == 302
+        assert res["Location"] == "/"
+
