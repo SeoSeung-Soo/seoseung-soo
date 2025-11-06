@@ -6,7 +6,7 @@ from typing import Optional
 from django.contrib import messages
 from django.contrib.auth import login
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt
@@ -140,9 +140,12 @@ class AppleLoginView(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class AppleCallbackView(View):
+    def get(self, request: HttpRequest) -> HttpResponse:
+        return redirect("/")
+
     def post(self, request: HttpRequest) -> HttpResponse:
-        code: str | None = request.POST.get("code")
-        state: str | None = request.POST.get("state")
+        code = request.POST.get("code")
+        state = request.POST.get("state")
 
         if not code:
             return JsonResponse({"error": "code 누락"}, status=400)
@@ -159,4 +162,5 @@ class AppleCallbackView(View):
             return JsonResponse({"error": error or "사용자 인증 실패"}, status=400)
 
         login(request, user)
-        return render(request, "home.html")
+
+        return redirect("/")
