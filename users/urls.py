@@ -17,6 +17,7 @@ from users.views.social_login import (
 
 urlpatterns = [
     path("mypage/", MyPageView.as_view(), name="mypage"),
+    path("membership/", include("membership.urls"), name="coupon-point"),
     path("orders/", include("orders.urls", namespace="orders")),
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),

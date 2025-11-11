@@ -1,7 +1,13 @@
-from config.basemodel import BaseModel
-from django.db import models
+from typing import TYPE_CHECKING, Optional, cast
 
+from django.db import models
 from django.db.models import Sum
+
+from config.basemodel import BaseModel
+
+if TYPE_CHECKING:
+    from users.models import User
+
 
 class Coupon(BaseModel):
     name = models.CharField(max_length=100)
@@ -39,5 +45,9 @@ class UserPoint(BaseModel):
         db_table = "user_point"
 
     @staticmethod
-    def get_user_balance(user):
-        return UserPoint.objects.filter(user=user).aggregate(total=Sum("amount"))["total"] or 0
+    def get_user_balance(user: "User") -> int:
+        total = cast(
+            Optional[int],
+            UserPoint.objects.filter(user=user).aggregate(total=Sum("amount"))["total"],
+        )
+        return total or 0

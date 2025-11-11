@@ -256,12 +256,10 @@
   margin: 0 0 32px 0;
 }
 
-/* 필터링 애니메이션 */
 .product-card.hidden {
   display: none;
 }
 
-/* 반응형 */
 @media (max-width: 768px) {
   .admin-container {
     padding: 20px 16px;

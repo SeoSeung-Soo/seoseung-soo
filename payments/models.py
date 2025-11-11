@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from membership.models import UserPoint
 from orders.models import Order
@@ -88,7 +89,7 @@ class Payment(models.Model):
     def __str__(self) -> str:
         return f"{self.provider.upper()} | {self.payment_key} ({self.status})"
 
-    def approve(self):
+    def approve(self) -> None:
         """결제 승인 처리 (포인트 차감 및 적립)"""
         user = self.order.user
 
@@ -107,7 +108,6 @@ class Payment(models.Model):
             )
 
         self.status = "APPROVED"
-        from datetime import timezone
         self.approved_at = timezone.now()
         self.save()
         self.order.status = "PAID"

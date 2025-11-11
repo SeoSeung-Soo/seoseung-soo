@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from config.basemodel import BaseModel
-from membership.models import Coupon
 
 
 # Create your models here.
