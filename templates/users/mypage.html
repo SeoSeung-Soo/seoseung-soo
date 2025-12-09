@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load product_filters %}
 
 {% block title %}마이페이지{% endblock %}
 
@@ -22,7 +23,7 @@
                 <div class="profile-stats">
                     <div class="stat-item">
                         <span class="stat-label">포인트</span>
-                        <span class="stat-value">{{ point_balance|default:0 }}P</span>
+                        <span class="stat-value">{{ point_balance|default:0|intcomma }}P</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">쿠폰</span>

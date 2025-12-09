@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load product_filters %}
 
 {% block title %}쿠폰 및 적립금{% endblock %}
 
@@ -67,7 +68,7 @@
                     <h2>내 포인트</h2>
                     <div class="point-balance">
                         <span class="balance-label">현재 잔액</span>
-                        <span class="balance-value">{{ point_balance|default:0 }}P</span>
+                        <span class="balance-value">{{ point_balance|default:0|intcomma }}P</span>
                     </div>
                 </div>
 
@@ -92,11 +93,11 @@
                             </div>
                             <div class="history-amount">
                                 {% if point.point_type == "EARN" %}
-                                <span class="amount-earn">+{{ point.amount }}P</span>
+                                <span class="amount-earn">+{{ point.amount|intcomma }}P</span>
                                 {% else %}
-                                <span class="amount-use">-{{ point.amount }}P</span>
+                                <span class="amount-use">-{{ point.amount|intcomma }}P</span>
                                 {% endif %}
-                                <span class="balance-after">잔액: {{ point.balance_after }}P</span>
+                                <span class="balance-after">잔액: {{ point.balance_after|intcomma }}P</span>
                             </div>
                         </div>
                         {% endfor %}

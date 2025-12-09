@@ -145,12 +145,9 @@ class TossVirtualWebhookView(View):
 
         if status == "DONE":
             with transaction.atomic():
-                payment.status = "APPROVED"
-                payment.approved_at = timezone.now()
-                payment.save(update_fields=["status", "approved_at"])
-
-                payment.order.status = "PAID"
-                payment.order.save(update_fields=["status"])
+                payment.raw_response = data
+                payment.save(update_fields=["raw_response"])
+                payment.approve()
 
             return JsonResponse({"success": True, "message": "입금 완료 처리됨"})
 

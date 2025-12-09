@@ -86,36 +86,37 @@ class Payment(models.Model):
     account_holder = models.CharField(max_length=100, null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
 
-    def __str__(self) -> str:
-        return f"{self.provider.upper()} | {self.payment_key} ({self.status})"
-
     def approve(self) -> None:
         """결제 승인 처리 (포인트 차감 및 적립)"""
+        if self.status == "APPROVED":
+            # 이미 승인 처리된 결제는 중복으로 처리하지 않음
+            return
+
         user = self.order.user
 
+        current_balance = UserPoint.get_user_balance(user)
+
         if self.used_point > 0:
-            current_balance = UserPoint.get_user_balance(user)
             if current_balance < self.used_point:
                 raise ValueError("보유 포인트가 부족합니다.")
 
+            current_balance -= self.used_point
             UserPoint.objects.create(
                 user=user,
                 point_type=UserPoint.PointType.USE,
                 amount=-self.used_point,
                 description=f"주문 {self.order.order_id} 결제 사용",
-                balance_after=current_balance - self.used_point,
+                balance_after=current_balance,
                 related_order=self.order,
             )
+            self.is_used_point = True
 
         self.status = "APPROVED"
         self.approved_at = timezone.now()
-        self.save()
-        self.order.status = "PAID"
-        self.order.save()
 
         earn_amount = int(self.order.total_amount * 0.05)  # 예: 5% 적립
         if earn_amount > 0:
-            new_balance = UserPoint.get_user_balance(user) + earn_amount
+            new_balance = current_balance + earn_amount
             UserPoint.objects.create(
                 user=user,
                 point_type=UserPoint.PointType.EARN,
@@ -125,7 +126,17 @@ class Payment(models.Model):
                 related_order=self.order,
             )
             self.earned_point = earn_amount
-            self.save()
+
+        self.save(
+            update_fields=[
+                "status",
+                "approved_at",
+                "is_used_point",
+                "earned_point",
+            ]
+        )
+        self.order.status = "PAID"
+        self.order.save(update_fields=["status"])
 
 
 class PaymentLog(models.Model):
