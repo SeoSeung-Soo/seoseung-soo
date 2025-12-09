@@ -134,10 +134,19 @@ class TossPaymentService:
         payment_data: Dict[str, Any],
         request_url: str,
         request_payload: Dict[str, Any],
-        response_status_code: int
+        response_status_code: int,
+        used_point: int = 0,
     ) -> None:
         user = get_user_model().objects.get(id=user_id)
         order_name = TossPaymentService.generate_order_name(items_data)
+
+        metadata_used_point = 0
+        metadata = payment_data.get("metadata")
+        if isinstance(metadata, dict):
+            metadata_used_point = int(metadata.get("usedPoint", 0))
+
+        used_point_value = used_point if used_point else metadata_used_point
+        used_point_value = max(0, used_point_value)
 
         with transaction.atomic():
             order = Order.objects.create(
@@ -171,19 +180,19 @@ class TossPaymentService:
                 )
             OrderItem.objects.bulk_create(order_items)
 
-            Payment.objects.create(
+            payment = Payment.objects.create(
                 order=order,
                 provider="toss",
                 method=payment_data.get("method", "CARD"),
                 payment_key=str(payment_key),
                 amount=amount,
                 receipt_url=payment_data.get("receipt", {}).get("url", ""),
-                status="APPROVED",
+                status="REQUESTED",
+                used_point=used_point_value,
                 raw_response=payment_data,
             )
 
-            order.status = "PAID"
-            order.save(update_fields=["status"])
+            payment.approve()
 
             PaymentLog.objects.create(
                 provider="toss",
@@ -192,6 +201,7 @@ class TossPaymentService:
                 request_payload=request_payload,
                 response_payload=payment_data,
                 status_code=response_status_code,
+                payment=payment,
             )
 
             TossPaymentService.clear_cart_after_payment(user_id, items_data)

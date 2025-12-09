@@ -1,4 +1,3 @@
-/* 회원가입 페이지 스타일 */
 .signup-container {
   min-height: calc(100vh - 200px);
   padding: 40px 40px;
@@ -264,7 +263,6 @@
 }
 
 
-/* 반응형 디자인 */
 @media (max-width: 768px) {
   .signup-container {
     background: #ffffff1a;
@@ -300,7 +298,7 @@
   
   .form-input {
     padding: 12px 14px;
-    font-size: 15px; /* iOS 줌 방지 */
+    font-size: 15px;
   }
   
   .phone-input {
@@ -366,7 +364,6 @@
   }
 }
 
-/* 동의 섹션 */
 .consent-section {
   background: transparent;
   padding: 30px 0;
@@ -383,7 +380,6 @@
   padding-top: 20px;
 }
 
-/* 동의 페이지 전용 부제목 스타일 */
 .consent-subtitle {
   font-size: 14px;
   font-weight: 400;
@@ -393,13 +389,11 @@
   line-height: 1.4;
 }
 
-/* 동의 페이지 전용 스타일 */
 .consent-page .consent-title {
   border-top: none;
   padding-top: 20px;
 }
 
-/* 전체 동의 */
 .all-consent {
   margin-bottom: 30px;
   padding: 15px 0;
@@ -607,7 +601,6 @@
   margin-bottom: 0;
 }
 
-/* 반응형 디자인 */
 @media (max-width: 768px) {
   .consent-section {
     margin-top: 15px;
@@ -715,7 +708,6 @@
   }
 }
 
-/* 전화번호 입력 필드 스타일 */
 .phone-input-wrapper {
   display: flex;
   align-items: center;
