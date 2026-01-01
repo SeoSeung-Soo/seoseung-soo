@@ -74,7 +74,6 @@
     font-weight: 600;
 }
 
-/* 우측 메인 콘텐츠 */
 .main-content {
     flex: 1;
     display: flex;
@@ -87,7 +86,7 @@
 .benefits-section,
 .recent-orders-section {
     background: white;
-    padding: 24px;
+    padding: 30px;
 }
 
 .section-header {
