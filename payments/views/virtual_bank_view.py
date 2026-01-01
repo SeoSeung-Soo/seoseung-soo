@@ -7,7 +7,6 @@ from django.conf import settings
 from django.db import transaction
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
