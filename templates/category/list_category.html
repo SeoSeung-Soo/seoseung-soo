@@ -2,41 +2,81 @@
 {% load static %}
 
 {% block style %}
+<link rel="stylesheet" href="{% static 'css/admin/product_list.css' %}">
 <link rel="stylesheet" href="{% static 'css/category/list_category.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="category-container">
-    <div class="category-header">
-        <h1 class="category-title">카테고리 목록</h1>
+<div class="admin-layout">
+    <div class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>관리자 메뉴</h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-category">
+                <h4>고객 관리</h4>
+                <ul>
+                    <li><a href="#">회원 목록</a></li>
+                    <li><a href="#">문의 내역</a></li>
+                </ul>
+            </div>
+            <div class="menu-category">
+                <h4>주문/배송 관리</h4>
+                <ul>
+                    <li><a href="#">주문 목록</a></li>
+                    <li><a href="#">배송 관리</a></li>
+                </ul>
+            </div>
+            <div class="menu-category">
+                <h4>상품 관리</h4>
+                <ul>
+                    <li><a href="{% url 'product-list' %}" class="{% if request.resolver_match.url_name == 'product-list' %}active{% endif %}">상품 목록</a></li>
+                    <li><a href="{% url 'product-create' %}" class="{% if request.resolver_match.url_name == 'product-create' %}active{% endif %}">상품 등록</a></li>
+                    <li><a href="{% url 'category-list' %}" class="{% if request.resolver_match.url_name == 'category-list' %}active{% endif %}">상품 카테고리</a></li>
+                </ul>
+            </div>
+            <div class="menu-category">
+                <h4>색상 관리</h4>
+                <ul>
+                    <li><a href="{% url 'admin-product-color' %}" class="{% if request.resolver_match.url_name == 'admin-product-color' %}active{% endif %}">색상 관리</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
-    
-    {% for main_category in main_categories %}
-    <div class="main-category-section">
-        <h2 class="main-category-title">{{ main_category.name }} (대분류)</h2>
-        <ul class="subcategory-list">
-            {% for subcat in main_category.children.all %}
-                <li class="subcategory-item">{{ subcat.name }}</li>
+    <div class="category-main-content">
+        <div class="category-container">
+            <div class="category-header">
+                <h1 class="category-title">카테고리 목록</h1>
+            </div>
+
+            {% for main_category in main_categories %}
+            <div class="main-category-section">
+                <h2 class="main-category-title">{{ main_category.name }} (대분류)</h2>
+                <ul class="subcategory-list">
+                    {% for subcat in main_category.children.all %}
+                        <li class="subcategory-item">{{ subcat.name }}</li>
+                    {% empty %}
+                        <li class="no-categories">소분류 카테고리가 없습니다.</li>
+                    {% endfor %}
+                </ul>
+            </div>
             {% empty %}
-                <li class="no-categories">소분류 카테고리가 없습니다.</li>
+            <div class="no-categories">
+                <p>등록된 대분류 카테고리가 없습니다.</p>
+            </div>
             {% endfor %}
-        </ul>
+
+            {% if form %}
+            <div class="category-form">
+                <h3>새 카테고리 추가</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">카테고리 추가</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    {% empty %}
-    <div class="no-categories">
-        <p>등록된 대분류 카테고리가 없습니다.</p>
-    </div>
-    {% endfor %}
-    
-    {% if form %}
-    <div class="category-form">
-        <h3>새 카테고리 추가</h3>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">카테고리 추가</button>
-        </form>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
