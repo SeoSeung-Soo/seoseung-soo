@@ -36,7 +36,7 @@
             </a>
             <nav class="top-nav">
                 {% if user.is_authenticated and user.role == 'admin' %}
-                <a href="{% url 'product-list' %}">ADMIN</a>
+                <a href="{% url 'admin-mypage' %}">ADMIN</a>
                 {% endif %}
                 {% if not user.is_authenticated %}
                 <a href="{% url "login" %}">LOGIN</a>

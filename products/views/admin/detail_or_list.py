@@ -6,11 +6,20 @@ from products.models import Product
 from users.utils.permission import AdminPermission
 
 
-class AdminProductListView(AdminPermission, View):
+class AdminMypageView(AdminPermission, View):
     def get(self, request: HttpRequest) -> HttpResponse:
         products = Product.objects.all().order_by('-created_at')
         context = {
             'products': products,
             'title': '상품 목록'
+        }
+        return render(request, 'users/admin/mypage_admin.html', context)
+
+class AdminProductListView(AdminPermission, View):
+    def get(self, request: HttpRequest) -> HttpResponse:
+        products = Product.objects.all().order_by('-created_at')
+        context = {
+            'products': products,
+            'title' : '상품 목록'
         }
         return render(request, 'products/admin/admin_product_list.html', context)
