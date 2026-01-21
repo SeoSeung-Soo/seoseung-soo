@@ -176,6 +176,17 @@ class TestCartCreate(TestSetupMixin):
         assert response.status_code == 302
         assert Cart.objects.count() == 0
 
+    def test_form_validation_error_non_without_product_name_redirects_to_list(self) -> None:
+        data = {
+            "product_id": 99999,  # 존재하지 않는 상품
+            "quantity": 1,
+        }
+
+        url = reverse("cart-create")
+        response = self.client.post(url, data=data)
+
+        assert response.status_code == 302
+
 
     def test_stock_insufficient_non_ajax(self) -> None:
         self.create_cart_data(quantity=2)

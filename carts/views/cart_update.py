@@ -16,17 +16,13 @@ class CartUpdateView(LoginRequiredMixin, View):
         if form.is_valid():
             quantity = form.cleaned_data['quantity']
             
-            if quantity <= 0:
-                cart_item.delete()
-                messages.success(request, '상품이 장바구니에서 삭제되었습니다.')
-            else:
-                if quantity > cart_item.product.stock:
-                    messages.error(request, f'재고가 부족합니다. (현재 재고: {cart_item.product.stock}개)')
-                    return redirect('cart-detail')
-                
-                cart_item.quantity = quantity
-                cart_item.save()
-                messages.success(request, f'수량이 {quantity}개로 변경되었습니다.')
+            if quantity > cart_item.product.stock:
+                messages.error(request, f'재고가 부족합니다. (현재 재고: {cart_item.product.stock}개)')
+                return redirect('cart-detail')
+            
+            cart_item.quantity = quantity
+            cart_item.save()
+            messages.success(request, f'수량이 {quantity}개로 변경되었습니다.')
 
             return redirect('cart-detail')
         
