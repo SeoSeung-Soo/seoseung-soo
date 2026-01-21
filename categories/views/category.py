@@ -1,5 +1,5 @@
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
 from categories.forms.category import CategoryForm
@@ -29,3 +29,9 @@ class CategoryView(AdminPermission, View):
             'main_categories': main_categories,
         }
         return render(request, "category/list_category.html", context)
+
+class CategoryDeleteView(AdminPermission, View):
+    def post(self, request: HttpRequest, category_id: int) -> HttpResponse:
+        category = get_object_or_404(Category, id=category_id)
+        category.delete()
+        return redirect("category-list")

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% load product_filters %}
+
+{% block title %}마이페이지{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/users/admin/admin_mypage.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="mypage-container">
+    <div class="main-content">
+        <div class="user-profile-section">
+            <div class="profile-header">
+                <div class="profile-info">
+                    <div class="user-name-container">
+                        <p class="user-name">{{ user.first_name|default:user.username }}</p>
+                        <p class="user-welcome">님, 안녕하세요!</p>
+                    </div>
+                    <p class="profile-email">{{ user.email }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="desktop-mypage-container">
+            <div class="desktop-mypage-category">
+                <div class="desktop-mypage-customer-container">
+                    <h4>회원 관리</h4>
+                    <ul>
+                        <li><a href="#">회원 목록</a></li>
+                        <li><a href="#">문의 내역</a></li>
+                    </ul>
+                </div>
+                <div class="desktop-mypage-order-container">
+                    <h4>주문/배송 관리</h4>
+                    <ul>
+                        <li><a href="#">주문 목록</a></li>
+                        <li><a href="#">배송 관리</a></li>
+                    </ul>
+                </div>
+                <div class="desktop-mypage-products-container">
+                    <h4>상품 관리</h4>
+                    <ul>
+                        <li><a href="{% url 'product-list' %}">상품 목록</a></li>
+                        <li><a href="{% url 'product-create' %}">상품 등록</a></li>
+                        <li><a href="{% url 'category-list' %}">상품 카테고리</a></li>
+                    </ul>
+                </div>
+                <div class="desktop-mypage-color-container">
+                    <h4>색상 관리</h4>
+                    <ul>
+                        <li><a href="{% url 'admin-product-color' %}">색상관리</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mobile-mypage-container">
+        <div class="mobile-category">
+            <div class="mobile-order-container">
+                <h4>주문/배송조회</h4>
+                <ul>
+                    <li><a href="{% url 'orders:status' %}">배송현황</a></li>
+                    <li><a href="#">취소/교환/반품 내역</a></li>
+                    <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

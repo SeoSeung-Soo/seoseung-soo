@@ -8,35 +8,7 @@
 
 {% block content %}
 <div class="admin-layout">
-    <div class="admin-sidebar">
-        <div class="sidebar-header">
-            <h2>관리자 메뉴</h2>
-        </div>
-        <div class="sidebar-menu">
-            <div class="menu-category">
-                <h4>상품 관리</h4>
-                <ul>
-                    <li><a href="{% url 'product-list' %}" class="{% if request.resolver_match.url_name == 'product-list' %}active{% endif %}">상품 목록</a></li>
-                    <li><a href="{% url 'product-create' %}" class="{% if request.resolver_match.url_name == 'product-create' %}active{% endif %}">상품 등록</a></li>
-                    <li><a href="{% url 'admin-product-color' %}" class="{% if request.resolver_match.url_name == 'admin-product-color' %}active{% endif %}">색상 관리</a></li>
-                </ul>
-            </div>
-            <div class="menu-category">
-                <h4>주문 관리</h4>
-                <ul>
-                    <li><a href="#">주문 목록</a></li>
-                    <li><a href="#">배송 관리</a></li>
-                </ul>
-            </div>
-            <div class="menu-category">
-                <h4>고객 관리</h4>
-                <ul>
-                    <li><a href="#">회원 목록</a></li>
-                    <li><a href="#">문의 내역</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    {% include "admin/sidebar.html" %}
     
     <div class="admin-main-content">
         <div class="admin-container">

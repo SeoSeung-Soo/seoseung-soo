@@ -2,41 +2,51 @@
 {% load static %}
 
 {% block style %}
+<link rel="stylesheet" href="{% static 'css/admin/product_list.css' %}">
 <link rel="stylesheet" href="{% static 'css/category/list_category.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="category-container">
-    <div class="category-header">
-        <h1 class="category-title">카테고리 목록</h1>
-    </div>
-    
-    {% for main_category in main_categories %}
-    <div class="main-category-section">
-        <h2 class="main-category-title">{{ main_category.name }} (대분류)</h2>
-        <ul class="subcategory-list">
-            {% for subcat in main_category.children.all %}
-                <li class="subcategory-item">{{ subcat.name }}</li>
+<div class="admin-layout">
+    {% include "admin/sidebar.html" %}
+    <div class="category-main-content">
+        <div class="category-container">
+            <div class="category-header">
+                <h1 class="category-title">카테고리 목록</h1>
+            </div>
+
+            {% for main_category in main_categories %}
+            <div class="main-category-section">
+                <div class="main-category-header">
+                    <h2 class="main-category-title">{{ main_category.name }} (대분류)</h2>
+
+                    <form method="post" action="{% url 'category-list' %}" class="subcategory-add-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent" value="{{ main_category.id }}">
+                        <input type="text" name="name" placeholder="소분류 추가" required class="subcategory-add-input">
+                        <button type="submit" class="btn btn-primary subcategory-add-btn">추가</button>
+                    </form>
+                </div>
+                <ul class="subcategory-list">
+                    {% for subcat in main_category.children.all %}
+                        <li class="subcategory-item">
+                            <span class="subcategory-name">{{ subcat.name }}</span>
+                            <form method="post" action="{% url 'category-delete' subcat.id %}" class="subcategory-delete-form">
+                                {% csrf_token %}
+                                <button type="submit" class="subcategory-delete-btn" aria-label="소분류 삭제" title="삭제" onclick="return confirm('삭제하시겠습니까?');">×</button>
+                            </form>
+                        </li>
+                    {% empty %}
+                        <li class="subcategory-empty">소분류 카테고리가 없습니다.</li>
+                    {% endfor %}
+                </ul>
+            </div>
             {% empty %}
-                <li class="no-categories">소분류 카테고리가 없습니다.</li>
+            <div class="category-empty-state">
+                <p>등록된 대분류 카테고리가 없습니다.</p>
+            </div>
             {% endfor %}
-        </ul>
+        </div>
     </div>
-    {% empty %}
-    <div class="no-categories">
-        <p>등록된 대분류 카테고리가 없습니다.</p>
-    </div>
-    {% endfor %}
-    
-    {% if form %}
-    <div class="category-form">
-        <h3>새 카테고리 추가</h3>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">카테고리 추가</button>
-        </form>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
