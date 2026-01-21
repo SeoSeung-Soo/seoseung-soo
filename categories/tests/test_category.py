@@ -41,3 +41,13 @@ class TestCategories(TestSetupMixin):
 
         assert 'main_categories' in response.context
 
+    def test_delete_category(self) -> None:
+        self.client.force_login(self.admin_user)
+        category = Category.objects.create(name="카테고리 삭제 데이터", parent=None)
+        url = reverse("category-delete", args=[category.id])
+
+        response = self.client.post(url)
+
+        assert response.status_code == 302
+        assert not Category.objects.filter(id=category.id).exists()
+
