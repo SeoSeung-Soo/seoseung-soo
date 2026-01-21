@@ -4,6 +4,7 @@ from django.urls import reverse
 from carts.forms.create import CartCreateForm
 from carts.models import Cart
 from config.utils.setup_test_method import TestSetupMixin
+from products.models import Color
 
 
 @pytest.mark.django_db
@@ -46,6 +47,47 @@ class TestCartCreate(TestSetupMixin):
         assert not form.is_valid()
         assert "product_id" in form.errors
         assert form.errors["product_id"] == ["존재하지 않는 상품입니다."]
+
+    def test_color_not_exist(self) -> None:
+        invalid_color_id = 99999
+        data = {
+            "product_id": self.product.id,
+            "quantity": 1,
+            "color_id": invalid_color_id,
+        }
+
+        form = CartCreateForm(data=data)
+
+        assert not form.is_valid()
+        assert "color_id" in form.errors
+        assert form.errors["color_id"] == ["존재하지 않는 색상입니다."]
+
+    def test_color_valid(self) -> None:
+        color = Color.objects.create(name="Black", hex_code="#000000")
+        data = {
+            "product_id": self.product.id,
+            "quantity": 1,
+            "color_id": color.id,
+        }
+
+        form = CartCreateForm(data=data)
+
+        assert form.is_valid()
+
+    def test_stock_insufficient_form_validation(self) -> None:
+        self.product.stock = 1
+        self.product.save()
+
+        data = {
+            "product_id": self.product.id,
+            "quantity": 2,
+        }
+
+        form = CartCreateForm(data=data)
+
+        assert not form.is_valid()
+        assert "quantity" in form.errors
+        assert form.errors["quantity"] == ["재고가 부족합니다."]
 
     def test_added_new_cart_item(self) -> None:
 
@@ -133,6 +175,17 @@ class TestCartCreate(TestSetupMixin):
         response = self.client.post(url, data=data)
         assert response.status_code == 302
         assert Cart.objects.count() == 0
+
+    def test_form_validation_error_non_without_product_name_redirects_to_list(self) -> None:
+        data = {
+            "product_id": 99999,  # 존재하지 않는 상품
+            "quantity": 1,
+        }
+
+        url = reverse("cart-create")
+        response = self.client.post(url, data=data)
+
+        assert response.status_code == 302
 
 
     def test_stock_insufficient_non_ajax(self) -> None:
