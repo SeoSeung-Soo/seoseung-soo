@@ -31,7 +31,7 @@ class Filtering:
         q = (request.GET.get("q") or "").strip()
         status = (request.GET.get("status") or "").strip()
 
-        orders_qs = Order.objects.filter(status="PAID").select_related("user").prefetch_related("items").order_by("-created_at")
+        orders_qs = Order.objects.select_related("user").prefetch_related("items").order_by("-created_at")
 
         if q:
             orders_qs = orders_qs.filter(
@@ -42,5 +42,7 @@ class Filtering:
             )
         if status:
             orders_qs = orders_qs.filter(status=status)
+        else:
+            orders_qs = orders_qs.filter(status="PAID")
 
         return orders_qs
