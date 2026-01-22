@@ -34,7 +34,7 @@
                 <div class="desktop-mypage-order-container">
                     <h4>주문/배송 관리</h4>
                     <ul>
-                        <li><a href="#">주문 목록</a></li>
+                        <li><a href="{% url 'orders:admin-order-list' %}" class="{% if request.resolver_match.url_name == 'admin-order-list' %}active{% endif %}">주문 목록</a></li>
                         <li><a href="#">배송 관리</a></li>
                     </ul>
                 </div>
