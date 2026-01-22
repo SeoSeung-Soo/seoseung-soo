@@ -7,17 +7,17 @@ from config.utils.filtering import Filtering
 from users.utils.permission import AdminPermission
 
 
-class AdminUserListView(AdminPermission, View):
+class AdminOrderListView(AdminPermission, View):
     def get(self, request: HttpRequest) -> HttpResponse:
-        users_qs = Filtering.user_list_filter(request)
+        orders_qs = Filtering.order_list_filter(request)
 
-        paginator = Paginator(users_qs, 20)
+        paginator = Paginator(orders_qs, 20)
         page_obj = paginator.get_page(request.GET.get("page") or "1")
 
         context = {
             "q": request.GET.get("q") or "",
-            "role": request.GET.get("role") or "",
+            "status": request.GET.get("status") or "",
             "page_obj": page_obj,
-            "users": page_obj.object_list,
+            "orders": page_obj.object_list,
         }
-        return render(request, "users/admin/user_list.html", context)
+        return render(request, "orders/admin/order_list.html", context)
