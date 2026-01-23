@@ -100,3 +100,19 @@ class TestShippingManagement(TestSetupMixin):
         assert response.status_code == 302
         self.order.refresh_from_db()
         assert self.order.shipping_status == "DELIVERED"
+
+    def test_shipping_management_update_status_invalid_status(self) -> None:
+        from django.contrib.messages import get_messages
+        self.client.force_login(self.admin_user)
+        url = reverse("orders:admin-shipping-management")
+
+        response = self.client.post(url, {
+            "order_id": self.order.id,
+            "shipping_status": "INVALID_STATUS"
+        }, follow=True)
+
+        assert response.status_code == 200
+        messages = list(get_messages(response.wsgi_request))
+        assert any("유효하지 않은 배송 상태입니다" in str(msg) for msg in messages)
+        self.order.refresh_from_db()
+        assert self.order.shipping_status == "PENDING"
