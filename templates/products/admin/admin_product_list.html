@@ -7,16 +7,15 @@
 {% endblock %}
 
 {% block content %}
-<div class="admin-container">
-    <div class="admin-header">
-        <h1 class="admin-title">{{ title }}</h1>
-        <div class="header-actions">
-            <a href="{% url 'admin-product-color' %}" class="btn btn-secondary">색상 관리</a>
-            <a href="{% url 'product-create' %}" class="btn btn-primary">상품 등록</a>
-        </div>
-    </div>
-
-    <div class="product-list">
+<div class="admin-layout">
+    {% include "admin/sidebar.html" %}
+    
+    <div class="admin-main-content">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1 class="admin-title">{{ title }}</h1>
+            </div>
+            <div class="product-list">
         {% if products %}
         <div class="list-header">
             <div class="list-info">
@@ -67,7 +66,6 @@
                         <span class="stock">재고: {{ product.stock }}개</span>
                     </div>
                 </div>
-                
                 <div class="product-actions">
                     <a href="{% url 'product-update' product.id %}" class="btn btn-sm btn-secondary">수정</a>
                     <button class="btn btn-sm btn-danger" onclick="deleteProduct({{ product.id }})">삭제</button>
@@ -78,11 +76,13 @@
         {% else %}
         <div class="empty-state">
             <div class="empty-icon">📦</div>
-            <h3>등록된 상품이 없습니다</h3>
-            <p>새로운 상품을 등록해보세요.</p>
-            <a href="{% url 'product-create' %}" class="btn btn-primary">상품 등록하기</a>
+                <h3>등록된 상품이 없습니다</h3>
+                <p>새로운 상품을 등록해보세요.</p>
+                <a href="{% url 'product-create' %}" class="btn btn-primary">상품 등록하기</a>
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

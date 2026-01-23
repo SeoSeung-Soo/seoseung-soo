@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/admin/product_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin/user_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    {% include "admin/sidebar.html" %}
+
+    <div class="admin-main-content">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1 class="admin-title">회원 목록</h1>
+            </div>
+
+            <div class="users-list">
+                <div class="list-header">
+                    <div class="list-info">
+                        <span>총 {{ page_obj.paginator.count }}명</span>
+                    </div>
+                    <div class="list-actions">
+                        <form method="get" class="user-list-search">
+                            <select name="role" class="filter-select">
+                                <option value="">전체 권한</option>
+                                <option value="admin" {% if role == "admin" %}selected{% endif %}>관리자</option>
+                                <option value="customer" {% if role == "customer" %}selected{% endif %}>고객</option>
+                            </select>
+                            <input type="text" name="q" value="{{ q }}" placeholder="이메일/이름/전화 검색" class="filter-select user-list-search-input">
+                            <button type="submit" class="btn btn-sm btn-secondary">검색</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="user-list-body">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>이메일</th>
+                                <th>이름</th>
+                                <th>권한</th>
+                                <th>휴대폰</th>
+                                <th>가입일</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr>
+                                <td>{{ u.id }}</td>
+                                <td>{{ u.email }}</td>
+                                <td>
+                                    {% if u.first_name or u.last_name %}
+                                        {{ u.last_name }}{{ u.first_name }}
+                                    {% else %}
+                                        {{ u.username }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if u.role == "admin" %}관리자{% else %}고객{% endif %}
+                                </td>
+                                <td>{{ u.phone_number|default:"-" }}</td>
+                                <td>{{ u.date_joined|date:"Y-m-d" }}</td>
+                                <td>
+                                    {% if u.is_active %}
+                                        <span class="status-indicator status-active" title="활성"></span>
+                                    {% else %}
+                                        <span class="status-indicator status-inactive" title="비활성"></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr class="user-table-empty"><td colspan="7">조회된 회원이 없습니다.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+                    <div class="user-pagination">
+                        {% if page_obj.has_previous %}
+                            <a class="btn btn-sm btn-secondary" href="?page={{ page_obj.previous_page_number }}&q={{ q }}&role={{ role }}">이전</a>
+                        {% endif %}
+                        <span class="user-pagination-info">
+                            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                        </span>
+                        {% if page_obj.has_next %}
+                            <a class="btn btn-sm btn-secondary" href="?page={{ page_obj.next_page_number }}&q={{ q }}&role={{ role }}">다음</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

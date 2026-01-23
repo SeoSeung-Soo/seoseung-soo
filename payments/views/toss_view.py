@@ -136,6 +136,8 @@ class TossConfirmView(View):
         request_url = f"{settings.TOSS_API_BASE}/payments/confirm"
         request_payload = {"paymentKey": payment_key, "orderId": order_id, "amount": amount}
 
+        used_point = int(cache_data.get("used_point", 0)) if cache_data.get("used_point") else 0
+
         try:
             TossPaymentService.create_order_and_payment(
                 order_id=order_id,
@@ -146,7 +148,8 @@ class TossConfirmView(View):
                 payment_data=payment_data,
                 request_url=request_url,
                 request_payload=request_payload,
-                response_status_code=status_code
+                response_status_code=status_code,
+                used_point=used_point,
             )
         except IntegrityError:
             return JsonResponse({"success": True, "message": "이미 승인된 결제입니다."}, status=200)

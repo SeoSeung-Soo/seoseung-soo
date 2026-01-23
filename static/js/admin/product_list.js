@@ -20,17 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-  
-  // 상품 카드 호버 효과
-  productCards.forEach(card => {
-    card.addEventListener('mouseenter', () => {
-      card.style.transform = 'translateY(-4px)';
-    });
-    
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'translateY(0)';
-    });
-  });
 });
 
 // 상품 삭제 확인

@@ -59,6 +59,7 @@ THIRD_PARTY_APPS = [
     "favorites.apps.FavoriteConfig",
     "orders.apps.OrdersConfig",
     "payments.apps.PaymentsConfig",
+    "membership.apps.MembershipConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS

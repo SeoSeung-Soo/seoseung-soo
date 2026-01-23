@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from users.views import LoginView
+from users.views.admin.user_list import AdminUserListView
 from users.views.check_duplicate import CheckDuplicateView
 from users.views.consent import PersonalInfoConsent
 from users.views.kakao_callback import KakaoCallbackView
@@ -16,7 +17,9 @@ from users.views.social_login import (
 )
 
 urlpatterns = [
+    path("admin/users/", AdminUserListView.as_view(), name="admin-user-list"),
     path("mypage/", MyPageView.as_view(), name="mypage"),
+    path("membership/", include("membership.urls"), name="coupon-point"),
     path("orders/", include("orders.urls", namespace="orders")),
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),

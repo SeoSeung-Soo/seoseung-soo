@@ -1,0 +1,101 @@
+.user-list-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.user-list {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.user-list-search {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.user-list-search-input {
+  width: 260px;
+}
+
+.user-list-body {
+  padding: 24px 32px;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table thead tr {
+  text-align: left;
+  border-bottom: 1px solid #e9e9e9;
+  color: #666;
+  font-size: 12px;
+}
+
+.user-table th,
+.user-table td {
+  padding: 12px 8px;
+}
+
+.user-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.user-table-empty td {
+  padding: 32px 8px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.user-pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.user-pagination-info {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.status-active {
+  background-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.status-inactive {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+@media (max-width: 768px) {
+  .user-list-body {
+    padding: 20px;
+  }
+
+  .user-list-search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-list-search-input {
+    width: 100%;
+  }
+}
+

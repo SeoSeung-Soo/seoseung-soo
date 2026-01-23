@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% load static %}
+{% load product_filters %}
+
+{% block title %}쿠폰 및 적립금{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/orders/order_mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/membership/membership.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="mypage-layout">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>나의 쇼핑활동</h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-category">
+                <div class="info-category-container">
+                    <h4>나의 정보</h4>
+                    <ul>
+                        <li><a href="{% url 'profile-edit' %}">개인정보 수정</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu-category">
+                <div class="order-category-container">
+                    <h4>주문/배송조회</h4>
+                    <ul>
+                        <li><a href="{% url 'orders:status' %}">배송현황</a></li>
+                        <li><a href="#">취소/교환/반품 내역</a></li>
+                        <li><a href="{% url 'cart-detail' %}">장바구니</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu-category">
+                <div class="benefit-category-container">
+                    <h4>혜택 관리</h4>
+                    <ul>
+                        <li><a href="{% url 'membership:list' %}" class="active">쿠폰/적립금</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu-category">
+                <div class="activity-category-container">
+                    <h4>활동 내역</h4>
+                    <ul>
+                        <li><a href="{% url 'favorite-list' %}">찜한 상품</a></li>
+                        <li><a href="#">최근 본 상품</a></li>
+                        <li><a href="#">나의 후기</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="coupon-point-container">
+            <div class="membership-header-section">
+                <div class="page-header">
+                    <h1>쿠폰 및 적립금</h1>
+                </div>
+            </div>
+
+            <div class="point-section">
+                <div class="section-header">
+                    <h2>내 포인트</h2>
+                    <div class="point-balance">
+                        <span class="balance-label">현재 잔액</span>
+                        <span class="balance-value">{{ point_balance|default:0|intcomma }}P</span>
+                    </div>
+                </div>
+
+                <div class="point-history">
+                    <h3>포인트 내역</h3>
+                    {% if point_history %}
+                    <div class="history-list">
+                        {% for point in point_history %}
+                        <div class="history-item">
+                            <div class="history-info">
+                                <div class="history-type">
+                                    {% if point.point_type == "EARN" %}
+                                    <span class="badge badge-earn">적립</span>
+                                    {% else %}
+                                    <span class="badge badge-use">사용</span>
+                                    {% endif %}
+                                </div>
+                                <div class="history-details">
+                                    <p class="history-description">{{ point.description|default:"포인트" }}</p>
+                                    <p class="history-date">{{ point.created_at|date:"Y년 m월 d일 H:i" }}</p>
+                                </div>
+                            </div>
+                            <div class="history-amount">
+                                {% if point.point_type == "EARN" %}
+                                <span class="amount-earn">+{{ point.amount|intcomma }}P</span>
+                                {% else %}
+                                <span class="amount-use">-{{ point.amount|intcomma }}P</span>
+                                {% endif %}
+                                <span class="balance-after">잔액: {{ point.balance_after|intcomma }}P</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <p>포인트 내역이 없습니다.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="coupon-section">
+                <div class="section-header">
+                    <h2>내 쿠폰</h2>
+                    <div class="coupon-count">
+                        <span class="count-label">사용 가능한 쿠폰</span>
+                        <span class="count-value">{{ available_coupons.count }}개</span>
+                    </div>
+                </div>
+
+                <div class="coupon-list">
+                    <h3>사용 가능한 쿠폰</h3>
+                    {% if available_coupons %}
+                    <div class="coupons-grid">
+                        {% for used_coupon in available_coupons %}
+                        <div class="coupon-card available">
+                            <div class="coupon-header">
+                                <h4>{{ used_coupon.coupon.name }}</h4>
+                                <span class="coupon-discount">{{ used_coupon.coupon.discount_percent }}% 할인</span>
+                            </div>
+                            <div class="coupon-body">
+                                <p class="coupon-period">
+                                    {{ used_coupon.coupon.start_date|date:"Y.m.d" }} ~ {{ used_coupon.coupon.end_date|date:"Y.m.d" }}
+                                </p>
+                                <p class="coupon-issued">
+                                    발급일: {{ used_coupon.created_at|date:"Y.m.d" }}
+                                </p>
+                            </div>
+                            <div class="coupon-status">
+                                <span class="status-badge active">사용 가능</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <p>사용 가능한 쿠폰이 없습니다.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="coupon-list">
+                    <h3>사용한 쿠폰</h3>
+                    {% if used_coupons %}
+                    <div class="coupons-grid">
+                        {% for used_coupon in used_coupons %}
+                        <div class="coupon-card used">
+                            <div class="coupon-header">
+                                <h4>{{ used_coupon.coupon.name }}</h4>
+                                <span class="coupon-discount">{{ used_coupon.coupon.discount_percent }}% 할인</span>
+                            </div>
+                            <div class="coupon-body">
+                                <p class="coupon-period">
+                                    {{ used_coupon.coupon.start_date|date:"Y.m.d" }} ~ {{ used_coupon.coupon.end_date|date:"Y.m.d" }}
+                                </p>
+                                <p class="coupon-used">
+                                    사용일: {{ used_coupon.used_at|date:"Y.m.d H:i" }}
+                                </p>
+                            </div>
+                            <div class="coupon-status">
+                                <span class="status-badge used">사용 완료</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <p>사용한 쿠폰이 없습니다.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

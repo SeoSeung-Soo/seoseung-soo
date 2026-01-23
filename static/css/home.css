@@ -5,7 +5,7 @@
   display: flex; 
   align-items: center; 
   justify-content: center;
-  overflow: hidden; /* 히어로 섹션 오버플로우 제어 */
+  overflow: hidden;
 }
 .hero-text { background: rgba(255,255,255,0.7); padding: 16px 24px; border-radius: 8px; text-align: center; }
 .hero-text h2 { margin: 0 0 6px 0; font-size: 28px; letter-spacing: 4px; }
@@ -80,7 +80,6 @@
 .product-actions { display: flex; gap: 8px; padding: 0 12px 12px; }
 .product-actions button { border: 1px solid #eee; background: #fff; padding: 6px 8px; cursor: pointer; }
 
-/* 슬라이드 메뉴가 열렸을 때 상품 액션 버튼 숨기기 */
 .mobile-menu.is-open ~ * .product-actions,
 .mobile-menu.is-open ~ * .product-actions button,
 body.menu-open .product-actions,
@@ -94,7 +93,6 @@ body.menu-open .product-actions button {
   transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* 슬라이드 메뉴가 닫힌 상태에서 버튼 표시 */
 body:not(.menu-open) .product-actions {
   display: flex !important;
   visibility: visible !important;

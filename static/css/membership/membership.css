@@ -1,0 +1,461 @@
+.coupon-point-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.membership-header-section {
+    padding: 30px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.page-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.point-section {
+    background: white;
+    padding: 30px;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 30px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.section-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.point-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 15px 20px;
+    border-radius: 4px;
+}
+
+.balance-label {
+    font-size: 11px;
+    opacity: 0.85;
+    font-weight: 400;
+}
+
+.balance-value {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.point-history h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: white;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.history-item:hover {
+    background: #f8f9fa;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.history-type {
+    min-width: 50px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-earn {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #dedddd;
+}
+
+.badge-use {
+    background: #f8f9fa;
+    color: #666;
+    border: 1px solid #dedddd;
+}
+
+.history-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.history-description {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+.history-date {
+    font-size: 11px;
+    color: #999;
+    margin: 0;
+}
+
+.history-amount {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.amount-earn {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.amount-use {
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+}
+
+.balance-after {
+    font-size: 11px;
+    color: #999;
+}
+
+.coupon-section {
+    background: white;
+    padding: 30px;
+    border: 1px solid #f0f0f0;
+}
+
+.coupon-count {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 15px 20px;
+    border-radius: 4px;
+}
+
+.count-label {
+    font-size: 11px;
+    opacity: 0.85;
+    font-weight: 400;
+}
+
+.count-value {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.coupon-list {
+    margin-bottom: 30px;
+}
+
+.coupon-list:last-child {
+    margin-bottom: 0;
+}
+
+.coupon-list h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.coupons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.coupon-card {
+    border: 1px solid #dedddd;
+    border-radius: 0;
+    padding: 20px;
+    background: white;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.coupon-card.available {
+    border-color: #1b1b1b;
+    background: white;
+}
+
+.coupon-card.used {
+    opacity: 0.5;
+    border-color: #e0e0e0;
+}
+
+.coupon-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.coupon-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.coupon-header h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    flex: 1;
+}
+
+.coupon-discount {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1b1b1b;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+
+.coupon-body {
+    margin-bottom: 12px;
+}
+
+.coupon-period,
+.coupon-issued,
+.coupon-used {
+    font-size: 11px;
+    color: #999;
+    margin: 4px 0;
+}
+
+.coupon-status {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #dedddd;
+}
+
+.status-badge.used {
+    background: #f8f9fa;
+    color: #999;
+    border: 1px solid #e0e0e0;
+}
+
+.empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+    background: #f8f9fa;
+    border-radius: 0;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 13px;
+}
+
+@media (max-width: 1024px) {
+    .coupon-point-container {
+        padding: 30px 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .coupon-point-container {
+        padding: 20px 15px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+
+    .page-header h1 {
+        font-size: 18px;
+    }
+
+    .point-section,
+    .coupon-section {
+        padding: 20px 15px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .point-balance,
+    .coupon-count {
+        width: 100%;
+        align-items: flex-start;
+        padding: 12px 15px;
+    }
+
+    .balance-value,
+    .count-value {
+        font-size: 20px;
+    }
+
+    .history-item {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 12px 15px;
+    }
+
+    .history-amount {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .coupons-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .coupon-card {
+        padding: 15px;
+    }
+
+    .coupon-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .coupon-discount {
+        margin-left: 0;
+    }
+
+    .section-header h2 {
+        font-size: 15px;
+    }
+
+    .coupon-list h3,
+    .point-history h3 {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .coupon-point-container {
+        padding: 15px 10px;
+    }
+
+    .page-header h1 {
+        font-size: 16px;
+    }
+
+    .balance-value,
+    .count-value {
+        font-size: 18px;
+    }
+
+    .point-balance,
+    .coupon-count {
+        padding: 10px 12px;
+    }
+
+    .history-item {
+        padding: 10px 12px;
+    }
+
+    .history-description {
+        font-size: 12px;
+    }
+
+    .amount-earn,
+    .amount-use {
+        font-size: 14px;
+    }
+
+    .coupon-card {
+        padding: 12px;
+    }
+
+    .coupon-header h4 {
+        font-size: 13px;
+    }
+
+    .coupon-discount {
+        font-size: 14px;
+    }
+
+    .section-header h2 {
+        font-size: 14px;
+    }
+
+    .coupon-list h3,
+    .point-history h3 {
+        font-size: 12px;
+    }
+}
+
