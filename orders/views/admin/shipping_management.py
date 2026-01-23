@@ -24,7 +24,7 @@ class ShippingManagementView(AdminPermission, View):
                 | Q(user__username__icontains=q)
                 | Q(product_name__icontains=q)
                 | Q(items__product_name__icontains=q)
-            )
+            ).distinct()
 
         if shipping_status:
             orders_qs = orders_qs.filter(shipping_status=shipping_status)
@@ -46,6 +46,11 @@ class ShippingManagementView(AdminPermission, View):
 
         if not order_id or not new_status:
             messages.error(request, "주문 ID와 배송 상태를 모두 입력해주세요.")
+            return redirect("orders:admin-shipping-management")
+
+        valid_statuses = [status[0] for status in Order._meta.get_field('shipping_status').choices]
+        if new_status not in valid_statuses:
+            messages.error(request, "유효하지 않은 배송 상태입니다.")
             return redirect("orders:admin-shipping-management")
 
         order = get_object_or_404(Order, id=order_id, status="PAID")
