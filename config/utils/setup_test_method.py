@@ -1,5 +1,6 @@
 from django.test.client import Client
 
+from orders.models import Order
 from products.models import Product, ProductImage
 from reviews.models import Review
 from users.models import User
@@ -53,4 +54,14 @@ class TestSetupMixin:
             user=self.admin_user,
             content='Admin Review Content',
             rating=5
+        )
+
+    def setup_test_order_data(self) -> None:
+        self.order = Order.objects.create(
+            user=self.admin_user,
+            order_id='123456',
+            product_name=self.product.name,
+            total_amount=50000,
+            status="PAID",
+            shipping_status="PENDING",
         )
