@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+{% load product_filters %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/admin/product_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin/shipping_management.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    {% include "admin/sidebar.html" %}
+
+    <div class="admin-main-content">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1 class="admin-title">배송 관리</h1>
+            </div>
+
+            <div class="order-list">
+                <div class="list-header">
+                    <div class="list-info">
+                        <span>총 {{ page_obj.paginator.count }}건의 주문</span>
+                    </div>
+                    <div class="list-actions">
+                        <form method="get" class="shipping-list-search">
+                            <select name="shipping_status" class="filter-select">
+                                <option value="">전체 배송 상태</option>
+                                <option value="PENDING" {% if shipping_status == "PENDING" %}selected{% endif %}>배송대기</option>
+                                <option value="SHIPPING" {% if shipping_status == "SHIPPING" %}selected{% endif %}>배송중</option>
+                                <option value="DELIVERED" {% if shipping_status == "DELIVERED" %}selected{% endif %}>배송완료</option>
+                            </select>
+                            <input type="text" name="q" value="{{ q }}" placeholder="주문번호/이메일/상품명 검색" class="filter-select shipping-list-search-input">
+                            <button type="submit" class="btn btn-sm btn-secondary">검색</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="shipping-list-body">
+                    <table class="shipping-table">
+                        <thead>
+                            <tr>
+                                <th>주문번호</th>
+                                <th>고객</th>
+                                <th>상품</th>
+                                <th>주문금액</th>
+                                <th>주문일시</th>
+                                <th>배송 상태</th>
+                                <th>상태 변경</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            {% with items_count=order.items.all|length items_list=order.items.all %}
+                            <tr class="shipping-row shipping-row-clickable" data-order-id="{{ order.id }}">
+                                <td class="order-id">
+                                    <div class="order-id-with-toggle">
+                                        <span class="toggle-icon">▼</span>
+                                        <span>{{ order.order_id }}</span>
+                                    </div>
+                                </td>
+                                <td class="customer-cell">
+                                    <div class="customer-info">
+                                        <div class="customer-email">{{ order.user.email }}</div>
+                                        <div class="customer-name">
+                                            {% if order.user.first_name or order.user.last_name %}
+                                                {{ order.user.last_name }}{{ order.user.first_name }}
+                                            {% else %}
+                                                {{ order.user.username }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="order-items-cell">
+                                    <div class="order-items-summary">
+                                        <span class="order-items-count">{{ items_count }}개 상품</span>
+                                    </div>
+                                    <div class="order-items-dropdown">
+                                        {% for item in items_list %}
+                                        <div class="order-item-detail">
+                                            <div class="order-item-header">
+                                                <span class="order-item-number">{{ forloop.counter }}</span>
+                                                <span class="order-item-name">{{ item.product_name }}</span>
+                                            </div>
+                                            <div class="order-item-info">
+                                                {% if item.color %}
+                                                <span class="order-item-color-label">색상:</span>
+                                                <span class="order-item-color">{{ item.color.name }}</span>
+                                                {% endif %}
+                                                <span class="order-item-quantity-label">수량:</span>
+                                                <span class="order-item-quantity">{{ item.quantity }}개</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td class="order-amount-cell">
+                                    <div class="order-amount">{{ order.total_amount|floatformat:0|intcomma }}원</div>
+                                </td>
+                                <td class="order-date-cell">
+                                    <div class="order-date">{{ order.created_at|date:"Y-m-d H:i" }}</div>
+                                </td>
+                                <td class="shipping-status-cell">
+                                    {% if order.shipping_status == "DELIVERED" %}
+                                        <span class="shipping-status-badge status-delivered">배송완료</span>
+                                    {% elif order.shipping_status == "SHIPPING" %}
+                                        <span class="shipping-status-badge status-shipping">배송중</span>
+                                    {% else %}
+                                        <span class="shipping-status-badge status-pending">배송대기</span>
+                                    {% endif %}
+                                </td>
+                                <td class="shipping-action-cell">
+                                    <form method="post" class="shipping-status-form" onsubmit="return confirm('배송 상태를 변경하시겠습니까?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="order_id" value="{{ order.id }}">
+                                        <select name="shipping_status" class="shipping-status-select" onchange="this.form.submit()">
+                                            <option value="PENDING" {% if order.shipping_status == "PENDING" %}selected{% endif %}>배송대기</option>
+                                            <option value="SHIPPING" {% if order.shipping_status == "SHIPPING" %}selected{% endif %}>배송중</option>
+                                            <option value="DELIVERED" {% if order.shipping_status == "DELIVERED" %}selected{% endif %}>배송완료</option>
+                                        </select>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endwith %}
+                            {% empty %}
+                            <tr class="shipping-table-empty">
+                                <td colspan="7">조회된 주문이 없습니다.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+                    <div class="shipping-pagination">
+                        {% if page_obj.has_previous %}
+                            <a class="btn btn-sm btn-secondary" href="?page={{ page_obj.previous_page_number }}&q={{ q }}&shipping_status={{ shipping_status }}">이전</a>
+                        {% endif %}
+                        <span class="shipping-pagination-info">
+                            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                        </span>
+                        {% if page_obj.has_next %}
+                            <a class="btn btn-sm btn-secondary" href="?page={{ page_obj.next_page_number }}&q={{ q }}&shipping_status={{ shipping_status }}">다음</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/admin/shipping_management.js' %}"></script>
+{% endblock %}

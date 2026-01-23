@@ -113,8 +113,15 @@
                                 <span class="order-id">주문번호: {{ order.order_id }}</span>
                                 <span class="order-date">{{ order.created_at|date:"Y년 m월 d일 H:i" }}</span>
                             </div>
-                            <div class="order-status-badge status-{{ order.status|lower }}">
-                                {{ order.get_status_display }}
+                            <div class="order-status-group">
+                                <div class="order-status-badge status-{{ order.status|lower }}">
+                                    {{ order.get_status_display }}
+                                </div>
+                                {% if order.status == "PAID" %}
+                                <div class="shipping-status-badge shipping-{{ order.shipping_status|lower }}">
+                                    {{ order.get_shipping_status_display }}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         
