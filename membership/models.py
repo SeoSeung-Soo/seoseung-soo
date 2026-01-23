@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, Optional, cast
+from typing import TYPE_CHECKING, Any, Optional, cast
 
 from django.db import models
 from django.db.models import Sum
+from django.utils import timezone
 
 from config.basemodel import BaseModel
 
@@ -23,10 +24,24 @@ class UsedCoupon(BaseModel):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name="user_coupons")
     coupon = models.ForeignKey(Coupon, on_delete=models.PROTECT)
     is_used = models.BooleanField(default=False)
-    used_at = models.DateTimeField(auto_now_add=True)
+    used_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'used_coupon'
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        if self.pk:
+            try:
+                old_instance = UsedCoupon.objects.get(pk=self.pk)
+                if not old_instance.is_used and self.is_used and not self.used_at:
+                    self.used_at = timezone.now()
+            except UsedCoupon.DoesNotExist:
+                if self.is_used and not self.used_at:
+                    self.used_at = timezone.now()
+        else:
+            if self.is_used and not self.used_at:
+                self.used_at = timezone.now()
+        super().save(*args, **kwargs)
 
 class UserPoint(BaseModel):
     class PointType(models.TextChoices):
