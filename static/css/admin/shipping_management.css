@@ -210,27 +210,27 @@
   text-align: center;
 }
 
-.shipping-status-badge {
+.status-indicator {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: middle;
 }
 
-.status-pending {
-  background-color: #fef3c7;
-  color: #92400e;
+.status-active {
+  background-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
 }
 
 .status-shipping {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
-.status-delivered {
-  background-color: #dcfce7;
-  color: #166534;
+.status-pending {
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
 }
 
 .shipping-action-cell {

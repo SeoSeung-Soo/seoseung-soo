@@ -23,6 +23,7 @@ class ShippingManagementView(AdminPermission, View):
                 | Q(user__email__icontains=q)
                 | Q(user__username__icontains=q)
                 | Q(product_name__icontains=q)
+                | Q(items__product_name__icontains=q)
             )
 
         if shipping_status:

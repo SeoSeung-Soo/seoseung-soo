@@ -102,11 +102,11 @@
                                 </td>
                                 <td class="shipping-status-cell">
                                     {% if order.shipping_status == "DELIVERED" %}
-                                        <span class="shipping-status-badge status-delivered">배송완료</span>
+                                        <span class="status-indicator status-active" title="배송완료"></span>
                                     {% elif order.shipping_status == "SHIPPING" %}
-                                        <span class="shipping-status-badge status-shipping">배송중</span>
+                                        <span class="status-indicator status-shipping" title="배송중"></span>
                                     {% else %}
-                                        <span class="shipping-status-badge status-pending">배송대기</span>
+                                        <span class="status-indicator status-pending" title="배송대기"></span>
                                     {% endif %}
                                 </td>
                                 <td class="shipping-action-cell">

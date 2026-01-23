@@ -104,6 +104,28 @@
                     <a href="#" class="view-all">전체보기 ></a>
                 </div>
                 
+                <div class="status-legend">
+                    <div class="legend-title">상태 표시</div>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <span class="status-indicator status-inactive" title="결제대기/취소/실패"></span>
+                            <span class="legend-label">결제대기/취소/실패</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="status-indicator status-pending" title="배송대기"></span>
+                            <span class="legend-label">배송대기</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="status-indicator status-shipping" title="배송중"></span>
+                            <span class="legend-label">배송중</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="status-indicator status-active" title="배송완료"></span>
+                            <span class="legend-label">배송완료</span>
+                        </div>
+                    </div>
+                </div>
+                
                 {% if recent_orders %}
                 <div class="orders-list">
                     {% for order in recent_orders %}
@@ -114,13 +136,16 @@
                                 <span class="order-date">{{ order.created_at|date:"Y년 m월 d일 H:i" }}</span>
                             </div>
                             <div class="order-status-group">
-                                <div class="order-status-badge status-{{ order.status|lower }}">
-                                    {{ order.get_status_display }}
-                                </div>
                                 {% if order.status == "PAID" %}
-                                <div class="shipping-status-badge shipping-{{ order.shipping_status|lower }}">
-                                    {{ order.get_shipping_status_display }}
-                                </div>
+                                    {% if order.shipping_status == "DELIVERED" %}
+                                        <span class="status-indicator status-active" title="배송완료"></span>
+                                    {% elif order.shipping_status == "SHIPPING" %}
+                                        <span class="status-indicator status-shipping" title="배송중"></span>
+                                    {% else %}
+                                        <span class="status-indicator status-pending" title="배송대기"></span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="status-indicator status-inactive" title="결제대기/취소/실패"></span>
                                 {% endif %}
                             </div>
                         </div>
