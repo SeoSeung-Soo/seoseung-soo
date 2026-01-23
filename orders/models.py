@@ -24,6 +24,16 @@ class Order(models.Model):
         default="PENDING",
     )
 
+    shipping_status = models.CharField(
+        max_length=20,
+        choices=[
+            ("PENDING", "배송대기"),
+            ("SHIPPING", "배송중"),
+            ("DELIVERED", "배송완료"),
+        ],
+        default="PENDING",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

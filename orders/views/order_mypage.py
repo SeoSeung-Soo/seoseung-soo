@@ -17,9 +17,9 @@ class OrderView(LoginRequiredMixin, View):
         orders = Order.objects.filter(user=user)
         order_stats = {
             'pending': orders.filter(status='PENDING').count(),
-            'preparing': orders.filter(status='PAID').count(),
-            'shipping': 0,
-            'delivered': 0,
+            'preparing': orders.filter(status='PAID', shipping_status='PENDING').count(),
+            'shipping': orders.filter(status='PAID', shipping_status='SHIPPING').count(),
+            'delivered': orders.filter(status='PAID', shipping_status='DELIVERED').count(),
         }
 
         cart_stats = {
