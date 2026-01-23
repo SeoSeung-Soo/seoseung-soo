@@ -48,10 +48,12 @@ class ShippingManagementView(AdminPermission, View):
             messages.error(request, "주문 ID와 배송 상태를 모두 입력해주세요.")
             return redirect("orders:admin-shipping-management")
 
-        valid_statuses = [status[0] for status in Order._meta.get_field('shipping_status').choices]
-        if new_status not in valid_statuses:
-            messages.error(request, "유효하지 않은 배송 상태입니다.")
-            return redirect("orders:admin-shipping-management")
+        shipping_field = Order._meta.get_field('shipping_status')
+        if shipping_field.choices:
+            valid_statuses = [status[0] for status in shipping_field.choices]
+            if new_status not in valid_statuses:
+                messages.error(request, "유효하지 않은 배송 상태입니다.")
+                return redirect("orders:admin-shipping-management")
 
         order = get_object_or_404(Order, id=order_id, status="PAID")
         
