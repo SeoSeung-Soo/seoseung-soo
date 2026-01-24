@@ -65,3 +65,22 @@ class Filtering:
             orders_qs = orders_qs.filter(cancellation_request_status=status)
 
         return orders_qs
+    
+    @staticmethod
+    def exchange_refund_list_filter(request: HttpRequest) -> QuerySet[Order]:
+        q = (request.GET.get("q") or "").strip()
+        status = (request.GET.get("status") or "").strip()
+
+        orders_qs = Order.objects.filter(exchange_refund_request_status__in=["PENDING", "APPROVED", "REJECTED"]).select_related("user").prefetch_related("items").order_by("-exchange_refund_requested_at")
+
+        if q:
+            orders_qs = orders_qs.filter(
+                Q(order_id__icontains=q)
+                | Q(user__email__icontains=q)
+                | Q(user__username__icontains=q)
+                | Q(product_name__icontains=q)
+            )
+        if status:
+            orders_qs = orders_qs.filter(exchange_refund_request_status=status)
+
+        return orders_qs
