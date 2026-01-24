@@ -35,6 +35,25 @@ class Order(models.Model):
         PENDING = "PENDING", "배송대기"
         SHIPPING = "SHIPPING", "배송중"
         DELIVERED = "DELIVERED", "배송완료"
+
+    class ExchangeRefundRequestStatus(models.TextChoices):
+        NONE = "NONE", "없음"
+        PENDING = "PENDING", "교환/환불요청"
+        APPROVED = "APPROVED", "교환/환불승인"
+        REJECTED = "REJECTED", "교환/환불거부"
+    
+    class ExchangeRefundType(models.TextChoices):
+        EXCHANGE = "EXCHANGE", "교환"
+        REFUND = "REFUND", "환불"
+    
+    class ExchangeRefundReason(models.TextChoices):
+        SIZE_MISMATCH = "SIZE_MISMATCH", "사이즈가 안 맞아요"
+        NOT_LIKE_COLOR = "NOT_LIKE_COLOR", "색상이 마음에 안 들어요"
+        NOT_LIKE_DESIGN = "NOT_LIKE_DESIGN", "디자인이 마음에 안 들어요"
+        WRONG_PRODUCT = "WRONG_PRODUCT", "다른 상품이 왔어요"
+        DEFECTIVE = "DEFECTIVE", "제품 불량이에요"
+        WRONG_DELIVERY = "WRONG_DELIVERY", "배송 오류"
+        OTHER = "OTHER", "기타"
         
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     order_id = models.CharField(max_length=64, unique=True)
@@ -50,6 +69,13 @@ class Order(models.Model):
     cancellation_requested_at = models.DateTimeField(null=True, blank=True, verbose_name="취소 요청 시간")
     cancellation_processed_at = models.DateTimeField(null=True, blank=True, verbose_name="취소 처리 시간")
     cancellation_admin_note = models.TextField(null=True, blank=True, verbose_name="관리자 메모")
+    
+    exchange_refund_request_status = models.CharField(max_length=20, choices=ExchangeRefundRequestStatus.choices, default=ExchangeRefundRequestStatus.NONE, verbose_name="교환/환불 요청 상태")
+    exchange_refund_type = models.CharField(max_length=20, choices=ExchangeRefundType.choices, null=True, blank=True, verbose_name="교환/환불 유형")
+    exchange_refund_reason = models.CharField(max_length=50, choices=ExchangeRefundReason.choices, null=True, blank=True, verbose_name="교환/환불 사유")
+    exchange_refund_requested_at = models.DateTimeField(null=True, blank=True, verbose_name="교환/환불 요청 시간")
+    exchange_refund_processed_at = models.DateTimeField(null=True, blank=True, verbose_name="교환/환불 처리 시간")
+    exchange_refund_admin_note = models.TextField(null=True, blank=True, verbose_name="관리자 메모")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

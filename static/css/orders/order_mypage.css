@@ -355,7 +355,9 @@ a.benefit-label {
     border-bottom: none;
 }
 
-.cancelled-item {
+.cancelled-item,
+.pending-item,
+.delivered-item {
     background-color: rgba(245, 245, 245, 0.3);
     position: relative;
 }
@@ -364,30 +366,12 @@ a.benefit-label {
 .cancelled-item .item-name,
 .cancelled-item .item-price,
 .cancelled-item .quantity-display,
-.cancelled-item .total-price {
-    filter: grayscale(100%);
-    opacity: 0.3;
-}
-
-.pending-item {
-    background-color: rgba(245, 245, 245, 0.3);
-    position: relative;
-}
-
+.cancelled-item .total-price,
 .pending-item .item-image img,
 .pending-item .item-name,
 .pending-item .item-price,
 .pending-item .quantity-display,
-.pending-item .total-price {
-    filter: grayscale(100%);
-    opacity: 0.3;
-}
-
-.delivered-item {
-    background-color: rgba(245, 245, 245, 0.3);
-    position: relative;
-}
-
+.pending-item .total-price,
 .delivered-item .item-image img,
 .delivered-item .item-name,
 .delivered-item .item-price,

@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.views import View
 
 from orders.forms.cancellation import OrderCancellationForm
+from orders.forms.exchange_refund import OrderExchangeRefundForm
 from orders.models import Order
 from products.models import Product
 from users.models import User
@@ -54,6 +55,7 @@ class OrderView(LoginRequiredMixin, View):
         order_id = request.session.pop('order_id', None)
 
         cancellation_form = OrderCancellationForm()
+        exchange_refund_form = OrderExchangeRefundForm()
         
         context = {
             'user': user,
@@ -64,6 +66,7 @@ class OrderView(LoginRequiredMixin, View):
             'payment_success': payment_success,
             'order_id': order_id,
             'cancellation_form': cancellation_form,
+            'exchange_refund_form': exchange_refund_form,
         }
 
         return render(request, "orders/order_mypage.html", context)
