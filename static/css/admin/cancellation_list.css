@@ -1,0 +1,229 @@
+.cancellation-reason-cell {
+  vertical-align: middle;
+  max-width: 200px;
+}
+
+.cancellation-reason {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 0;
+  text-decoration: underline;
+  margin-top: 4px;
+  display: block;
+}
+
+.btn-link:hover {
+  color: #2563eb;
+}
+
+.cancellation-status-cell {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.cancellation-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cancellation-status-badge.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.cancellation-status-badge.status-approved {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.cancellation-status-badge.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.cancellation-action-cell {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.cancellation-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-success {
+  background-color: #22c55e;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-success:hover {
+  background-color: #16a34a;
+}
+
+.btn-danger {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.cancellation-processed-info {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.admin-note {
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+.processed-date {
+  color: #9ca3af;
+}
+
+/* 모달 스타일 */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #ffffff;
+  margin: 10% auto;
+  padding: 0;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9e9e9;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close {
+  color: #9ca3af;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.close:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-body p {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group .required {
+  color: #ef4444;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e9e9e9;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: #1b1b1b;
+  box-shadow: 0 0 0 3px rgba(27, 27, 27, 0.1);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e9e9e9;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary {
+  background-color: #e9e9e9;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background-color: #d1d5db;
+}

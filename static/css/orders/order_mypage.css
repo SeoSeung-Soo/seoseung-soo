@@ -89,6 +89,14 @@
     padding: 30px;
 }
 
+.order-status-section {
+    padding: 20px 30px;
+}
+
+.benefits-section {
+    padding: 15px 30px;
+}
+
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -144,7 +152,7 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 20px 0;
+    padding: 10px 0;
 }
 
 .benefit-item {
@@ -207,7 +215,6 @@ a.benefit-label {
 
 .order-group {
     border: 1px solid #f0f0f0;
-    border-radius: 8px;
     overflow: hidden;
     background: white;
 }
@@ -228,6 +235,12 @@ a.benefit-label {
 }
 
 .order-id {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.cancellation-status-text {
     font-size: 14px;
     font-weight: 600;
     color: #333;
@@ -300,7 +313,6 @@ a.benefit-label {
 .status-legend {
     background: #f8f9fa;
     border: 1px solid #e9e9e9;
-    border-radius: 8px;
     padding: 16px 20px;
     margin-bottom: 20px;
 }
@@ -336,10 +348,49 @@ a.benefit-label {
 
 .order-item {
     border-bottom: 1px solid #f0f0f0;
+    position: relative;
 }
 
 .order-item:last-child {
     border-bottom: none;
+}
+
+.cancelled-item,
+.pending-item,
+.delivered-item {
+    background-color: rgba(245, 245, 245, 0.3);
+    position: relative;
+}
+
+.cancelled-item .item-image img,
+.cancelled-item .item-name,
+.cancelled-item .item-price,
+.cancelled-item .quantity-display,
+.cancelled-item .total-price,
+.pending-item .item-image img,
+.pending-item .item-name,
+.pending-item .item-price,
+.pending-item .quantity-display,
+.pending-item .total-price,
+.delivered-item .item-image img,
+.delivered-item .item-name,
+.delivered-item .item-price,
+.delivered-item .quantity-display,
+.delivered-item .total-price {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+
+.cancelled-text {
+    color: #1b1b1b;
+    padding: 1px;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 10;
+    opacity: 1 !important;
 }
 
 .quantity-display {
@@ -353,7 +404,8 @@ a.benefit-label {
     background: #f8f9fa;
     border-top: 1px solid #f0f0f0;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .order-total {
@@ -373,6 +425,195 @@ a.benefit-label {
     color: #333;
 }
 
+.order-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.cancellation-link,
+.exchange-refund-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #666;
+    font-size: 14px;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.cancellation-link:hover,
+.exchange-refund-link:hover {
+    color: #333;
+    text-decoration-color: #333;
+}
+
+.cancellation-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.cancellation-status-badge.status-pending {
+    background-color: #1b1b1b;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.cancellation-status-badge.status-approved {
+    background-color: #1b1b1b;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.cancellation-status-badge.status-rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.cancellation-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.cancellation-modal-content {
+    background-color: #ffffff;
+    margin: 10% auto;
+    padding: 0;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cancellation-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.cancellation-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.cancellation-modal-close {
+    color: #9ca3af;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.cancellation-modal-close:hover {
+    color: #333;
+}
+
+.cancellation-modal-body {
+    padding: 24px;
+}
+
+.cancellation-order-info {
+    background: #f8f9fa;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.cancellation-order-info p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.cancellation-order-info strong {
+    color: #333;
+}
+
+.cancellation-modal-body .form-group {
+    margin-bottom: 0;
+}
+
+.cancellation-modal-body .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.cancellation-modal-body .form-group .required {
+    color: #ef4444;
+}
+
+.cancellation-modal-body .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e9e9e9;
+    font-size: 14px;
+    font-family: inherit;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+.cancellation-modal-body .form-control:focus {
+    outline: none;
+    border-color: #1b1b1b;
+    box-shadow: 0 0 0 3px rgba(27, 27, 27, 0.1);
+}
+
+.cancellation-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #e9e9e9;
+}
+
+.cancellation-modal-footer .btn {
+    padding: 12px 24px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+}
+
+.cancellation-modal-footer .btn-secondary {
+    background: #ffffff;
+    color: #1b1b1b;
+    border: 1px solid #e9e9e9;
+}
+
+.cancellation-modal-footer .btn-secondary:hover {
+    background: #f8f9fa;
+    border-color: #1b1b1b;
+}
+
+.cancellation-modal-footer .btn-danger {
+    background: #1b1b1b;
+    color: white;
+}
+
+.cancellation-modal-footer .btn-danger:hover {
+    background: #333;
+}
+
 @media (max-width: 768px) {
     .user-header {
         flex-direction: column;
@@ -381,21 +622,37 @@ a.benefit-label {
     }
 
     .order-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
     }
 
     .stat-box {
-        padding: 16px;
+        padding: 12px 8px;
     }
 
     .stat-number {
-        font-size: 24px;
+        font-size: 20px;
+    }
+
+    .stat-label {
+        font-size: 12px;
     }
 
     .benefits-stats {
-        flex-direction: column;
-        gap: 20px;
+        justify-content: space-around;
+        padding: 15px 0;
+    }
+
+    .benefit-item {
+        gap: 6px;
+    }
+
+    a.benefit-label {
+        font-size: 12px;
+    }
+
+    .benefit-value {
+        font-size: 18px;
     }
 
     .table-header {
@@ -405,9 +662,7 @@ a.benefit-label {
     .sidebar-menu {
         grid-template-columns: 1fr;
     }
-}
 
-@media (max-width: 768px) {
     .mypage-layout {
         flex-direction: column;
         padding: 20px;
@@ -455,6 +710,18 @@ a.benefit-label {
     .legend-item {
         gap: 6px;
     }
+
+    .total-value {
+        font-size: 14px;
+    }
+
+    .total-label {
+        font-size: 12px;
+    }
+
+    .cancellation-link {
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -465,6 +732,25 @@ a.benefit-label {
         padding: 12px;
     }
     .order-stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+    .stat-box {
+        padding: 10px 4px;
+    }
+    .stat-number {
+        font-size: 18px;
+    }
+    .stat-label {
+        font-size: 11px;
+    }
+    .benefits-stats {
+        padding: 12px 0;
+    }
+    a.benefit-label {
+        font-size: 11px;
+    }
+    .benefit-value {
+        font-size: 16px;
     }
 }

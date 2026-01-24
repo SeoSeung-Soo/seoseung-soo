@@ -14,7 +14,9 @@
             <h4>주문/배송 관리</h4>
             <ul>
                 <li><a href="{% url 'orders:admin-order-list' %}" class="{% if request.resolver_match.url_name == 'admin-order-list' %}active{% endif %}">주문 목록</a></li>
-                <li><a href="{% url 'orders:admin-shipping-management' %}" class="{% if request.resolver_match.url_name == 'admin-shipping-management' %}active{% endif %}">배송 관리</a></li>
+                        <li><a href="{% url 'orders:admin-shipping-management' %}" class="{% if request.resolver_match.url_name == 'admin-shipping-management' %}active{% endif %}">배송 관리</a></li>
+                        <li><a href="{% url 'orders:admin-cancellation-list' %}" class="{% if request.resolver_match.url_name == 'admin-cancellation-list' %}active{% endif %}">취소 관리</a></li>
+                        <li><a href="{% url 'orders:admin-exchange-refund-list' %}" class="{% if request.resolver_match.url_name == 'admin-exchange-refund-list' %}active{% endif %}">교환/환불 관리</a></li>
             </ul>
         </div>
         <div class="menu-category">
