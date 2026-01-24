@@ -192,6 +192,23 @@
                                 <span class="total-label">주문 금액:</span>
                                 <span class="total-value">{{ order.total_amount|floatformat:0|intcomma }}원</span>
                             </div>
+                            {% if order.status == "PAID" and order.cancellation_request_status == "NONE" %}
+                            <div class="order-actions">
+                                <button type="button" class="btn btn-sm btn-danger" onclick="showCancellationModal({{ order.id }}, '{{ order.order_id }}', {{ order.total_amount }})">주문 취소</button>
+                            </div>
+                            {% elif order.cancellation_request_status == "PENDING" %}
+                            <div class="order-actions">
+                                <span class="cancellation-status-badge status-pending">취소 요청 중</span>
+                            </div>
+                            {% elif order.cancellation_request_status == "APPROVED" %}
+                            <div class="order-actions">
+                                <span class="cancellation-status-badge status-approved">취소 완료</span>
+                            </div>
+                            {% elif order.cancellation_request_status == "REJECTED" %}
+                            <div class="order-actions">
+                                <span class="cancellation-status-badge status-rejected">취소 거부</span>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -205,8 +222,48 @@
         </div>
     </div>
 </div>
+
+<!-- 취소 요청 모달 -->
+<div id="cancellationModal" class="cancellation-modal">
+    <div class="cancellation-modal-content">
+        <div class="cancellation-modal-header">
+            <h3>주문 취소 요청</h3>
+            <span class="cancellation-modal-close" onclick="closeCancellationModal()">&times;</span>
+        </div>
+        <form method="post" id="cancellationForm" action="">
+            {% csrf_token %}
+            <div class="cancellation-modal-body">
+                <div class="cancellation-order-info">
+                    <p><strong>주문번호:</strong> <span id="cancellationOrderId"></span></p>
+                    <p><strong>주문금액:</strong> <span id="cancellationOrderAmount"></span>원</p>
+                </div>
+                <div class="form-group">
+                    <label for="cancellationReason">취소 사유 <span class="required">*</span></label>
+                    <select name="reason" id="cancellationReason" required class="form-control">
+                        <option value="">취소 사유를 선택해주세요</option>
+                        <option value="SIZE_MISMATCH">사이즈가 안 맞아요</option>
+                        <option value="NOT_LIKE_COLOR">색상이 마음에 안 들어요</option>
+                        <option value="NOT_LIKE_DESIGN">디자인이 마음에 안 들어요</option>
+                        <option value="WRONG_PRODUCT">다른 상품이 왔어요</option>
+                        <option value="DEFECTIVE">제품 불량이에요</option>
+                        <option value="WRONG_DELIVERY">배송 오류</option>
+                        <option value="SIMPLE_CHANGE_OF_MIND">단순히 마음 바뀜</option>
+                        <option value="TOO_EXPENSIVE">너무 비싸서</option>
+                        <option value="NO_NEED_ANYMORE">필요 없어졌어요</option>
+                        <option value="OTHER">기타</option>
+                    </select>
+                </div>
+            </div>
+            <div class="cancellation-modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeCancellationModal()">취소</button>
+                <button type="submit" class="btn btn-danger">취소 요청하기</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{% static 'js/orders/order_mypage.js' %}"></script>
+<script src="{% static 'js/orders/cancellation_modal.js' %}"></script>
 {% endblock %}
