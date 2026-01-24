@@ -89,6 +89,14 @@
     padding: 30px;
 }
 
+.order-status-section {
+    padding: 20px 30px;
+}
+
+.benefits-section {
+    padding: 15px 30px;
+}
+
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -144,7 +152,7 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 20px 0;
+    padding: 10px 0;
 }
 
 .benefit-item {
@@ -381,21 +389,37 @@ a.benefit-label {
     }
 
     .order-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
     }
 
     .stat-box {
-        padding: 16px;
+        padding: 12px 8px;
     }
 
     .stat-number {
-        font-size: 24px;
+        font-size: 20px;
+    }
+
+    .stat-label {
+        font-size: 12px;
     }
 
     .benefits-stats {
-        flex-direction: column;
-        gap: 20px;
+        justify-content: space-around;
+        padding: 15px 0;
+    }
+
+    .benefit-item {
+        gap: 6px;
+    }
+
+    a.benefit-label {
+        font-size: 12px;
+    }
+
+    .benefit-value {
+        font-size: 18px;
     }
 
     .table-header {
@@ -405,9 +429,7 @@ a.benefit-label {
     .sidebar-menu {
         grid-template-columns: 1fr;
     }
-}
 
-@media (max-width: 768px) {
     .mypage-layout {
         flex-direction: column;
         padding: 20px;
@@ -465,6 +487,25 @@ a.benefit-label {
         padding: 12px;
     }
     .order-stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+    .stat-box {
+        padding: 10px 4px;
+    }
+    .stat-number {
+        font-size: 18px;
+    }
+    .stat-label {
+        font-size: 11px;
+    }
+    .benefits-stats {
+        padding: 12px 0;
+    }
+    a.benefit-label {
+        font-size: 11px;
+    }
+    .benefit-value {
+        font-size: 16px;
     }
 }
