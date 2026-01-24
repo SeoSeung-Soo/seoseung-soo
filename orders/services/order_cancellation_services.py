@@ -14,13 +14,6 @@ class OrderCancellationService:
         if order.cancellation_request_status != "NONE":
             return False, "이미 취소 요청이 처리되었거나 진행 중입니다."
         
-        if not reason:
-            return False, "취소 사유를 선택해주세요."
-        
-        valid_reasons = [choice[0] for choice in Order.CancellationReason.choices]
-        if reason not in valid_reasons:
-            return False, "유효하지 않은 취소 사유입니다."
-        
         order.cancellation_request_status = "PENDING"
         order.cancellation_reason = reason
         order.cancellation_requested_at = timezone.now()

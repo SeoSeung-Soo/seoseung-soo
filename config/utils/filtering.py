@@ -60,7 +60,7 @@ class Filtering:
                 | Q(user__email__icontains=q)
                 | Q(user__username__icontains=q)
                 | Q(product_name__icontains=q)
-            ).distinct()
+            )
         if status:
             orders_qs = orders_qs.filter(cancellation_request_status=status)
 
