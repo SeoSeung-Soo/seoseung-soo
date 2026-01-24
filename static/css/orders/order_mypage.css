@@ -215,7 +215,6 @@ a.benefit-label {
 
 .order-group {
     border: 1px solid #f0f0f0;
-    border-radius: 8px;
     overflow: hidden;
     background: white;
 }
@@ -236,6 +235,12 @@ a.benefit-label {
 }
 
 .order-id {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.cancellation-status-text {
     font-size: 14px;
     font-weight: 600;
     color: #333;
@@ -308,7 +313,6 @@ a.benefit-label {
 .status-legend {
     background: #f8f9fa;
     border: 1px solid #e9e9e9;
-    border-radius: 8px;
     padding: 16px 20px;
     margin-bottom: 20px;
 }
@@ -344,10 +348,65 @@ a.benefit-label {
 
 .order-item {
     border-bottom: 1px solid #f0f0f0;
+    position: relative;
 }
 
 .order-item:last-child {
     border-bottom: none;
+}
+
+.cancelled-item {
+    background-color: rgba(245, 245, 245, 0.3);
+    position: relative;
+}
+
+.cancelled-item .item-image img,
+.cancelled-item .item-name,
+.cancelled-item .item-price,
+.cancelled-item .quantity-display,
+.cancelled-item .total-price {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+
+.pending-item {
+    background-color: rgba(245, 245, 245, 0.3);
+    position: relative;
+}
+
+.pending-item .item-image img,
+.pending-item .item-name,
+.pending-item .item-price,
+.pending-item .quantity-display,
+.pending-item .total-price {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+
+.delivered-item {
+    background-color: rgba(245, 245, 245, 0.3);
+    position: relative;
+}
+
+.delivered-item .item-image img,
+.delivered-item .item-name,
+.delivered-item .item-price,
+.delivered-item .quantity-display,
+.delivered-item .total-price {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+
+.cancelled-text {
+    color: #1b1b1b;
+    padding: 1px;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 10;
+    opacity: 1 !important;
 }
 
 .quantity-display {
@@ -388,24 +447,24 @@ a.benefit-label {
     align-items: center;
 }
 
-.btn-sm {
-    padding: 8px 16px;
-    font-size: 13px;
-    border-radius: 6px;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.2s ease;
+.cancellation-link,
+.exchange-refund-link {
+    background: none;
     border: none;
+    padding: 0;
+    color: #666;
+    font-size: 14px;
+    text-decoration: underline;
+    text-decoration-color: transparent;
     cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
 }
 
-.btn-danger {
-    background-color: #ef4444;
-    color: white;
-}
-
-.btn-danger:hover {
-    background-color: #dc2626;
+.cancellation-link:hover,
+.exchange-refund-link:hover {
+    color: #333;
+    text-decoration-color: #333;
 }
 
 .cancellation-status-badge {
@@ -417,13 +476,15 @@ a.benefit-label {
 }
 
 .cancellation-status-badge.status-pending {
-    background-color: #fef3c7;
-    color: #92400e;
+    background-color: #1b1b1b;
+    color: #ffffff;
+    font-weight: 600;
 }
 
 .cancellation-status-badge.status-approved {
-    background-color: #dcfce7;
-    color: #166534;
+    background-color: #1b1b1b;
+    color: #ffffff;
+    font-weight: 600;
 }
 
 .cancellation-status-badge.status-rejected {
@@ -447,7 +508,6 @@ a.benefit-label {
     background-color: #ffffff;
     margin: 10% auto;
     padding: 0;
-    border-radius: 8px;
     width: 90%;
     max-width: 500px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -487,7 +547,6 @@ a.benefit-label {
 .cancellation-order-info {
     background: #f8f9fa;
     padding: 16px;
-    border-radius: 6px;
     margin-bottom: 20px;
 }
 
@@ -521,7 +580,6 @@ a.benefit-label {
     width: 100%;
     padding: 10px;
     border: 1px solid #e9e9e9;
-    border-radius: 6px;
     font-size: 14px;
     font-family: inherit;
     background-color: white;
@@ -540,6 +598,36 @@ a.benefit-label {
     gap: 12px;
     padding: 16px 24px;
     border-top: 1px solid #e9e9e9;
+}
+
+.cancellation-modal-footer .btn {
+    padding: 12px 24px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+}
+
+.cancellation-modal-footer .btn-secondary {
+    background: #ffffff;
+    color: #1b1b1b;
+    border: 1px solid #e9e9e9;
+}
+
+.cancellation-modal-footer .btn-secondary:hover {
+    background: #f8f9fa;
+    border-color: #1b1b1b;
+}
+
+.cancellation-modal-footer .btn-danger {
+    background: #1b1b1b;
+    color: white;
+}
+
+.cancellation-modal-footer .btn-danger:hover {
+    background: #333;
 }
 
 @media (max-width: 768px) {
@@ -637,6 +725,18 @@ a.benefit-label {
     
     .legend-item {
         gap: 6px;
+    }
+
+    .total-value {
+        font-size: 14px;
+    }
+
+    .total-label {
+        font-size: 12px;
+    }
+
+    .cancellation-link {
+        font-size: 12px;
     }
 }
 
