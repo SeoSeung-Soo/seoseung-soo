@@ -8,13 +8,13 @@ from orders.models import Order
 class OrderCancellationService:
     @staticmethod
     def request_cancellation(order: Order, reason: str) -> Tuple[bool, str]:
-        if order.status == "CANCELLED":
+        if order.status == Order.Status.CANCELLED:
             return False, "이미 취소된 주문입니다."
         
-        if order.cancellation_request_status != "NONE":
+        if order.cancellation_request_status != Order.CancellationRequestStatus.NONE:
             return False, "이미 취소 요청이 처리되었거나 진행 중입니다."
         
-        order.cancellation_request_status = "PENDING"
+        order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
         order.cancellation_reason = reason
         order.cancellation_requested_at = timezone.now()
         order.save(update_fields=["cancellation_request_status", "cancellation_reason", "cancellation_requested_at"])
@@ -23,11 +23,11 @@ class OrderCancellationService:
 
     @staticmethod
     def approve_cancellation(order: Order, admin_note: str | None = None) -> Tuple[bool, str]:
-        if order.cancellation_request_status != "PENDING":
+        if order.cancellation_request_status != Order.CancellationRequestStatus.PENDING:
             return False, "처리할 수 없는 취소 요청입니다."
         
-        order.cancellation_request_status = "APPROVED"
-        order.status = "CANCELLED"
+        order.cancellation_request_status = Order.CancellationRequestStatus.APPROVED
+        order.status = Order.Status.CANCELLED
         order.cancellation_processed_at = timezone.now()
         if admin_note:
             order.cancellation_admin_note = admin_note
@@ -37,13 +37,13 @@ class OrderCancellationService:
 
     @staticmethod
     def reject_cancellation(order: Order, admin_note: str) -> Tuple[bool, str]:
-        if order.cancellation_request_status != "PENDING":
+        if order.cancellation_request_status != Order.CancellationRequestStatus.PENDING:
             return False, "처리할 수 없는 취소 요청입니다."
         
         if not admin_note or not admin_note.strip():
             return False, "거부 사유를 입력해주세요."
         
-        order.cancellation_request_status = "REJECTED"
+        order.cancellation_request_status = Order.CancellationRequestStatus.REJECTED
         order.cancellation_processed_at = timezone.now()
         order.cancellation_admin_note = admin_note.strip()
         order.save(update_fields=["cancellation_request_status", "cancellation_processed_at", "cancellation_admin_note"])

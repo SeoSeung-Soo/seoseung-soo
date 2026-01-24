@@ -14,14 +14,11 @@ class Order(models.Model):
         REJECTED = "REJECTED", "취소거부"
         
     class CancellationReason(models.TextChoices):
-        SIZE_MISMATCH = "SIZE_MISMATCH", "사이즈가 안 맞아요"
         NOT_LIKE_COLOR = "NOT_LIKE_COLOR", "색상이 마음에 안 들어요"
         NOT_LIKE_DESIGN = "NOT_LIKE_DESIGN", "디자인이 마음에 안 들어요"
-        WRONG_PRODUCT = "WRONG_PRODUCT", "다른 상품이 왔어요"
-        DEFECTIVE = "DEFECTIVE", "제품 불량이에요"
-        WRONG_DELIVERY = "WRONG_DELIVERY", "배송 오류"
+        LONG_TIME_DELIVERY = "LONG_TIME_DELIVERY", "배송 시간이 길어요"
         SIMPLE_CHANGE_OF_MIND = "SIMPLE_CHANGE_OF_MIND", "단순히 마음 바뀜"
-        TOO_EXPENSIVE = "TOO_EXPENSIVE", "너무 비싸서"
+        TOO_EXPENSIVE = "TOO_EXPENSIVE", "너무 비싸요"
         NO_NEED_ANYMORE = "NO_NEED_ANYMORE", "필요 없어졌어요"
         OTHER = "OTHER", "기타"
         

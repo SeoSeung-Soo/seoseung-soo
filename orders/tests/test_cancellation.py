@@ -16,21 +16,21 @@ class TestOrderCancellationService(TestSetupMixin):
         self.setup_test_order_data()
 
     def test_request_cancellation_success(self) -> None:
-        reason = Order.CancellationReason.SIZE_MISMATCH
+        reason = Order.CancellationReason.SIMPLE_CHANGE_OF_MIND
         
         success, message = OrderCancellationService.request_cancellation(self.order, reason)
         
         assert success is True
         assert "접수되었습니다" in message
         self.order.refresh_from_db()
-        assert self.order.cancellation_request_status == "PENDING"
+        assert self.order.cancellation_request_status == Order.CancellationRequestStatus.PENDING
         assert self.order.cancellation_reason == reason
         assert self.order.cancellation_requested_at is not None
 
     def test_request_cancellation_already_cancelled(self) -> None:
-        self.order.status = "CANCELLED"
+        self.order.status = Order.Status.CANCELLED
         self.order.save()
-        reason = Order.CancellationReason.SIZE_MISMATCH
+        reason = Order.CancellationReason.SIMPLE_CHANGE_OF_MIND
         
         success, message = OrderCancellationService.request_cancellation(self.order, reason)
         
@@ -38,9 +38,9 @@ class TestOrderCancellationService(TestSetupMixin):
         assert "이미 취소된 주문입니다" in message
 
     def test_request_cancellation_already_pending(self) -> None:
-        self.order.cancellation_request_status = "PENDING"
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
         self.order.save()
-        reason = Order.CancellationReason.SIZE_MISMATCH
+        reason = Order.CancellationReason.SIMPLE_CHANGE_OF_MIND
         
         success, message = OrderCancellationService.request_cancellation(self.order, reason)
         
@@ -48,7 +48,7 @@ class TestOrderCancellationService(TestSetupMixin):
         assert "이미 취소 요청이 처리되었거나 진행 중입니다" in message
 
     def test_approve_cancellation_success(self) -> None:
-        self.order.cancellation_request_status = "PENDING"
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
         self.order.save()
         admin_note = "승인 메모"
         
@@ -57,24 +57,24 @@ class TestOrderCancellationService(TestSetupMixin):
         assert success is True
         assert "승인되었습니다" in message
         self.order.refresh_from_db()
-        assert self.order.cancellation_request_status == "APPROVED"
-        assert self.order.status == "CANCELLED"
+        assert self.order.cancellation_request_status == Order.CancellationRequestStatus.APPROVED
+        assert self.order.status == Order.Status.CANCELLED
         assert self.order.cancellation_admin_note == admin_note
         assert self.order.cancellation_processed_at is not None
 
     def test_approve_cancellation_without_admin_note(self) -> None:
-        self.order.cancellation_request_status = "PENDING"
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
         self.order.save()
         
         success, message = OrderCancellationService.approve_cancellation(self.order, None)
         
         assert success is True
         self.order.refresh_from_db()
-        assert self.order.cancellation_request_status == "APPROVED"
-        assert self.order.status == "CANCELLED"
+        assert self.order.cancellation_request_status == Order.CancellationRequestStatus.APPROVED
+        assert self.order.status == Order.Status.CANCELLED
 
     def test_approve_cancellation_not_pending(self) -> None:
-        self.order.cancellation_request_status = "APPROVED"
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.APPROVED
         self.order.save()
         
         success, message = OrderCancellationService.approve_cancellation(self.order, None)
@@ -83,7 +83,7 @@ class TestOrderCancellationService(TestSetupMixin):
         assert "처리할 수 없는 취소 요청입니다" in message
 
     def test_reject_cancellation_success(self) -> None:
-        self.order.cancellation_request_status = "PENDING"
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
         self.order.save()
         admin_note = "거부 사유"
         
@@ -92,12 +92,12 @@ class TestOrderCancellationService(TestSetupMixin):
         assert success is True
         assert "거부되었습니다" in message
         self.order.refresh_from_db()
-        assert self.order.cancellation_request_status == "REJECTED"
+        assert self.order.cancellation_request_status == Order.CancellationRequestStatus.REJECTED
         assert self.order.cancellation_admin_note == admin_note
         assert self.order.cancellation_processed_at is not None
 
     def test_reject_cancellation_empty_admin_note(self) -> None:
-        self.order.cancellation_request_status = "PENDING"
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
         self.order.save()
         
         success, message = OrderCancellationService.reject_cancellation(self.order, "")
@@ -106,7 +106,7 @@ class TestOrderCancellationService(TestSetupMixin):
         assert "거부 사유를 입력해주세요" in message
 
     def test_reject_cancellation_whitespace_admin_note(self) -> None:
-        self.order.cancellation_request_status = "PENDING"
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
         self.order.save()
         
         success, message = OrderCancellationService.reject_cancellation(self.order, "   ")
@@ -115,7 +115,7 @@ class TestOrderCancellationService(TestSetupMixin):
         assert "거부 사유를 입력해주세요" in message
 
     def test_reject_cancellation_not_pending(self) -> None:
-        self.order.cancellation_request_status = "APPROVED"
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.APPROVED
         self.order.save()
         
         success, message = OrderCancellationService.reject_cancellation(self.order, "거부 사유")
@@ -147,24 +147,24 @@ class TestOrderCancellationRequestView(TestSetupMixin):
         url = reverse("orders:cancel-request", kwargs={"order_id": self.order.id})
         
         response = self.client.post(url, {
-            "reason": Order.CancellationReason.SIZE_MISMATCH
+            "reason": Order.CancellationReason.SIMPLE_CHANGE_OF_MIND
         }, follow=True)
         
         assert response.status_code == 200
         messages_list = list(get_messages(response.wsgi_request))
         assert any("접수되었습니다" in str(msg) for msg in messages_list)
         self.order.refresh_from_db()
-        assert self.order.cancellation_request_status == "PENDING"
+        assert self.order.cancellation_request_status == Order.CancellationRequestStatus.PENDING
 
     def test_post_already_cancelled(self) -> None:
         self.order.user = self.customer_user
-        self.order.status = "CANCELLED"
+        self.order.status = Order.Status.CANCELLED
         self.order.save()
         self.client.force_login(self.customer_user)
         url = reverse("orders:cancel-request", kwargs={"order_id": self.order.id})
         
         response = self.client.post(url, {
-            "reason": Order.CancellationReason.SIZE_MISMATCH
+            "reason": Order.CancellationReason.SIMPLE_CHANGE_OF_MIND
         }, follow=True)
         
         assert response.status_code == 200
@@ -190,7 +190,7 @@ class TestOrderCancellationRequestView(TestSetupMixin):
         url = reverse("orders:cancel-request", kwargs={"order_id": self.order.id})
         
         response = self.client.post(url, {
-            "reason": Order.CancellationReason.SIZE_MISMATCH
+            "reason": Order.CancellationReason.SIMPLE_CHANGE_OF_MIND
         })
         
         assert response.status_code == 404
@@ -202,8 +202,8 @@ class TestAdminCancellationListView(TestSetupMixin):
         self.setup_test_user_data()
         self.setup_test_products_data()
         self.setup_test_order_data()
-        self.order.cancellation_request_status = "PENDING"
-        self.order.cancellation_reason = Order.CancellationReason.SIZE_MISMATCH
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
+        self.order.cancellation_reason = Order.CancellationReason.SIMPLE_CHANGE_OF_MIND
         self.order.cancellation_requested_at = timezone.now()
         self.order.save()
 
@@ -236,13 +236,13 @@ class TestAdminCancellationListView(TestSetupMixin):
         self.client.force_login(self.admin_user)
         url = reverse("orders:admin-cancellation-list")
         
-        response = self.client.get(url, {"status": "PENDING"})
+        response = self.client.get(url, {"status": Order.CancellationRequestStatus.PENDING})
         
         assert response.status_code == 200
-        assert response.context["status"] == "PENDING"
+        assert response.context["status"] == Order.CancellationRequestStatus.PENDING
         orders = list(response.context["orders"])
         assert len(orders) > 0
-        assert all(o.cancellation_request_status == "PENDING" for o in orders)
+        assert all(o.cancellation_request_status == Order.CancellationRequestStatus.PENDING for o in orders)
 
 
 @pytest.mark.django_db
@@ -251,7 +251,7 @@ class TestAdminCancellationProcessView(TestSetupMixin):
         self.setup_test_user_data()
         self.setup_test_products_data()
         self.setup_test_order_data()
-        self.order.cancellation_request_status = "PENDING"
+        self.order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
         self.order.save()
 
     def test_approve_cancellation(self) -> None:
@@ -267,8 +267,8 @@ class TestAdminCancellationProcessView(TestSetupMixin):
         messages_list = list(get_messages(response.wsgi_request))
         assert any("승인되었습니다" in str(msg) for msg in messages_list)
         self.order.refresh_from_db()
-        assert self.order.cancellation_request_status == "APPROVED"
-        assert self.order.status == "CANCELLED"
+        assert self.order.cancellation_request_status == Order.CancellationRequestStatus.APPROVED
+        assert self.order.status == Order.Status.CANCELLED
 
     def test_reject_cancellation(self) -> None:
         self.client.force_login(self.admin_user)
@@ -283,7 +283,7 @@ class TestAdminCancellationProcessView(TestSetupMixin):
         messages_list = list(get_messages(response.wsgi_request))
         assert any("거부되었습니다" in str(msg) for msg in messages_list)
         self.order.refresh_from_db()
-        assert self.order.cancellation_request_status == "REJECTED"
+        assert self.order.cancellation_request_status == Order.CancellationRequestStatus.REJECTED
 
     def test_reject_cancellation_without_admin_note(self) -> None:
         self.client.force_login(self.admin_user)
