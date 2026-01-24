@@ -5,6 +5,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views import View
 
+from orders.forms.cancellation import OrderCancellationForm
 from orders.models import Order
 from products.models import Product
 from users.models import User
@@ -52,6 +53,8 @@ class OrderView(LoginRequiredMixin, View):
         payment_success = request.session.pop('payment_success', False)
         order_id = request.session.pop('order_id', None)
 
+        cancellation_form = OrderCancellationForm()
+        
         context = {
             'user': user,
             'order_stats': order_stats,
@@ -60,6 +63,7 @@ class OrderView(LoginRequiredMixin, View):
             'current_page': 'orders',
             'payment_success': payment_success,
             'order_id': order_id,
+            'cancellation_form': cancellation_form,
         }
 
         return render(request, "orders/order_mypage.html", context)
