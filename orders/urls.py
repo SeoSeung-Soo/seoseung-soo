@@ -11,6 +11,7 @@ from .views.admin.exchange_refund import (
 )
 from .views.admin.order_list import AdminOrderListView
 from .views.admin.shipping_management import ShippingManagementView
+from .views.cancel_refund import CancelRefundView
 from .views.cancellation import OrderCancellationRequestView
 from .views.exchange_refund import OrderExchangeRefundRequestView
 from .views.order_virtual_create import OrderCreateVirtualView
@@ -19,6 +20,7 @@ app_name = "orders"
 
 urlpatterns = [
     path("status/", OrderView.as_view(), name="status"),
+    path("cancel-refund/", CancelRefundView.as_view(), name="cancel-refund"),
     path("create/", OrderCreateView.as_view(), name="create"),
     path("virtual/create/", OrderCreateVirtualView.as_view(), name="virtual-create"),
     path("cancel/<int:order_id>/", OrderCancellationRequestView.as_view(), name="cancel-request"),
