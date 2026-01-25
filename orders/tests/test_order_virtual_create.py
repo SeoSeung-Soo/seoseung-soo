@@ -64,7 +64,9 @@ class TestOrderCreateVirtualView(TestSetupMixin):
 
         order_items = OrderItem.objects.filter(order=order)
         assert order_items.count() == 1
-        assert order_items.first().quantity == 2
+        order_item = order_items.first()
+        assert order_item is not None
+        assert order_item.quantity == 2
 
     def test_create_virtual_order_with_color(self) -> None:
         self.client.force_login(self.customer_user)
@@ -94,7 +96,8 @@ class TestOrderCreateVirtualView(TestSetupMixin):
         assert data["success"] is True
 
         order = Order.objects.get(order_id=data["orderId"])
-        order_item = OrderItem.objects.get(order=order)
+        order_item = OrderItem.objects.filter(order=order).first()
+        assert order_item is not None
         assert order_item.color == color
 
     def test_create_virtual_order_invalid_items(self) -> None:
