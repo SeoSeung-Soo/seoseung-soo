@@ -1,0 +1,43 @@
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>나의 쇼핑활동</h2>
+    </div>
+    <div class="sidebar-menu">
+        <div class="menu-category">
+            <div class="info-category-container">
+                <h4>나의 정보</h4>
+                <ul>
+                    <li><a href="{% url 'profile-edit' %}" class="{% if request.resolver_match.url_name == 'profile-edit' %}active{% endif %}">개인정보 수정</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="menu-category">
+            <div class="order-category-container">
+                <h4>주문/배송조회</h4>
+                <ul>
+                    <li><a href="{% url 'orders:status' %}" class="{% if request.resolver_match.url_name == 'status' and request.resolver_match.namespace == 'orders' %}active{% endif %}">배송현황</a></li>
+                    <li><a href="{% url 'orders:cancel-refund' %}" class="{% if request.resolver_match.url_name == 'cancel-refund' and request.resolver_match.namespace == 'orders' %}active{% endif %}">취소/교환/반품 내역</a></li>
+                    <li><a href="{% url 'cart-detail' %}" class="{% if request.resolver_match.url_name == 'cart-detail' %}active{% endif %}">장바구니</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="menu-category">
+            <div class="benefit-category-container">
+                <h4>혜택 관리</h4>
+                <ul>
+                    <li><a href="{% url 'membership:list' %}" class="{% if request.resolver_match.url_name == 'list' and request.resolver_match.namespace == 'membership' %}active{% endif %}">쿠폰/적립금</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="menu-category">
+            <div class="activity-category-container">
+                <h4>활동 내역</h4>
+                <ul>
+                    <li><a href="{% url 'favorite-list' %}" class="{% if request.resolver_match.url_name == 'favorite-list' %}active{% endif %}">찜한 상품</a></li>
+                    <li><a href="#">최근 본 상품</a></li>
+                    <li><a href="#">나의 후기</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
