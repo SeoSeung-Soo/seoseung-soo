@@ -70,3 +70,26 @@ class TestCreateOrderView(TestSetupMixin):
         assert cached["amount"] == 70000
         assert cached["user_id"] == self.customer_user.id
         assert len(cached["items"]) == 1
+
+    def test_create_order_invalid_items(self) -> None:
+        self.client.force_login(self.customer_user)
+
+        payload: Dict[str, Any] = {
+            "items": [
+                {
+                    "product_id": 99999,
+                    "quantity": 1,
+                }
+            ]
+        }
+
+        response = self.client.post(
+            reverse("orders:create"),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 400
+        data = response.json()
+        assert "error" in data
+        assert "존재하지 않는 상품" in data["error"]

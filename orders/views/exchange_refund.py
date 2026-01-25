@@ -34,4 +34,4 @@ class OrderExchangeRefundRequestView(LoginRequiredMixin, View):
         else:
             messages.error(request, message)
         
-        return redirect("orders:status")
+        return redirect("orders:cancel-refund")

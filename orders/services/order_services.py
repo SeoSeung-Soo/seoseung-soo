@@ -2,9 +2,11 @@ import uuid
 from decimal import Decimal
 from typing import Any, Dict, List, Tuple
 
+from django.db.models import QuerySet
 from django.utils import timezone
 
 from config.utils.cache_helper import CacheHelper
+from orders.models import Order
 from products.models import Color, Product
 
 
@@ -95,3 +97,49 @@ class OrderService:
         CacheHelper.set(preorder_key, cache_data, timeout=60 * 15)
 
         return preorder_key
+
+
+class OrderStatisticsService:
+    @staticmethod
+    def calculate_order_stats(orders: QuerySet[Order]) -> Dict[str, int]:
+        return {
+            'preparing': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.PENDING).count(),
+            'shipping': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.SHIPPING).count(),
+            'delivered': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.DELIVERED).count(),
+        }
+
+    @staticmethod
+    def calculate_cancellation_exchange_refund_stats(orders: QuerySet[Order]) -> Dict[str, int]:
+        return {
+            'cancellation': orders.filter(
+                cancellation_request_status__in=[Order.CancellationRequestStatus.PENDING, Order.CancellationRequestStatus.APPROVED]
+            ).count(),
+            'exchange': orders.filter(
+                exchange_refund_request_status__in=[Order.ExchangeRefundRequestStatus.PENDING, Order.ExchangeRefundRequestStatus.APPROVED],
+                exchange_refund_type=Order.ExchangeRefundType.EXCHANGE
+            ).count(),
+            'refund': orders.filter(
+                exchange_refund_request_status__in=[Order.ExchangeRefundRequestStatus.PENDING, Order.ExchangeRefundRequestStatus.APPROVED],
+                exchange_refund_type=Order.ExchangeRefundType.REFUND
+            ).count(),
+        }
+
+    @staticmethod
+    def attach_products_to_orders(orders_list: List[Order]) -> None:
+        all_product_ids: List[int] = []
+        for order in orders_list:
+            order.items_list = list(order.items.all())  # type: ignore[attr-defined]
+            for item in order.items_list:  # type: ignore[attr-defined]
+                if item.product_id not in all_product_ids:
+                    all_product_ids.append(item.product_id)
+
+        products_dict: Dict[int, Product]
+        if all_product_ids:
+            products = Product.objects.filter(id__in=all_product_ids).prefetch_related('image', 'colors')
+            products_dict = {p.id: p for p in products}
+        else:
+            products_dict = {}
+
+        for order in orders_list:
+            for item in order.items_list:  # type: ignore[attr-defined]
+                item.product = products_dict.get(item.product_id)

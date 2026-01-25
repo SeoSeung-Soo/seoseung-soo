@@ -31,4 +31,4 @@ class OrderCancellationRequestView(LoginRequiredMixin, View):
             messages.success(request, message)
         else:
             messages.error(request, message)
-        return redirect("orders:status")
+        return redirect("orders:cancel-refund")

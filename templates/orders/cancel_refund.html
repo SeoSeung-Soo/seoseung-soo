@@ -2,7 +2,7 @@
 {% load static %}
 {% load product_filters %}
 
-{% block title %}주문 현황{% endblock %}
+{% block title %}취소/교환/반품 내역{% endblock %}
 
 {% block style %}
 <link rel="stylesheet" href="{% static 'css/orders/order_mypage.css' %}">
@@ -54,59 +54,85 @@
 
             <div class="recent-orders-section">
                 <div class="section-header">
-                    <h3>배송현황</h3>
+                    <h3>취소/교환/반품 내역</h3>
                 </div>
                 
                 <div class="status-legend">
                     <div class="legend-title">상태 표시</div>
                     <div class="legend-items">
                         <div class="legend-item">
-                            <span class="status-indicator status-pending" title="상품준비중"></span>
-                            <span class="legend-label">상품준비중</span>
+                            <span class="status-indicator status-cancelled" title="거부"></span>
+                            <span class="legend-label">거부</span>
                         </div>
                         <div class="legend-item">
-                            <span class="status-indicator status-shipping" title="배송중"></span>
-                            <span class="legend-label">배송중</span>
+                            <span class="status-indicator status-pending" title="대기중"></span>
+                            <span class="legend-label">대기중</span>
                         </div>
                         <div class="legend-item">
-                            <span class="status-indicator status-active" title="배송완료"></span>
-                            <span class="legend-label">배송완료</span>
+                            <span class="status-indicator status-approved-cancel" title="완료"></span>
+                            <span class="legend-label">완료</span>
                         </div>
                     </div>
                 </div>
                 
-                {% if shipping_orders %}
+                {% if cancellation_exchange_refund_orders %}
                 <div class="orders-list">
-                    {% for order in shipping_orders %}
+                    {% for order in cancellation_exchange_refund_orders %}
                     <div class="order-group">
                         <div class="order-header">
                             <div class="order-header-info">
                                 <span class="order-id">
                                     주문번호: {{ order.order_id }}
-                                    {% if order.shipping_status == 'DELIVERED' %}
-                                    <span class="cancellation-status-text">/ 배송 완료</span>
-                                    {% elif order.shipping_status == 'SHIPPING' %}
-                                    <span class="cancellation-status-text">/ 배송중</span>
-                                    {% else %}
-                                    <span class="cancellation-status-text">/ 상품준비중</span>
+                                    {% if order.cancellation_request_status == 'APPROVED' or order.status == 'CANCELLED' %}
+                                    <span class="cancellation-status-text">/ 취소됨</span>
+                                    {% elif order.cancellation_request_status == 'PENDING' %}
+                                    <span class="cancellation-status-text">/ 취소 요청 중</span>
+                                    {% elif order.exchange_refund_request_status == 'APPROVED' %}
+                                        {% if order.exchange_refund_type == 'EXCHANGE' %}
+                                        <span class="cancellation-status-text">/ 교환 완료</span>
+                                        {% else %}
+                                        <span class="cancellation-status-text">/ 환불 완료</span>
+                                        {% endif %}
+                                    {% elif order.exchange_refund_request_status == 'PENDING' %}
+                                        {% if order.exchange_refund_type == 'EXCHANGE' %}
+                                        <span class="cancellation-status-text">/ 교환 진행중</span>
+                                        {% else %}
+                                        <span class="cancellation-status-text">/ 환불 진행중</span>
+                                        {% endif %}
+                                    {% elif order.exchange_refund_request_status == 'REJECTED' %}
+                                        {% if order.exchange_refund_type == 'EXCHANGE' %}
+                                        <span class="cancellation-status-text">/ 교환 거부</span>
+                                        {% else %}
+                                        <span class="cancellation-status-text">/ 환불 거부</span>
+                                        {% endif %}
                                     {% endif %}
                                 </span>
                                 <span class="order-date">{{ order.created_at|date:"Y년 m월 d일 H:i" }}</span>
                             </div>
                             <div class="order-status-group">
-                                {% if order.shipping_status == "DELIVERED" %}
-                                    <span class="status-indicator status-active" title="배송완료"></span>
-                                {% elif order.shipping_status == "SHIPPING" %}
-                                    <span class="status-indicator status-shipping" title="배송중"></span>
-                                {% else %}
-                                    <span class="status-indicator status-pending" title="상품준비중"></span>
+                                {% if order.cancellation_request_status != 'NONE' %}
+                                    {% if order.cancellation_request_status == 'APPROVED' %}
+                                        <span class="status-indicator status-approved-cancel" title="취소완료"></span>
+                                    {% elif order.cancellation_request_status == 'PENDING' %}
+                                        <span class="status-indicator status-pending" title="취소요청"></span>
+                                    {% else %}
+                                        <span class="status-indicator status-cancelled" title="취소거부"></span>
+                                    {% endif %}
+                                {% elif order.exchange_refund_request_status != 'NONE' %}
+                                    {% if order.exchange_refund_request_status == 'APPROVED' %}
+                                        <span class="status-indicator status-approved-cancel" title="처리완료"></span>
+                                    {% elif order.exchange_refund_request_status == 'PENDING' %}
+                                        <span class="status-indicator status-pending" title="처리중"></span>
+                                    {% else %}
+                                        <span class="status-indicator status-cancelled" title="거부"></span>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </div>
                         
                         <div class="order-items">
                             {% for item in order.items_list %}
-                            <div class="cart-item order-item {% if order.shipping_status == 'DELIVERED' %}delivered-item{% endif %}">
+                            <div class="cart-item order-item {% if order.cancellation_request_status == 'APPROVED' or order.exchange_refund_request_status == 'APPROVED' %}completed-item{% endif %}">
                                 <div class="item-image" onclick="window.location.href='{% url 'products-detail' item.product_name|product_slug %}'" style="cursor: pointer;">
                                     {% if item.product and item.product.image.all %}
                                         <img src="{{ item.product.image.first.image.url }}" alt="{{ item.product_name }}">
@@ -147,10 +173,28 @@
                                 <span class="total-value">{{ order.total_amount|floatformat:0|intcomma }}원</span>
                             </div>
                             <div class="order-actions">
-                                {% if order.shipping_status == "DELIVERED" %}
-                                <button type="button" class="exchange-refund-link" onclick="showExchangeRefundModal({{ order.id }}, '{{ order.order_id }}', {{ order.total_amount }})">교환/환불</button>
-                                {% else %}
-                                <button type="button" class="cancellation-link" onclick="showCancellationModal({{ order.id }}, '{{ order.order_id }}', {{ order.total_amount }})">주문 취소</button>
+                                {% if order.cancellation_request_status == 'PENDING' %}
+                                    <span class="cancellation-status-badge status-pending">취소 요청 중</span>
+                                {% elif order.cancellation_request_status == 'REJECTED' %}
+                                    <span class="cancellation-status-badge status-rejected">취소 거부</span>
+                                {% elif order.exchange_refund_request_status == 'PENDING' %}
+                                    {% if order.exchange_refund_type == 'EXCHANGE' %}
+                                    <span class="cancellation-status-badge status-pending">교환 진행중</span>
+                                    {% else %}
+                                    <span class="cancellation-status-badge status-pending">반품 진행중</span>
+                                    {% endif %}
+                                {% elif order.exchange_refund_request_status == 'APPROVED' %}
+                                    {% if order.exchange_refund_type == 'EXCHANGE' %}
+                                    <span class="cancellation-status-badge status-approved">교환 완료</span>
+                                    {% else %}
+                                    <span class="cancellation-status-badge status-approved">반품 완료</span>
+                                    {% endif %}
+                                {% elif order.exchange_refund_request_status == 'REJECTED' %}
+                                    {% if order.exchange_refund_type == 'EXCHANGE' %}
+                                    <span class="cancellation-status-badge status-rejected">교환 거부</span>
+                                    {% else %}
+                                    <span class="cancellation-status-badge status-rejected">반품 거부</span>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </div>
@@ -159,94 +203,11 @@
                 </div>
                 {% else %}
                 <div class="no-orders">
-                    <p>배송중인 주문이 없습니다.</p>
+                    <p>취소/교환/반품 내역이 없습니다.</p>
                 </div>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
-
-<div id="cancellationModal" class="cancellation-modal">
-    <div class="cancellation-modal-content">
-        <div class="cancellation-modal-header">
-            <h3>주문 취소 요청</h3>
-            <span class="cancellation-modal-close" onclick="closeCancellationModal()">&times;</span>
-        </div>
-        <form method="post" id="cancellationForm" action="">
-            {% csrf_token %}
-            <div class="cancellation-modal-body">
-                <div class="cancellation-order-info">
-                    <p><strong>주문번호:</strong> <span id="cancellationOrderId"></span></p>
-                    <p><strong>주문금액:</strong> <span id="cancellationOrderAmount"></span>원</p>
-                </div>
-                <div class="form-group">
-                    <label for="cancellationReason">취소 사유 <span class="required">*</span></label>
-                    {{ cancellation_form.reason }}
-                    {% if cancellation_form.reason.errors %}
-                        <div class="errorlist">
-                            {% for error in cancellation_form.reason.errors %}
-                                <span class="error">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="cancellation-modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeCancellationModal()">취소</button>
-                <button type="submit" class="btn btn-primary">취소 요청하기</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="exchangeRefundModal" class="cancellation-modal">
-    <div class="cancellation-modal-content">
-        <div class="cancellation-modal-header">
-            <h3>교환/환불 요청</h3>
-            <span class="cancellation-modal-close" onclick="closeExchangeRefundModal()">&times;</span>
-        </div>
-        <form method="post" id="exchangeRefundForm" action="">
-            {% csrf_token %}
-            <div class="cancellation-modal-body">
-                <div class="cancellation-order-info">
-                    <p><strong>주문번호:</strong> <span id="exchangeRefundOrderId"></span></p>
-                    <p><strong>주문금액:</strong> <span id="exchangeRefundOrderAmount"></span>원</p>
-                </div>
-                <div class="form-group">
-                    <label for="exchangeRefundType">교환/환불 유형 <span class="required">*</span></label>
-                    {{ exchange_refund_form.type }}
-                    {% if exchange_refund_form.type.errors %}
-                        <div class="errorlist">
-                            {% for error in exchange_refund_form.type.errors %}
-                                <span class="error">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="exchangeRefundReason">교환/환불 사유 <span class="required">*</span></label>
-                    {{ exchange_refund_form.reason }}
-                    {% if exchange_refund_form.reason.errors %}
-                        <div class="errorlist">
-                            {% for error in exchange_refund_form.reason.errors %}
-                                <span class="error">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="cancellation-modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeExchangeRefundModal()">취소</button>
-                <button type="submit" class="btn btn-primary">교환/환불 요청하기</button>
-            </div>
-        </form>
-    </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script src="{% static 'js/orders/order_mypage.js' %}"></script>
-<script src="{% static 'js/orders/cancellation_modal.js' %}"></script>
-<script src="{% static 'js/orders/exchange_refund_modal.js' %}"></script>
 {% endblock %}
