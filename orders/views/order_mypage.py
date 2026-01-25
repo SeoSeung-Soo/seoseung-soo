@@ -8,7 +8,7 @@ from django.views import View
 from orders.forms.cancellation import OrderCancellationForm
 from orders.forms.exchange_refund import OrderExchangeRefundForm
 from orders.models import Order
-from products.models import Product
+from orders.services.order_services import OrderStatisticsService
 from users.models import User
 
 
@@ -17,25 +17,8 @@ class OrderView(LoginRequiredMixin, View):
         user = cast(User, request.user)
 
         orders = Order.objects.filter(user=user)
-        order_stats = {
-            'preparing': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.PENDING).count(),
-            'shipping': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.SHIPPING).count(),
-            'delivered': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.DELIVERED).count(),
-        }
-
-        cancellation_exchange_refund_stats = {
-            'cancellation': orders.filter(
-                cancellation_request_status__in=[Order.CancellationRequestStatus.PENDING, Order.CancellationRequestStatus.APPROVED]
-            ).count(),
-            'exchange': orders.filter(
-                exchange_refund_request_status__in=[Order.ExchangeRefundRequestStatus.PENDING, Order.ExchangeRefundRequestStatus.APPROVED],
-                exchange_refund_type=Order.ExchangeRefundType.EXCHANGE
-            ).count(),
-            'refund': orders.filter(
-                exchange_refund_request_status__in=[Order.ExchangeRefundRequestStatus.PENDING, Order.ExchangeRefundRequestStatus.APPROVED],
-                exchange_refund_type=Order.ExchangeRefundType.REFUND
-            ).count(),
-        }
+        order_stats = OrderStatisticsService.calculate_order_stats(orders)
+        cancellation_exchange_refund_stats = OrderStatisticsService.calculate_cancellation_exchange_refund_stats(orders)
 
         shipping_orders = orders.filter(
             status=Order.Status.PAID,
@@ -44,22 +27,7 @@ class OrderView(LoginRequiredMixin, View):
             exchange_refund_request_status=Order.ExchangeRefundRequestStatus.NONE
         ).order_by('-created_at').prefetch_related('items__color')[:10]
 
-        all_product_ids = []
-        for order in shipping_orders:
-            order.items_list = list(order.items.all())  # type: ignore[attr-defined]
-            for item in order.items_list:  # type: ignore[attr-defined]
-                if item.product_id not in all_product_ids:
-                    all_product_ids.append(item.product_id)
-
-        if all_product_ids:
-            products = Product.objects.filter(id__in=all_product_ids).prefetch_related('image', 'colors')
-            products_dict = {p.id: p for p in products}
-        else:
-            products_dict = {}
-
-        for order in shipping_orders:
-            for item in order.items_list:  # type: ignore[attr-defined]
-                item.product = products_dict.get(item.product_id)
+        OrderStatisticsService.attach_products_to_orders(list(shipping_orders))
 
         payment_success = request.session.pop('payment_success', False)
         order_id = request.session.pop('order_id', None)
