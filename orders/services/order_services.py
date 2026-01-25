@@ -2,7 +2,7 @@ import uuid
 from decimal import Decimal
 from typing import Any, Dict, List, Tuple
 
-from django.db.models import QuerySet
+from django.db.models import Count, Q, QuerySet
 from django.utils import timezone
 
 from config.utils.cache_helper import CacheHelper
@@ -102,36 +102,35 @@ class OrderService:
 class OrderStatisticsService:
     @staticmethod
     def calculate_order_stats(orders: QuerySet[Order]) -> Dict[str, int]:
-        return {
-            'preparing': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.PENDING).count(),
-            'shipping': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.SHIPPING).count(),
-            'delivered': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.DELIVERED).count(),
-        }
+        return orders.filter(status=Order.Status.PAID).aggregate(
+            preparing=Count('id', filter=Q(shipping_status=Order.ShippingStatus.PENDING)),
+            shipping=Count('id', filter=Q(shipping_status=Order.ShippingStatus.SHIPPING)),
+            delivered=Count('id', filter=Q(shipping_status=Order.ShippingStatus.DELIVERED)),
+        )
 
     @staticmethod
     def calculate_cancellation_exchange_refund_stats(orders: QuerySet[Order]) -> Dict[str, int]:
-        return {
-            'cancellation': orders.filter(
+        return orders.aggregate(
+            cancellation=Count('id', filter=Q(
                 cancellation_request_status__in=[Order.CancellationRequestStatus.PENDING, Order.CancellationRequestStatus.APPROVED]
-            ).count(),
-            'exchange': orders.filter(
+            )),
+            exchange=Count('id', filter=Q(
                 exchange_refund_request_status__in=[Order.ExchangeRefundRequestStatus.PENDING, Order.ExchangeRefundRequestStatus.APPROVED],
                 exchange_refund_type=Order.ExchangeRefundType.EXCHANGE
-            ).count(),
-            'refund': orders.filter(
+            )),
+            refund=Count('id', filter=Q(
                 exchange_refund_request_status__in=[Order.ExchangeRefundRequestStatus.PENDING, Order.ExchangeRefundRequestStatus.APPROVED],
                 exchange_refund_type=Order.ExchangeRefundType.REFUND
-            ).count(),
-        }
+            )),
+        )
 
     @staticmethod
     def attach_products_to_orders(orders_list: List[Order]) -> None:
-        all_product_ids: List[int] = []
+        all_product_ids: set[int] = set()
         for order in orders_list:
             order.items_list = list(order.items.all())  # type: ignore[attr-defined]
             for item in order.items_list:  # type: ignore[attr-defined]
-                if item.product_id not in all_product_ids:
-                    all_product_ids.append(item.product_id)
+                all_product_ids.add(item.product_id)
 
         products_dict: Dict[int, Product]
         if all_product_ids:
