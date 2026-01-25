@@ -334,3 +334,19 @@ class TestAdminExchangeRefundProcessView(TestSetupMixin):
         })
         
         assert response.status_code == 403
+
+    def test_process_exchange_refund_error_message(self) -> None:
+        self.order.exchange_refund_request_status = "APPROVED"
+        self.order.save()
+        self.client.force_login(self.admin_user)
+        url = reverse("orders:admin-exchange-refund-process", kwargs={"order_id": self.order.id})
+        
+        response = self.client.post(url, {
+            "action": "approve",
+            "admin_note": "",
+        }, follow=True)
+        
+        assert response.status_code == 200
+        messages_list = list(get_messages(response.wsgi_request))
+        assert len(messages_list) > 0
+        assert any("처리할 수 없는" in str(msg) for msg in messages_list)

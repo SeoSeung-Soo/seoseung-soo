@@ -1,7 +1,7 @@
 import pytest
 
 from config.utils.setup_test_method import TestSetupMixin
-from orders.models import Order, OrderItem
+from orders.models import OrderItem
 
 
 @pytest.mark.django_db

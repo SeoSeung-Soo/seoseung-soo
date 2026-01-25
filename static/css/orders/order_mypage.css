@@ -125,7 +125,7 @@
 
 .order-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
 }
 
@@ -149,30 +149,9 @@
 }
 
 .benefits-stats {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 10px 0;
-}
-
-.benefit-item {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-a.benefit-label {
-    font-size: 14px;
-    color: #666;
-    text-decoration: none;
-}
-
-.benefit-value {
-    text-decoration: none;
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
 }
 
 .order-table {
@@ -310,6 +289,16 @@ a.benefit-label {
     box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
 }
 
+.status-cancelled {
+    background-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.status-approved-cancel {
+    background-color: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
 .status-legend {
     background: #f8f9fa;
     border: 1px solid #e9e9e9;
@@ -377,6 +366,20 @@ a.benefit-label {
 .delivered-item .item-price,
 .delivered-item .quantity-display,
 .delivered-item .total-price {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+
+.completed-item {
+    background-color: rgba(245, 245, 245, 0.3);
+    position: relative;
+}
+
+.completed-item .item-image img,
+.completed-item .item-name,
+.completed-item .item-price,
+.completed-item .quantity-display,
+.completed-item .total-price {
     filter: grayscale(100%);
     opacity: 0.3;
 }
@@ -622,7 +625,7 @@ a.benefit-label {
     }
 
     .order-stats {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 8px;
     }
 
@@ -639,20 +642,8 @@ a.benefit-label {
     }
 
     .benefits-stats {
-        justify-content: space-around;
-        padding: 15px 0;
-    }
-
-    .benefit-item {
-        gap: 6px;
-    }
-
-    a.benefit-label {
-        font-size: 12px;
-    }
-
-    .benefit-value {
-        font-size: 18px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
     }
 
     .table-header {
@@ -732,7 +723,7 @@ a.benefit-label {
         padding: 12px;
     }
     .order-stats {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 6px;
     }
     .stat-box {
@@ -745,12 +736,7 @@ a.benefit-label {
         font-size: 11px;
     }
     .benefits-stats {
-        padding: 12px 0;
-    }
-    a.benefit-label {
-        font-size: 11px;
-    }
-    .benefit-value {
-        font-size: 16px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
     }
 }

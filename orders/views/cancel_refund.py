@@ -5,18 +5,17 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views import View
 
-from orders.forms.cancellation import OrderCancellationForm
-from orders.forms.exchange_refund import OrderExchangeRefundForm
 from orders.models import Order
 from products.models import Product
 from users.models import User
 
 
-class OrderView(LoginRequiredMixin, View):
+class CancelRefundView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest) -> HttpResponse:
         user = cast(User, request.user)
 
         orders = Order.objects.filter(user=user)
+
         order_stats = {
             'preparing': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.PENDING).count(),
             'shipping': orders.filter(status=Order.Status.PAID, shipping_status=Order.ShippingStatus.SHIPPING).count(),
@@ -37,15 +36,15 @@ class OrderView(LoginRequiredMixin, View):
             ).count(),
         }
 
-        shipping_orders = orders.filter(
-            status=Order.Status.PAID,
-            shipping_status__in=[Order.ShippingStatus.PENDING, Order.ShippingStatus.SHIPPING, Order.ShippingStatus.DELIVERED],
-            cancellation_request_status=Order.CancellationRequestStatus.NONE,
-            exchange_refund_request_status=Order.ExchangeRefundRequestStatus.NONE
-        ).order_by('-created_at').prefetch_related('items__color')[:10]
+        cancellation_exchange_refund_orders = orders.filter(
+            cancellation_request_status__in=[Order.CancellationRequestStatus.PENDING, Order.CancellationRequestStatus.APPROVED, Order.CancellationRequestStatus.REJECTED]
+        ) | orders.filter(
+            exchange_refund_request_status__in=[Order.ExchangeRefundRequestStatus.PENDING, Order.ExchangeRefundRequestStatus.APPROVED, Order.ExchangeRefundRequestStatus.REJECTED]
+        )
+        cancellation_exchange_refund_orders = cancellation_exchange_refund_orders.distinct().order_by('-created_at').prefetch_related('items__color')[:10]
 
         all_product_ids = []
-        for order in shipping_orders:
+        for order in cancellation_exchange_refund_orders:
             order.items_list = list(order.items.all())  # type: ignore[attr-defined]
             for item in order.items_list:  # type: ignore[attr-defined]
                 if item.product_id not in all_product_ids:
@@ -57,28 +56,16 @@ class OrderView(LoginRequiredMixin, View):
         else:
             products_dict = {}
 
-        for order in shipping_orders:
+        for order in cancellation_exchange_refund_orders:
             for item in order.items_list:  # type: ignore[attr-defined]
                 item.product = products_dict.get(item.product_id)
 
-        payment_success = request.session.pop('payment_success', False)
-        order_id = request.session.pop('order_id', None)
-
-        cancellation_form = OrderCancellationForm()
-        exchange_refund_form = OrderExchangeRefundForm()
-        
         context = {
             'user': user,
             'order_stats': order_stats,
             'cancellation_exchange_refund_stats': cancellation_exchange_refund_stats,
-            'shipping_orders': shipping_orders,
+            'cancellation_exchange_refund_orders': cancellation_exchange_refund_orders,
             'current_page': 'orders',
-            'payment_success': payment_success,
-            'order_id': order_id,
-            'cancellation_form': cancellation_form,
-            'exchange_refund_form': exchange_refund_form,
         }
 
-        return render(request, "orders/order_mypage.html", context)
-
-
+        return render(request, "orders/cancel_refund.html", context)
