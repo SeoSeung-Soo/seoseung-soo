@@ -100,7 +100,7 @@ class TestCancelRefundView(TestSetupMixin):
         self.order.cancellation_request_status = Order.CancellationRequestStatus.PENDING
         self.order.save()
         
-        order_item = OrderItem.objects.create(
+        OrderItem.objects.create(
             order=self.order,
             product_id=self.product.id,
             product_name=self.product.name,
