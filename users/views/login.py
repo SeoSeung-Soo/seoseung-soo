@@ -15,20 +15,24 @@ class LoginView(View):
         user = cast(User, request.user)
         if user.is_authenticated:
             return redirect('home')
+        next_url = request.GET.get("next", "")
         form = LoginForm()
         context = {
             'form': form,
             'google_client_id': settings.GOOGLE_OAUTH2_CLIENT_ID,
-            'kakao_rest_api_key': settings.KAKAO_REST_API_KEY
+            'kakao_rest_api_key': settings.KAKAO_REST_API_KEY,
+            'next': next_url,
         }
         return render(request, 'users/login.html', context)
 
     def post(self, request: HttpRequest) -> HttpResponse:
         form = LoginForm(request.POST)
+        next_url = request.POST.get("next") or request.GET.get("next")
         context = {
             'form': form,
             'google_client_id': settings.GOOGLE_OAUTH2_CLIENT_ID,
-            'kakao_rest_api_key': settings.KAKAO_REST_API_KEY
+            'kakao_rest_api_key': settings.KAKAO_REST_API_KEY,
+            'next': next_url or "",
         }
         if form.is_valid():
             # 실제 로그인 로직 추가
@@ -38,7 +42,9 @@ class LoginView(View):
 
             if user is not None:
                 login(request, user)
-                return redirect('home')  # URL name 사용
+                if next_url:
+                    return redirect(next_url)
+                return redirect('home')
             else:
                 form.add_error(None, '유효하지 않은 사용자명 또는 비밀번호입니다.')
 
