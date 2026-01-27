@@ -16,6 +16,8 @@ class LoginView(View):
         if user.is_authenticated:
             return redirect('home')
         next_url = request.GET.get("next", "")
+        if next_url:
+            request.session["login_next"] = next_url
         form = LoginForm()
         context = {
             'form': form,
