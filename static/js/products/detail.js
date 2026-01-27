@@ -477,8 +477,105 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    const buyNowButton = document.getElementById('buyNowButton');
+    if (buyNowButton) {
+        buyNowButton.addEventListener('click', function () {
+            handleImmediatePurchase(false);
+        });
+    }
+    
+    const drawerBuyBtn = document.getElementById('drawerBuyBtn');
+    if (drawerBuyBtn) {
+        drawerBuyBtn.addEventListener('click', function () {
+            handleImmediatePurchase(true);
+        });
+    }
 });
 
-function handleDrawerBuy() {
-    alert('구매하기 기능은 준비중입니다.');
+function getCsrfToken() {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='));
+    return cookieValue ? cookieValue.split('=')[1] : '';
+}
+
+function handleImmediatePurchase(isMobileDrawer) {
+    const csrfTokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    const csrftoken = csrfTokenInput ? csrfTokenInput.value : getCsrfToken();
+
+    if (!csrftoken) {
+        window.location.href = '/login/';
+        return;
+    }
+
+    const productIdElement = document.getElementById('buyNowButton');
+    if (!productIdElement) {
+        alert('상품 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    const productId = parseInt(productIdElement.dataset.productId || '0', 10);
+    if (!productId) {
+        alert('상품 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    let quantity = 1;
+    let colorId = null;
+
+    const quantityDisplay = document.getElementById(isMobileDrawer ? 'drawerQuantityDisplay' : 'quantityDisplay');
+    if (quantityDisplay) {
+        quantity = parseInt(quantityDisplay.textContent || '1', 10);
+    }
+
+    const hiddenColorInput = document.getElementById(isMobileDrawer ? 'drawerSelectedColorId' : 'selectedColorId');
+    if (hiddenColorInput && hiddenColorInput.value) {
+        colorId = parseInt(hiddenColorInput.value, 10);
+    }
+
+    const items = [
+        {
+            product_id: productId,
+            quantity: quantity,
+            color_id: colorId,
+        },
+    ];
+
+    fetch('/orders/preorder/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({ items }),
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().catch(() => null).then(data => {
+                    const message = data && data.message ? data.message : '주문 처리 중 오류가 발생했습니다.';
+                    throw new Error(message);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.redirectUrl) {
+                window.location.href = data.redirectUrl;
+            } else {
+                const message = data.message || '주문 처리 중 오류가 발생했습니다.';
+                if (typeof toast !== 'undefined') {
+                    toast.error(message, '오류');
+                } else {
+                    alert(message);
+                }
+            }
+        })
+        .catch(error => {
+            if (typeof toast !== 'undefined') {
+                toast.error(error.message || '주문 처리 중 오류가 발생했습니다.', '오류');
+            } else {
+                alert(error.message || '주문 처리 중 오류가 발생했습니다.');
+            }
+        });
 }

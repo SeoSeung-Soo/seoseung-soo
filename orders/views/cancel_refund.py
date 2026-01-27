@@ -1,9 +1,9 @@
 from typing import cast
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.db.models import Q
 from django.views import View
 
 from orders.models import Order

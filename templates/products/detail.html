@@ -79,7 +79,13 @@
             <div class="product-actions">
                 {% if products.is_live and not products.is_sold %}
                     <div class="primary-action">
-                        <button class="btn btn-primary btn-large">즉시 구매</button>
+                        <button
+                            class="btn btn-primary btn-large"
+                            id="buyNowButton"
+                            data-product-id="{{ products.id }}"
+                        >
+                            즉시 구매
+                        </button>
                     </div>
                     <div class="secondary-actions">
                         {% if user.is_authenticated %}
