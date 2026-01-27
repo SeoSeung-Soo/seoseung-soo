@@ -523,24 +523,14 @@ function handleImmediatePurchase(isMobileDrawer) {
     let quantity = 1;
     let colorId = null;
 
-    if (isMobileDrawer) {
-        const drawerQuantityDisplay = document.getElementById('drawerQuantityDisplay');
-        if (drawerQuantityDisplay) {
-            quantity = parseInt(drawerQuantityDisplay.textContent || '1', 10);
-        }
-        const drawerHiddenColorInput = document.getElementById('drawerSelectedColorId');
-        if (drawerHiddenColorInput && drawerHiddenColorInput.value) {
-            colorId = parseInt(drawerHiddenColorInput.value, 10);
-        }
-    } else {
-        const quantityDisplay = document.getElementById('quantityDisplay');
-        if (quantityDisplay) {
-            quantity = parseInt(quantityDisplay.textContent || '1', 10);
-        }
-        const hiddenColorInput = document.getElementById('selectedColorId');
-        if (hiddenColorInput && hiddenColorInput.value) {
-            colorId = parseInt(hiddenColorInput.value, 10);
-        }
+    const quantityDisplay = document.getElementById(isMobileDrawer ? 'drawerQuantityDisplay' : 'quantityDisplay');
+    if (quantityDisplay) {
+        quantity = parseInt(quantityDisplay.textContent || '1', 10);
+    }
+
+    const hiddenColorInput = document.getElementById(isMobileDrawer ? 'drawerSelectedColorId' : 'selectedColorId');
+    if (hiddenColorInput && hiddenColorInput.value) {
+        colorId = parseInt(hiddenColorInput.value, 10);
     }
 
     const items = [
