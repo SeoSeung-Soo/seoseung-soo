@@ -60,13 +60,15 @@
             </div>
             
             <div class="size-quantity-section" data-product-stock="{{ products.stock }}">
+                {% if products.sizes.exists %}
                 <div class="size-selection">
                     <div class="size-options">
-                        <button class="size-btn" data-size="S">S</button>
-                        <button class="size-btn" data-size="M">M</button>
-                        <button class="size-btn" data-size="L">L</button>
+                        {% for size in products.sizes.all %}
+                        <button type="button" class="size-btn{% if forloop.first %} active{% endif %}" data-size="{{ size.name }}" data-size-id="{{ size.id }}">{{ size.name }}</button>
+                        {% endfor %}
                     </div>
                 </div>
+                {% endif %}
                 <div class="quantity-selection">
                     <div class="quantity-controls">
                         <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
@@ -99,6 +101,11 @@
                                 <input type="hidden" name="color_id" id="selectedColorId" value="{{ products.colors.first.id }}">
                                 {% else %}
                                 <input type="hidden" name="color_id" id="selectedColorId" value="">
+                                {% endif %}
+                                {% if products.sizes.first %}
+                                <input type="hidden" name="size_id" id="selectedSizeId" value="{{ products.sizes.first.id }}">
+                                {% else %}
+                                <input type="hidden" name="size_id" id="selectedSizeId" value="">
                                 {% endif %}
                                 <button type="submit" class="btn btn-secondary">장바구니 담기</button>
                             </form>
@@ -417,14 +424,16 @@
                 </div>
             </div>
             <div class="drawer-options-row">
+                {% if products.sizes.exists %}
                 <div class="drawer-size-section">
                     <h5>사이즈</h5>
                     <div class="drawer-size-options">
-                        <button class="drawer-size-btn active" data-size="S">S</button>
-                        <button class="drawer-size-btn" data-size="M">M</button>
-                        <button class="drawer-size-btn" data-size="L">L</button>
+                        {% for size in products.sizes.all %}
+                        <button type="button" class="drawer-size-btn{% if forloop.first %} active{% endif %}" data-size="{{ size.name }}" data-size-id="{{ size.id }}">{{ size.name }}</button>
+                        {% endfor %}
                     </div>
                 </div>
+                {% endif %}
                 
                 <div class="drawer-quantity-section">
                     <h5>수량</h5>
@@ -450,6 +459,11 @@
                             <input type="hidden" name="color_id" id="drawerSelectedColorId" value="{{ products.colors.first.id }}">
                             {% else %}
                             <input type="hidden" name="color_id" id="drawerSelectedColorId" value="">
+                            {% endif %}
+                            {% if products.sizes.first %}
+                            <input type="hidden" name="size_id" id="drawerSelectedSizeId" value="{{ products.sizes.first.id }}">
+                            {% else %}
+                            <input type="hidden" name="size_id" id="drawerSelectedSizeId" value="">
                             {% endif %}
                             <button type="submit" class="drawer-btn drawer-btn-secondary">장바구니</button>
                         </form>

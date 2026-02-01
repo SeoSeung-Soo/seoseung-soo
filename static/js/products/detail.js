@@ -378,20 +378,29 @@ function updateDrawerQuantity() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const colorOptionBtns = document.querySelectorAll('.color-option-btn');
-    const hiddenColorInput = document.getElementById('selectedColorId');
-    colorOptionBtns.forEach(btn => {
+function setupOptionButtons(btnSelector, inputId, datasetKey) {
+    const buttons = document.querySelectorAll(btnSelector);
+    const input = document.getElementById(inputId);
+    if (!buttons.length || !input) return;
+
+    buttons.forEach(btn => {
         btn.addEventListener('click', function() {
-            colorOptionBtns.forEach(b => b.classList.remove('active'));
+            buttons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            const selectedColor = this.dataset.color;
-            if (hiddenColorInput) {
-                hiddenColorInput.value = selectedColor || '';
+            const value = this.dataset[datasetKey];
+            if (value) {
+                input.value = value;
             }
         });
     });
-    
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupOptionButtons('.color-option-btn', 'selectedColorId', 'color');
+    setupOptionButtons('.drawer-color-option-btn', 'drawerSelectedColorId', 'color');
+    setupOptionButtons('.size-btn', 'selectedSizeId', 'sizeId');
+    setupOptionButtons('.drawer-size-btn', 'drawerSelectedSizeId', 'sizeId');
+
     const mobileFabBtn = document.getElementById('mobileFabBtn');
     const drawerOverlay = document.getElementById('drawerOverlay');
     const drawerClose = document.getElementById('drawerClose');
@@ -407,33 +416,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (drawerClose) {
         drawerClose.addEventListener('click', closeMobileDrawer);
     }
-    
-    const drawerSizeBtns = document.querySelectorAll('.drawer-size-btn');
-    drawerSizeBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            drawerSizeBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-    
-    const drawerColorBtns = document.querySelectorAll('.drawer-color-option-btn');
-    const drawerHiddenColorInput = document.getElementById('drawerSelectedColorId');
-    drawerColorBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            drawerColorBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const selectedColor = this.dataset.color;
-            if (drawerHiddenColorInput) {
-                drawerHiddenColorInput.value = selectedColor || '';
-            }
-        });
-    });
-    
+
     const drawerCartForm = document.querySelector('.drawer-cart-form');
     if (drawerCartForm) {
         drawerCartForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
+            const drawerCartQuantity = document.getElementById('drawerCartQuantity');
+            const drawerQuantityDisplay = document.getElementById('drawerQuantityDisplay');
+            if (drawerCartQuantity && drawerQuantityDisplay) {
+                drawerCartQuantity.value = drawerQuantityDisplay.textContent || '1';
+            }
+
             const formData = new FormData(drawerCartForm);
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             
@@ -531,6 +525,7 @@ function handleImmediatePurchase(isMobileDrawer) {
 
     let quantity = 1;
     let colorId = null;
+    let sizeId = null;
 
     if (isMobileDrawer) {
         const drawerQuantityDisplay = document.getElementById('drawerQuantityDisplay');
@@ -541,6 +536,10 @@ function handleImmediatePurchase(isMobileDrawer) {
         if (drawerHiddenColorInput && drawerHiddenColorInput.value) {
             colorId = parseInt(drawerHiddenColorInput.value, 10);
         }
+        const drawerHiddenSizeInput = document.getElementById('drawerSelectedSizeId');
+        if (drawerHiddenSizeInput && drawerHiddenSizeInput.value) {
+            sizeId = parseInt(drawerHiddenSizeInput.value, 10);
+        }
     } else {
         const quantityDisplay = document.getElementById('quantityDisplay');
         if (quantityDisplay) {
@@ -550,6 +549,10 @@ function handleImmediatePurchase(isMobileDrawer) {
         if (hiddenColorInput && hiddenColorInput.value) {
             colorId = parseInt(hiddenColorInput.value, 10);
         }
+        const hiddenSizeInput = document.getElementById('selectedSizeId');
+        if (hiddenSizeInput && hiddenSizeInput.value) {
+            sizeId = parseInt(hiddenSizeInput.value, 10);
+        }
     }
 
     const items = [
@@ -557,6 +560,7 @@ function handleImmediatePurchase(isMobileDrawer) {
             product_id: productId,
             quantity: quantity,
             color_id: colorId,
+            size_id: sizeId,
         },
     ];
 

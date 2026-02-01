@@ -10,8 +10,9 @@ from django.utils import timezone
 
 from carts.models import Cart
 from orders.models import Order, OrderItem
+from orders.services.order_services import OrderService
 from payments.models import Payment, PaymentLog
-from products.models import Color
+from products.models import Color, Size
 
 TOSS_API_BASE = os.getenv("TOSS_API_BASE")
 
@@ -157,16 +158,16 @@ class TossPaymentService:
                 status="PENDING",
             )
 
-            color_ids = [item["color_id"] for item in items_data if item.get("color_id")]
-            colors_map = {color.id: color for color in Color.objects.filter(id__in=color_ids)} if color_ids else {}
+            colors_map = OrderService.get_options_map(items_data, "color_id", Color)
+            sizes_map = OrderService.get_options_map(items_data, "size_id", Size)
 
             order_items = []
             for item_data in items_data:
                 color_id = item_data.get("color_id")
-                color = None
-                if color_id and isinstance(color_id, int):
-                    color = colors_map.get(color_id)
-                
+                size_id = item_data.get("size_id")
+                color = colors_map.get(color_id) if color_id and isinstance(color_id, int) else None
+                size = sizes_map.get(size_id) if size_id and isinstance(size_id, int) else None
+
                 order_items.append(
                     OrderItem(
                         order=order,
@@ -176,6 +177,7 @@ class TossPaymentService:
                         unit_price=item_data["unit_price"],
                         subtotal=item_data["quantity"] * item_data["unit_price"],
                         color=color,
+                        size=size,
                     )
                 )
             OrderItem.objects.bulk_create(order_items)
@@ -217,11 +219,11 @@ class TossPaymentService:
         all_cart_items = Cart.objects.filter(
             user=user,
             product_id__in=product_ids
-        ).select_related('color').order_by('id')
+        ).select_related('color', 'size').order_by('id')
 
-        cart_items_by_key: Dict[tuple[int, int | None], List[Cart]] = {}
+        cart_items_by_key: Dict[tuple[int, int | None, int | None], List[Cart]] = {}
         for cart_item in all_cart_items:
-            key = (cart_item.product_id, cart_item.color_id)
+            key = (cart_item.product_id, cart_item.color_id, cart_item.size_id)
             if key not in cart_items_by_key:
                 cart_items_by_key[key] = []
             cart_items_by_key[key].append(cart_item)
@@ -232,12 +234,13 @@ class TossPaymentService:
         for item_data in items_data:
             product_id = item_data.get("product_id")
             color_id = item_data.get("color_id")
+            size_id = item_data.get("size_id")
             order_quantity = item_data.get("quantity", 1)
 
             if product_id is None:
                 continue
 
-            key = (product_id, color_id)
+            key = (product_id, color_id, size_id)
             cart_items = cart_items_by_key.get(key, [])
 
             if not cart_items:
