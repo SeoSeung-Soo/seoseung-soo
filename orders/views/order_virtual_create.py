@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_protect
 from orders.models import Order, OrderItem
 from orders.services.order_services import OrderService
 from payments.services.toss_payment_service import TossPaymentService
-from products.models import Color
+from products.models import Color, Size
 from users.models import User
 
 
@@ -49,12 +49,17 @@ class OrderCreateVirtualView(LoginRequiredMixin, View):
             )
 
             color_ids = [item["color_id"] for item in validated_items if item.get("color_id")]
-            colors_map = {color.id: color for color in Color.objects.filter(id__in=color_ids)}
+            colors_map = {c.id: c for c in Color.objects.filter(id__in=color_ids)} if color_ids else {}
+
+            size_ids = [item["size_id"] for item in validated_items if item.get("size_id")]
+            sizes_map = {s.id: s for s in Size.objects.filter(id__in=size_ids)} if size_ids else {}
 
             order_items = []
             for item in validated_items:
                 color_id = item.get("color_id")
+                size_id = item.get("size_id")
                 color = colors_map.get(color_id) if isinstance(color_id, int) else None
+                size = sizes_map.get(size_id) if isinstance(size_id, int) else None
                 order_items.append(
                     OrderItem(
                         order=order,
@@ -64,6 +69,7 @@ class OrderCreateVirtualView(LoginRequiredMixin, View):
                         unit_price=int(item["unit_price"]),
                         subtotal=int(item["quantity"]) * int(item["unit_price"]),
                         color=color,
+                        size=size,
                     )
                 )
 

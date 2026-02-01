@@ -288,6 +288,17 @@
   font-size: 12px;
 }
 
+.order-item-size-label,
+.order-item-size-name {
+  color: #374151;
+  font-size: 12px;
+}
+
+.order-item-size-label {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
 .order-item-quantity {
   color: #374151;
   font-weight: 500;

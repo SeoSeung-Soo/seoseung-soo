@@ -3,7 +3,7 @@ from typing import Any
 from django.conf import settings
 from django.db import models
 
-from products.models import Color
+from products.models import Color, Size
 
 
 class Order(models.Model):
@@ -90,7 +90,7 @@ class OrderItem(models.Model):
     unit_price = models.PositiveIntegerField()
     subtotal = models.PositiveIntegerField()
     color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True, blank=True)
-
+    size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True, blank=True)    
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args: Any, **kwargs: Any) -> None:

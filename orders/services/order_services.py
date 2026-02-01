@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from config.utils.cache_helper import CacheHelper
 from orders.models import Order
-from products.models import Color, Product
+from products.models import Color, Product, Size
 
 
 class OrderService:
@@ -17,7 +17,7 @@ class OrderService:
 
     @staticmethod
     def validate_products(product_ids: List[int]) -> Tuple[bool, str, Dict[int, Product]]:
-        products = Product.objects.filter(id__in=product_ids).prefetch_related('colors')
+        products = Product.objects.filter(id__in=product_ids).prefetch_related('colors', 'sizes')
         product_map = {p.id: p for p in products}
 
         if len(product_ids) != len(product_map):
@@ -32,6 +32,16 @@ class OrderService:
 
         if not product.colors.filter(id=color_id).exists():
             return False, f"'{product.name}' 상품에 선택하신 색상이 존재하지 않습니다."
+
+        return True, ""
+
+    @staticmethod
+    def validate_size(size_id: int, product: Product) -> Tuple[bool, str]:
+        if not Size.objects.filter(id=size_id).exists():
+            return False, "존재하지 않는 사이즈입니다."
+
+        if not product.sizes.filter(id=size_id).exists():
+            return False, f"'{product.name}' 상품에 선택하신 사이즈가 존재하지 않습니다."
 
         return True, ""
 
@@ -61,9 +71,15 @@ class OrderService:
             product_id = item["product_id"]
             product = product_map[product_id]
             color_id = item.get("color_id")
+            size_id = item.get("size_id")
 
             if color_id:
                 is_valid, error_message = OrderService.validate_color(color_id, product)
+                if not is_valid:
+                    return False, error_message, [], Decimal("0.0")
+
+            if size_id:
+                is_valid, error_message = OrderService.validate_size(size_id, product)
                 if not is_valid:
                     return False, error_message, [], Decimal("0.0")
 
@@ -78,6 +94,7 @@ class OrderService:
                 "quantity": quantity,
                 "unit_price": int(price),
                 "color_id": color_id,
+                "size_id": size_id,
             })
 
         return True, "", validated_items, total_amount

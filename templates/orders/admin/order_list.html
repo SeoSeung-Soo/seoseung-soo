@@ -103,6 +103,10 @@
                                                 <span class="order-item-color-swatch" style="background-color: {% if item.color.hex_code %}{{ item.color.hex_code }}{% else %}#e5e7eb{% endif %};" title="{{ item.color.name }}"></span>
                                                 <span class="order-item-color-name">{{ item.color.name }}</span>
                                                 {% endif %}
+                                                {% if item.size %}
+                                                <span class="order-item-size-label">사이즈:</span>
+                                                <span class="order-item-size-name">{{ item.size.name }}</span>
+                                                {% endif %}
                                                 <span class="order-item-quantity-label">수량:</span>
                                                 <span class="order-item-quantity">{{ item.quantity }}개</span>
                                             </div>

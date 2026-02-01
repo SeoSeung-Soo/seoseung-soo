@@ -409,10 +409,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     const drawerSizeBtns = document.querySelectorAll('.drawer-size-btn');
+    const drawerSizeInput = document.getElementById('drawerSelectedSizeId');
     drawerSizeBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             drawerSizeBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
+            const sizeId = this.dataset.sizeId;
+            if (drawerSizeInput && sizeId) {
+                drawerSizeInput.value = sizeId;
+            }
+        });
+    });
+
+    const sizeBtns = document.querySelectorAll('.size-btn');
+    const sizeInput = document.getElementById('selectedSizeId');
+    sizeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            sizeBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const sizeId = this.dataset.sizeId;
+            if (sizeInput && sizeId) {
+                sizeInput.value = sizeId;
+            }
         });
     });
     
@@ -433,7 +451,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (drawerCartForm) {
         drawerCartForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
+            const drawerCartQuantity = document.getElementById('drawerCartQuantity');
+            const drawerQuantityDisplay = document.getElementById('drawerQuantityDisplay');
+            if (drawerCartQuantity && drawerQuantityDisplay) {
+                drawerCartQuantity.value = drawerQuantityDisplay.textContent || '1';
+            }
+
             const formData = new FormData(drawerCartForm);
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             
@@ -531,6 +555,7 @@ function handleImmediatePurchase(isMobileDrawer) {
 
     let quantity = 1;
     let colorId = null;
+    let sizeId = null;
 
     if (isMobileDrawer) {
         const drawerQuantityDisplay = document.getElementById('drawerQuantityDisplay');
@@ -541,6 +566,10 @@ function handleImmediatePurchase(isMobileDrawer) {
         if (drawerHiddenColorInput && drawerHiddenColorInput.value) {
             colorId = parseInt(drawerHiddenColorInput.value, 10);
         }
+        const drawerHiddenSizeInput = document.getElementById('drawerSelectedSizeId');
+        if (drawerHiddenSizeInput && drawerHiddenSizeInput.value) {
+            sizeId = parseInt(drawerHiddenSizeInput.value, 10);
+        }
     } else {
         const quantityDisplay = document.getElementById('quantityDisplay');
         if (quantityDisplay) {
@@ -550,6 +579,10 @@ function handleImmediatePurchase(isMobileDrawer) {
         if (hiddenColorInput && hiddenColorInput.value) {
             colorId = parseInt(hiddenColorInput.value, 10);
         }
+        const hiddenSizeInput = document.getElementById('selectedSizeId');
+        if (hiddenSizeInput && hiddenSizeInput.value) {
+            sizeId = parseInt(hiddenSizeInput.value, 10);
+        }
     }
 
     const items = [
@@ -557,6 +590,7 @@ function handleImmediatePurchase(isMobileDrawer) {
             product_id: productId,
             quantity: quantity,
             color_id: colorId,
+            size_id: sizeId,
         },
     ];
 
