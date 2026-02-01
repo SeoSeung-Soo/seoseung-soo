@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from carts.models import Cart
 from orders.models import Order, OrderItem
+from orders.services.order_services import OrderService
 from payments.models import Payment, PaymentLog
 from products.models import Color, Size
 
@@ -157,11 +158,8 @@ class TossPaymentService:
                 status="PENDING",
             )
 
-            color_ids = [item["color_id"] for item in items_data if item.get("color_id")]
-            colors_map = {c.id: c for c in Color.objects.filter(id__in=color_ids)} if color_ids else {}
-
-            size_ids = [item["size_id"] for item in items_data if item.get("size_id")]
-            sizes_map = {s.id: s for s in Size.objects.filter(id__in=size_ids)} if size_ids else {}
+            colors_map = OrderService.get_options_map(items_data, "color_id", Color)
+            sizes_map = OrderService.get_options_map(items_data, "size_id", Size)
 
             order_items = []
             for item_data in items_data:

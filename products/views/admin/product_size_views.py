@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
@@ -9,14 +11,15 @@ from users.utils.permission import AdminPermission
 
 
 class AdminProductSizeView(AdminPermission, View):
-    def get(self, request: HttpRequest) -> HttpResponse:
-        sizes = SizeService.get_all_sizes()
-        form = ProductSizeForm()
-        context = {
+    def _get_context(self, form: ProductSizeForm) -> dict[str, Any]:
+        return {
             "form": form,
-            "sizes": sizes,
+            "sizes": SizeService.get_all_sizes(),
             "title": "사이즈 관리",
         }
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        context = self._get_context(ProductSizeForm())
         return render(request, "products/admin/admin_product_size.html", context)
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -24,26 +27,23 @@ class AdminProductSizeView(AdminPermission, View):
         if form.is_valid():
             form.save()
             return redirect("admin-product-size")
-        sizes = SizeService.get_all_sizes()
-        context = {
-            "form": form,
-            "sizes": sizes,
-            "title": "사이즈 관리",
-        }
+        context = self._get_context(form)
         return render(request, "products/admin/admin_product_size.html", context)
 
 
 class AdminSizeUpdateView(AdminPermission, View):
-    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
-        size = get_object_or_404(Size, pk=pk)
-        form = ProductSizeForm(instance=size)
-        sizes = SizeService.get_all_sizes()
-        context = {
+    def _get_context(self, form: ProductSizeForm, size: Size) -> dict[str, Any]:
+        return {
             "form": form,
-            "sizes": sizes,
+            "sizes": SizeService.get_all_sizes(),
             "size": size,
             "title": "사이즈 수정",
         }
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        size = get_object_or_404(Size, pk=pk)
+        form = ProductSizeForm(instance=size)
+        context = self._get_context(form, size)
         return render(request, "products/admin/admin_product_size.html", context)
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
@@ -52,13 +52,7 @@ class AdminSizeUpdateView(AdminPermission, View):
         if form.is_valid():
             form.save()
             return redirect("admin-product-size")
-        sizes = SizeService.get_all_sizes()
-        context = {
-            "form": form,
-            "sizes": sizes,
-            "size": size,
-            "title": "사이즈 수정",
-        }
+        context = self._get_context(form, size)
         return render(request, "products/admin/admin_product_size.html", context)
 
 

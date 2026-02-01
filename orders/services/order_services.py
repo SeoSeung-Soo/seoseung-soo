@@ -2,7 +2,7 @@ import uuid
 from decimal import Decimal
 from typing import Any, Dict, List, Tuple
 
-from django.db.models import Count, Q, QuerySet
+from django.db.models import Count, Model, Q, QuerySet
 from django.utils import timezone
 
 from config.utils.cache_helper import CacheHelper
@@ -26,24 +26,39 @@ class OrderService:
         return True, "", product_map
 
     @staticmethod
-    def validate_color(color_id: int, product: Product) -> Tuple[bool, str]:
-        if not Color.objects.filter(id=color_id).exists():
-            return False, "존재하지 않는 색상입니다."
+    def _validate_option(
+        option_id: int,
+        product: Product,
+        model: type[Model],
+        product_relation_name: str,
+        option_name: str,
+    ) -> Tuple[bool, str]:
+        if not model.objects.filter(id=option_id).exists():
+            return False, f"존재하지 않는 {option_name}입니다."
 
-        if not product.colors.filter(id=color_id).exists():
-            return False, f"'{product.name}' 상품에 선택하신 색상이 존재하지 않습니다."
+        product_relation = getattr(product, product_relation_name)
+        if not product_relation.filter(id=option_id).exists():
+            return False, f"'{product.name}' 상품에 선택하신 {option_name}가 존재하지 않습니다."
 
         return True, ""
 
     @staticmethod
+    def validate_color(color_id: int, product: Product) -> Tuple[bool, str]:
+        return OrderService._validate_option(color_id, product, Color, "colors", "색상")
+
+    @staticmethod
     def validate_size(size_id: int, product: Product) -> Tuple[bool, str]:
-        if not Size.objects.filter(id=size_id).exists():
-            return False, "존재하지 않는 사이즈입니다."
+        return OrderService._validate_option(size_id, product, Size, "sizes", "사이즈")
 
-        if not product.sizes.filter(id=size_id).exists():
-            return False, f"'{product.name}' 상품에 선택하신 사이즈가 존재하지 않습니다."
-
-        return True, ""
+    @staticmethod
+    def get_options_map(
+        items: List[Dict[str, Any]], option_key: str, model: type[Model]
+    ) -> Dict[int, Model]:
+        """주문 항목에서 특정 옵션 ID 목록을 추출하고, 해당 모델 인스턴스의 id -> 인스턴스 맵을 반환"""
+        option_ids = [item[option_key] for item in items if item.get(option_key)]
+        if not option_ids:
+            return {}
+        return {obj.id: obj for obj in model.objects.filter(id__in=option_ids)}
 
     @staticmethod
     def calculate_item_price(product: Product) -> Decimal:

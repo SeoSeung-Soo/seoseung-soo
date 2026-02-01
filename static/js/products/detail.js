@@ -378,20 +378,29 @@ function updateDrawerQuantity() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const colorOptionBtns = document.querySelectorAll('.color-option-btn');
-    const hiddenColorInput = document.getElementById('selectedColorId');
-    colorOptionBtns.forEach(btn => {
+function setupOptionButtons(btnSelector, inputId, datasetKey) {
+    const buttons = document.querySelectorAll(btnSelector);
+    const input = document.getElementById(inputId);
+    if (!buttons.length || !input) return;
+
+    buttons.forEach(btn => {
         btn.addEventListener('click', function() {
-            colorOptionBtns.forEach(b => b.classList.remove('active'));
+            buttons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            const selectedColor = this.dataset.color;
-            if (hiddenColorInput) {
-                hiddenColorInput.value = selectedColor || '';
+            const value = this.dataset[datasetKey];
+            if (value) {
+                input.value = value;
             }
         });
     });
-    
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupOptionButtons('.color-option-btn', 'selectedColorId', 'color');
+    setupOptionButtons('.drawer-color-option-btn', 'drawerSelectedColorId', 'color');
+    setupOptionButtons('.size-btn', 'selectedSizeId', 'sizeId');
+    setupOptionButtons('.drawer-size-btn', 'drawerSelectedSizeId', 'sizeId');
+
     const mobileFabBtn = document.getElementById('mobileFabBtn');
     const drawerOverlay = document.getElementById('drawerOverlay');
     const drawerClose = document.getElementById('drawerClose');
@@ -407,46 +416,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (drawerClose) {
         drawerClose.addEventListener('click', closeMobileDrawer);
     }
-    
-    const drawerSizeBtns = document.querySelectorAll('.drawer-size-btn');
-    const drawerSizeInput = document.getElementById('drawerSelectedSizeId');
-    drawerSizeBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            drawerSizeBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const sizeId = this.dataset.sizeId;
-            if (drawerSizeInput && sizeId) {
-                drawerSizeInput.value = sizeId;
-            }
-        });
-    });
 
-    const sizeBtns = document.querySelectorAll('.size-btn');
-    const sizeInput = document.getElementById('selectedSizeId');
-    sizeBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            sizeBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const sizeId = this.dataset.sizeId;
-            if (sizeInput && sizeId) {
-                sizeInput.value = sizeId;
-            }
-        });
-    });
-    
-    const drawerColorBtns = document.querySelectorAll('.drawer-color-option-btn');
-    const drawerHiddenColorInput = document.getElementById('drawerSelectedColorId');
-    drawerColorBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            drawerColorBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const selectedColor = this.dataset.color;
-            if (drawerHiddenColorInput) {
-                drawerHiddenColorInput.value = selectedColor || '';
-            }
-        });
-    });
-    
     const drawerCartForm = document.querySelector('.drawer-cart-form');
     if (drawerCartForm) {
         drawerCartForm.addEventListener('submit', function(e) {

@@ -48,11 +48,8 @@ class OrderCreateVirtualView(LoginRequiredMixin, View):
                 status="PENDING",
             )
 
-            color_ids = [item["color_id"] for item in validated_items if item.get("color_id")]
-            colors_map = {c.id: c for c in Color.objects.filter(id__in=color_ids)} if color_ids else {}
-
-            size_ids = [item["size_id"] for item in validated_items if item.get("size_id")]
-            sizes_map = {s.id: s for s in Size.objects.filter(id__in=size_ids)} if size_ids else {}
+            colors_map = OrderService.get_options_map(validated_items, "color_id", Color)
+            sizes_map = OrderService.get_options_map(validated_items, "size_id", Size)
 
             order_items = []
             for item in validated_items:
