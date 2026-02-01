@@ -500,17 +500,26 @@ function getCsrfToken() {
 }
 
 function handleImmediatePurchase(isMobileDrawer) {
+    const productIdElement = document.getElementById('buyNowButton');
+    if (!productIdElement) {
+        alert('상품 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    const isAuthenticated = productIdElement.dataset.isAuthenticated === 'true';
+    const loginUrl = productIdElement.dataset.loginUrl || '/login/';
+    if (!isAuthenticated) {
+        const nextUrl = window.location.pathname + window.location.search;
+        window.location.href = `${loginUrl}?next=${encodeURIComponent(nextUrl)}`;
+        return;
+    }
+
     const csrfTokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
     const csrftoken = csrfTokenInput ? csrfTokenInput.value : getCsrfToken();
 
     if (!csrftoken) {
-        window.location.href = '/login/';
-        return;
-    }
-
-    const productIdElement = document.getElementById('buyNowButton');
-    if (!productIdElement) {
-        alert('상품 정보를 찾을 수 없습니다.');
+        const nextUrl = window.location.pathname + window.location.search;
+        window.location.href = `${loginUrl}?next=${encodeURIComponent(nextUrl)}`;
         return;
     }
 
@@ -523,14 +532,24 @@ function handleImmediatePurchase(isMobileDrawer) {
     let quantity = 1;
     let colorId = null;
 
-    const quantityDisplay = document.getElementById(isMobileDrawer ? 'drawerQuantityDisplay' : 'quantityDisplay');
-    if (quantityDisplay) {
-        quantity = parseInt(quantityDisplay.textContent || '1', 10);
-    }
-
-    const hiddenColorInput = document.getElementById(isMobileDrawer ? 'drawerSelectedColorId' : 'selectedColorId');
-    if (hiddenColorInput && hiddenColorInput.value) {
-        colorId = parseInt(hiddenColorInput.value, 10);
+    if (isMobileDrawer) {
+        const drawerQuantityDisplay = document.getElementById('drawerQuantityDisplay');
+        if (drawerQuantityDisplay) {
+            quantity = parseInt(drawerQuantityDisplay.textContent || '1', 10);
+        }
+        const drawerHiddenColorInput = document.getElementById('drawerSelectedColorId');
+        if (drawerHiddenColorInput && drawerHiddenColorInput.value) {
+            colorId = parseInt(drawerHiddenColorInput.value, 10);
+        }
+    } else {
+        const quantityDisplay = document.getElementById('quantityDisplay');
+        if (quantityDisplay) {
+            quantity = parseInt(quantityDisplay.textContent || '1', 10);
+        }
+        const hiddenColorInput = document.getElementById('selectedColorId');
+        if (hiddenColorInput && hiddenColorInput.value) {
+            colorId = parseInt(hiddenColorInput.value, 10);
+        }
     }
 
     const items = [
@@ -551,11 +570,24 @@ function handleImmediatePurchase(isMobileDrawer) {
         body: JSON.stringify({ items }),
     })
         .then(response => {
+            // 로그인 필요로 인해 Django의 LoginRequiredMixin이 리다이렉트한 경우
+            if (response.redirected && response.url.includes('/login')) {
+                window.location.href = response.url;
+                // 이후 체이닝 중단
+                return Promise.reject(new Error('redirect_to_login'));
+            }
+
             if (!response.ok) {
-                return response.json().catch(() => null).then(data => {
-                    const message = data && data.message ? data.message : '주문 처리 중 오류가 발생했습니다.';
-                    throw new Error(message);
-                });
+                return response
+                    .json()
+                    .catch(() => null)
+                    .then(data => {
+                        const message =
+                            data && data.message
+                                ? data.message
+                                : '주문 처리 중 오류가 발생했습니다.';
+                        throw new Error(message);
+                    });
             }
             return response.json();
         })
@@ -572,10 +604,23 @@ function handleImmediatePurchase(isMobileDrawer) {
             }
         })
         .catch(error => {
+            // 로그인 리다이렉트는 이미 처리했으므로 추가 알림 불필요
+            if (error && error.message === 'redirect_to_login') {
+                return;
+            }
+
             if (typeof toast !== 'undefined') {
-                toast.error(error.message || '주문 처리 중 오류가 발생했습니다.', '오류');
+                toast.error(
+                    error && error.message
+                        ? error.message
+                        : '주문 처리 중 오류가 발생했습니다.',
+                    '오류'
+                );
             } else {
-                alert(error.message || '주문 처리 중 오류가 발생했습니다.');
+                alert(
+                    (error && error.message) ||
+                        '주문 처리 중 오류가 발생했습니다.'
+                );
             }
         });
 }

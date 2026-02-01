@@ -83,6 +83,8 @@
                             class="btn btn-primary btn-large"
                             id="buyNowButton"
                             data-product-id="{{ products.id }}"
+                            data-is-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
+                            data-login-url="{% url 'login' %}"
                         >
                             즉시 구매
                         </button>
