@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 
 from users.forms.login import LoginForm
@@ -44,9 +45,14 @@ class LoginView(View):
 
             if user is not None:
                 login(request, user)
-                if next_url:
+                if next_url and url_has_allowed_host_and_scheme(
+                    url=next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure()
+                ):
                     return redirect(next_url)
-                return redirect('home')
+                else:
+                    return redirect('home')
             else:
                 form.add_error(None, '유효하지 않은 사용자명 또는 비밀번호입니다.')
 

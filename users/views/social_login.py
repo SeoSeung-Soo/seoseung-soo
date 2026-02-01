@@ -130,6 +130,12 @@ class NaverCallbackView(View):
         login(request, user)
 
         next_url = request.session.pop("login_next", "/")
+        if not url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure()
+            ):
+            next_url = '/'
         return redirect(next_url)
 
 class AppleLoginView(View):
@@ -165,4 +171,9 @@ class AppleCallbackView(View):
         login(request, user)
 
         next_url = request.session.pop("login_next", "/")
+        if not url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure()):
+            next_url = '/'
         return redirect(next_url)
